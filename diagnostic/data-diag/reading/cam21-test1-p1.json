@@ -1,0 +1,510 @@
+{
+  "title": "IELTS Academic 21 - Test 1 - Passage 1: The Davies Sisters",
+  "answers": {
+    "q1": "mining",
+    "q2": "education",
+    "q3": "notes",
+    "q4": "journals",
+    "q5": "Venice",
+    "q6": "canteen",
+    "q7": "friends",
+    "q8": "TRUE",
+    "q9": "NOT GIVEN",
+    "q10": "FALSE",
+    "q11": "NOT GIVEN",
+    "q12": "TRUE",
+    "q13": "TRUE"
+  },
+  "passageHtml": "<h2>READING PASSAGE 1</h2><h3>The Davies Sisters</h3><p><em>Between 1908 and 1924, Gwendoline and Margaret Davies amassed one of the largest collections of late-nineteenth and early-twentieth-century French paintings in Britain</em></p><p><strong>Paragraph 1.</strong> Gwendoline (1882–1951) and Margaret (1884–1963) Davies were the granddaughters of David Davies, a Welshman who amassed a fortune in the shipping and <span class=\"hl\" id=\"hl-q1\" data-q=\"[Q1]\"><span class=\"kw\">mining</span> industries</span>. In 1907, when Gwendoline came into her inheritance (Margaret would follow in 1909), the sisters were said to be the wealthiest unmarried women in Britain. <span class=\"hl\" id=\"hl-q8\" data-q=\"[Q8]\">Their religious upbringing in rural Wales gave them a deep sense of social responsibility and they chose to use their inheritance for cultural and philanthropic* purposes</span>.</p><p><strong>Paragraph 2.</strong> While there was no real family history of art collecting, <span class=\"hl\" id=\"hl-q2\" data-q=\"[Q2]\">the sisters' <span class=\"kw\">education</span> was rigorously geared toward such pursuits</span>. Their London school focused on cultural rather than academic study, and they travelled extensively with their governess, Jane Blaker, visiting art galleries and <span class=\"hl\" id=\"hl-q3\" data-q=\"[Q3]\">making extensive <span class=\"kw\">notes</span> on the collections there</span>.</p><p><strong>Paragraph 3.</strong> The sisters began to make regular art purchases from 1908, which roughly coincided with the dates of their inheritance. They took advice from various people, including the art dealer Hugh Blaker (the brother of Jane Blaker) and David Croal Thompson, who was also an art dealer. While it was long assumed that these men were largely responsible for the nature of the sisters' collection, it has recently been accepted that Gwendoline and Margaret retained a far more active role in the process.</p><p><strong>Paragraph 4.</strong> <span class=\"hl\" id=\"hl-q4\" data-q=\"[Q4]\">The sisters' <span class=\"kw\">journals</span> reveal their preference for Old Master** paintings</span>. Yet they initially made very few attempts to secure any such works. While the sisters were wealthy in relative terms, their income was nothing compared to the fortunes of American art collectors of this period, such as J. Pierpont Morgan. Quite simply, high quality Old Master works were, if not beyond their means, then beyond what they were willing to pay for them. <span class=\"hl\" id=\"hl-q9\" data-q=\"[Q9]\">Instead, their early purchases were of the fashionable, safe variety, and included, for example, paintings by the French artist Jean-Baptiste-Camille Corot</span>.</p><p><strong>Paragraph 5.</strong> However, it was only a few years before their collecting took a new direction and they turned to the work of the French Impressionists***. <span class=\"hl\" id=\"hl-q10\" data-q=\"[Q10]\">We know that Hugh Blaker, as a champion of contemporary French art had a hand in the decision</span>, and we know also that they would have seen examples on their various trips to Paris. Whatever the precise reason for this change, <span class=\"hl\" id=\"hl-q5\" data-q=\"[Q5]\">their first purchases of Impressionist art, made in October 1912, were scenes of <span class=\"kw\">Venice</span> by the French artist Claude Monet</span>. Over the next 12 years, the sisters amassed the bulk of their Impressionist collection, including six further works by Monet, two more by Manet, and three by Renoir, including his well-known painting La Parisienne.</p><p><strong>Paragraph 6.</strong> The First World War (1914–1918) played a part in the development of the sisters' collection. Their initial response to the war effort was to finance the safe passage of artists from occupied Belgium to Wales, as a humanitarian act, but also with the hope of establishing a vibrant artists' community in the area. Later in the conflict, <span class=\"hl\" id=\"hl-q6\" data-q=\"[Q6]\">both sisters decided to volunteer at a <span class=\"kw\">canteen</span> for troops at Troyes, in northern France</span>; Gwendoline in 1916, followed by Margaret in 1917.</p><p><strong>Paragraph 7.</strong> It was tedious and distressing work, which would have a permanent effect on Gwendoline's health. Yet on one of numerous trips to nearby Paris, she visited the Bernheim-Jeune Gallery. Here she acquired two works by Cézanne – Provençal Landscape and The François Zola Dam. <span class=\"hl\" id=\"hl-q11\" data-q=\"[Q11]\">The paintings were shipped directly to Bath, England, where they became the first works by Cézanne to go on display in a public gallery in Britain</span>.</p><p><strong>Paragraph 8.</strong> Commentators have often described the sisters as unlikely pioneer collectors. <span class=\"hl\" id=\"hl-q7\" data-q=\"[Q7]\">Much is made of their isolation in rural Wales and the fact that they didn't make <span class=\"kw\">friends</span> with artists or gallery owners</span>. Yet they didn't feel obliged to follow fashionable tastes and were free to pursue their own preferences. Although they relied on a trusted circle of advisers, they made frequent trips to London and Paris, and also regularly had paintings sent to their home for consideration.</p><p><strong>Paragraph 9.</strong> <span class=\"hl\" id=\"hl-q12\" data-q=\"[Q12]\">By the early 1920s, Gwendoline felt increasingly uncomfortable buying art works when faced with the poverty and social upheaval created by the First World War</span>. Her philanthropic pursuits then became focused almost exclusively on social causes and the development of the sisters' home at Gregynog Hall into a conference center and venue for the Gregynog Festival of Music and Poetry. Gwendoline made her final art purchase in March 1926. Margaret also stopped collecting around this time, but started again in the 1930s acquiring, on a relatively small scale, work by contemporary British artists.</p><p><strong>Paragraph 10.</strong> <span class=\"hl\" id=\"hl-q13\" data-q=\"[Q13]\">The sisters collected French Impressionist paintings at a time when such art was routinely ignored by individuals and institutions alike</span>. The Gwendoline and Margaret Davies collection, donated in 1951 and 1963 respectively to the National Museum Wales, contains major examples of work by leading French Impressionists. In collecting paintings that they loved, the sisters created a lasting and meaningful cultural legacy for the people of Wales and beyond.</p><p><em>* philanthropic: seeking to promote the welfare of others, often by charitable funding<br>** Old Master: a highly respected artist of great skill who worked in Europe before about 1800<br>*** Impressionist: an artist with a style of painting that developed in France in the late 1800s by Renoir, including his well-known painting La Parisienne</em></p>",
+  "groups": [
+    {
+      "id": "g1",
+      "type": "notes",
+      "title": "Questions 1-7",
+      "instructions": "<i>Complete the notes below.<br>Choose <b>ONE WORD ONLY</b> from the passage for each answer.<br>Write your answers in boxes 1-7 on your answer sheet.</i>",
+      "noteTitle": "Gwendoline and Margaret Davies",
+      "questionIds": ["q1", "q2", "q3", "q4", "q5", "q6", "q7"],
+      "template": "<p><b>Family and early life</b></p><ul><li style=\"margin-bottom: 12px;\">their grandfather's wealth came from <b>1.</b> {{q1}} and transportation businesses</li><li style=\"margin-bottom: 12px;\">their upbringing gave them a sense of social responsibility</li><li style=\"margin-bottom: 12px;\">their <b>2.</b> {{q2}} was designed to give them an interest in activities such as collecting art</li><li style=\"margin-bottom: 12px;\">their governess took them on trips to art galleries</li><li style=\"margin-bottom: 12px;\">they took lengthy <b>3.</b> {{q3}} about the things they saw in art galleries</li></ul><p><b>The sisters as art collectors</b></p><ul><li style=\"margin-bottom: 12px;\">their <b>4.</b> {{q4}} showed they liked Old Master paintings, but they were expensive to buy</li><li style=\"margin-bottom: 12px;\">their early purchases were safe, popular paintings</li><li style=\"margin-bottom: 12px;\">the first Impressionist paintings they bought showed places in <b>5.</b> {{q5}}</li></ul><p><b>Impact of First World War</b></p><ul><li style=\"margin-bottom: 12px;\">they helped bring artists from Belgium to Wales</li><li style=\"margin-bottom: 12px;\">they worked in a <b>6.</b> {{q6}} for soldiers in France</li></ul><p><b>Opinions about the sisters as art collectors</b></p><ul><li style=\"margin-bottom: 12px;\">were not considered typical collectors – they lived in isolation in the countryside and did not have any <b>7.</b> {{q7}} who were artists</li></ul>"
+    },
+    {
+      "id": "g2",
+      "type": "tfng",
+      "title": "Questions 8-13",
+      "instructions": "<i>Do the following statements agree with the information given in Reading Passage 1?<br>In boxes 8-13 on your answer sheet, write:<br><b>TRUE</b> if the statement agrees with the information<br><b>FALSE</b> if the statement contradicts the information<br><b>NOT GIVEN</b> if there is no information on this</i>",
+      "questionIds": ["q8", "q9", "q10", "q11", "q12", "q13"]
+    }
+  ],
+  "questions": {
+    "q1": {
+      "num": 1,
+      "finalAnswer": "mining",
+      "inputWidth": "110px",
+      "highlightId": "hl-q1",
+      "socratic": {
+        "steps": [
+          {
+            "title": "Xác định từ cần điền",
+            "question": "Câu 1 nói sự giàu có của người ông đến từ ngành vận tải ('transportation businesses') và ngành gì ('came from 1 ______ and transportation')?",
+            "guide": "Sau giới từ 'from' cần một danh từ chỉ ngành nghề kinh doanh mang lại khối tài sản cho người ông.",
+            "bridge": "Mình cùng đọc câu đầu tiên của Paragraph 1 nhé."
+          },
+          {
+            "title": "Tìm câu chứa thông tin",
+            "question": "Paragraph 1 nói ông David Davies làm giàu từ những ngành công nghiệp nào?",
+            "guide": "Paragraph 1 viết: '...granddaughters of David Davies, a Welshman who amassed a fortune in the shipping and mining industries.' (cháu gái của David Davies, người đã tích lũy tài sản từ ngành vận tải biển và ngành khai mỏ).",
+            "bridge": "'shipping' tương đương với 'transportation businesses', vậy ngành còn lại là gì?"
+          },
+          {
+            "title": "Chọn từ nguyên văn",
+            "question": "Từ 1 chữ duy nhất chỉ ngành còn lại là gì?",
+            "guide": "Đáp án là 'mining' (ngành khai thác mỏ).",
+            "bridge": "Chốt câu 1: mining."
+          }
+        ]
+      },
+      "explanation": {
+        "steps": [
+          "<b>Vị trí ngữ pháp:</b> Cần danh từ chỉ ngành nghề kinh doanh đi đôi với <i>transportation</i>.",
+          "<b>Paragraph 1 (dòng 2-3):</b> <i>'...amassed a fortune in the shipping and mining industries.'</i>",
+          "<b>Khớp từ:</b> <i>transportation</i> = <i>shipping</i>; ngành nghề còn lại là <i>mining</i>.",
+          "<b>Từ cần điền:</b> <b>mining</b>."
+        ]
+      }
+    },
+    "q2": {
+      "num": 2,
+      "finalAnswer": "education",
+      "inputWidth": "120px",
+      "highlightId": "hl-q2",
+      "socratic": {
+        "steps": [
+          {
+            "title": "Xác định từ cần điền",
+            "question": "Câu 2 nói điều gì của hai chị em ('their 2 ______') đã được thiết kế nhằm giúp họ có hứng thú với việc sưu tầm nghệ thuật?",
+            "guide": "Sau tính từ sở hữu 'their' cần một danh từ chỉ quá trình học tập hoặc nuôi dưỡng của hai chị em.",
+            "bridge": "Hãy đọc câu đầu tiên của Paragraph 2."
+          },
+          {
+            "title": "Tìm câu chứa thông tin",
+            "question": "Paragraph 2 nói cái gì của hai chị em được định hướng kỹ lưỡng cho những đam mê nghệ thuật này?",
+            "guide": "Paragraph 2 viết: 'the sisters' education was rigorously geared toward such pursuits.' (nền giáo dục của hai chị em được định hướng kỹ lưỡng cho những mục tiêu theo đuổi như vậy).",
+            "bridge": "'geared toward such pursuits' chính là được thiết kế để tạo hứng thú với nghệ thuật.",
+            "answer": "education"
+          },
+          {
+            "title": "Chọn từ nguyên văn",
+            "question": "Từ danh từ cần điền là gì?",
+            "guide": "Đáp án là 'education' (nền giáo dục / việc học hành).",
+            "bridge": "Chốt câu 2: education."
+          }
+        ]
+      },
+      "explanation": {
+        "steps": [
+          "<b>Vị trí ngữ pháp:</b> Cần danh từ sau <i>their</i>.",
+          "<b>Paragraph 2 (dòng 1-2):</b> <i>'...the sisters' education was rigorously geared toward such pursuits.'</i>",
+          "<b>Khớp từ:</b> <i>was designed to give them an interest</i> = <i>was rigorously geared toward</i>; từ cần lấy là <i>education</i>.",
+          "<b>Từ cần điền:</b> <b>education</b>."
+        ]
+      }
+    },
+    "q3": {
+      "num": 3,
+      "finalAnswer": "notes",
+      "inputWidth": "100px",
+      "highlightId": "hl-q3",
+      "socratic": {
+        "steps": [
+          {
+            "title": "Xác định từ cần điền",
+            "question": "Câu 3 nói hai chị em đã ghi chép rất dài ('took lengthy 3 ______') về những thứ họ nhìn thấy ở phòng trưng bày tranh?",
+            "guide": "Sau tính từ 'lengthy' cần một danh từ số nhiều chỉ các ghi chép, sổ tay ghi lại những điều họ quan sát được.",
+            "bridge": "Cùng đọc câu thứ hai của Paragraph 2 nhé."
+          },
+          {
+            "title": "Tìm câu chứa thông tin",
+            "question": "Paragraph 2 nói khi đi thăm các phòng trưng bày nghệ thuật, hai chị em đã làm gì?",
+            "guide": "Paragraph 2 viết: '...visiting art galleries and making extensive notes on the collections there.' (đi thăm các phòng tranh và ghi chép rất chi tiết về các bộ sưu tập ở đó).",
+            "bridge": "'lengthy' đồng nghĩa với 'extensive' (dài, chi tiết). Vậy từ đi liền sau là gì?"
+          },
+          {
+            "title": "Chọn từ nguyên văn",
+            "question": "Từ danh từ số nhiều trong bài là gì?",
+            "guide": "Đáp án là 'notes' (các ghi chép).",
+            "bridge": "Chốt câu 3: notes."
+          }
+        ]
+      },
+      "explanation": {
+        "steps": [
+          "<b>Vị trí ngữ pháp:</b> Cần danh từ sau tính từ <i>lengthy</i>.",
+          "<b>Paragraph 2 (câu cuối):</b> <i>'...visiting art galleries and making extensive notes on the collections there.'</i>",
+          "<b>Khớp từ:</b> <i>took lengthy</i> = <i>making extensive</i>; từ cần lấy là <i>notes</i>.",
+          "<b>Từ cần điền:</b> <b>notes</b>."
+        ]
+      }
+    },
+    "q4": {
+      "num": 4,
+      "finalAnswer": "journals",
+      "inputWidth": "110px",
+      "highlightId": "hl-q4",
+      "socratic": {
+        "steps": [
+          {
+            "title": "Xác định từ cần điền",
+            "question": "Câu 4 nói thứ gì của hai chị em ('their 4 ______') cho thấy họ rất thích tranh của các bậc thầy cổ điển (Old Master paintings)?",
+            "guide": "Sau 'their' cần một danh từ chỉ tài liệu hoặc nhật ký cá nhân nơi họ bày tỏ sở thích của mình.",
+            "bridge": "Hãy tìm cụm từ 'Old Master' ở câu đầu Paragraph 4."
+          },
+          {
+            "title": "Tìm câu chứa thông tin",
+            "question": "Paragraph 4 nói tài liệu nào tiết lộ sở thích của hai chị em?",
+            "guide": "Paragraph 4 viết: 'The sisters' journals reveal their preference for Old Master** paintings.' (Những cuốn nhật ký của hai chị em tiết lộ sở thích của họ đối với tranh của các bậc thầy cổ điển).",
+            "bridge": "'reveal their preference' chính là cho thấy họ thích. Tài liệu đó là gì?"
+          },
+          {
+            "title": "Chọn từ nguyên văn",
+            "question": "Từ danh từ số nhiều trong bài là gì?",
+            "guide": "Đáp án là 'journals' (nhật ký cá nhân).",
+            "bridge": "Chốt câu 4: journals."
+          }
+        ]
+      },
+      "explanation": {
+        "steps": [
+          "<b>Vị trí ngữ pháp:</b> Cần danh từ sau <i>their</i>.",
+          "<b>Paragraph 4 (câu đầu):</b> <i>'The sisters' journals reveal their preference for Old Master** paintings.'</i>",
+          "<b>Khớp từ:</b> <i>showed they liked</i> = <i>reveal their preference for</i>; từ cần lấy là <i>journals</i>.",
+          "<b>Từ cần điền:</b> <b>journals</b>."
+        ]
+      }
+    },
+    "q5": {
+      "num": 5,
+      "finalAnswer": "Venice",
+      "inputWidth": "100px",
+      "highlightId": "hl-q5",
+      "socratic": {
+        "steps": [
+          {
+            "title": "Xác định từ cần điền",
+            "question": "Câu 5 nói những bức tranh Ấn tượng đầu tiên họ mua thể hiện các địa danh ở đâu ('showed places in 5 ______')?",
+            "guide": "Sau giới từ 'in' cần một danh từ riêng chỉ tên một địa danh hoặc thành phố nổi tiếng.",
+            "bridge": "Hãy tìm cụm 'first purchases of Impressionist art' ở Paragraph 5."
+          },
+          {
+            "title": "Tìm câu chứa thông tin",
+            "question": "Paragraph 5 nói những bức tranh đầu tiên họ mua của họa sĩ Claude Monet vẽ cảnh ở đâu?",
+            "guide": "Paragraph 5 viết: '...their first purchases of Impressionist art, made in October 1912, were scenes of Venice by the French artist Claude Monet.' (vẽ cảnh thành phố Venice).",
+            "bridge": "'scenes of Venice' chính là những khung cảnh ở Venice.",
+            "answer": "Venice"
+          },
+          {
+            "title": "Chọn từ nguyên văn",
+            "question": "Tên địa danh đó là gì?",
+            "guide": "Đáp án là 'Venice'.",
+            "bridge": "Chốt câu 5: Venice."
+          }
+        ]
+      },
+      "explanation": {
+        "steps": [
+          "<b>Vị trí ngữ pháp:</b> Cần danh từ riêng chỉ địa danh sau giới từ <i>in</i>.",
+          "<b>Paragraph 5 (dòng 5):</b> <i>'...their first purchases of Impressionist art, made in October 1912, were scenes of Venice by the French artist Claude Monet.'</i>",
+          "<b>Khớp từ:</b> <i>showed places in</i> = <i>scenes of</i>.",
+          "<b>Từ cần điền:</b> <b>Venice</b>."
+        ]
+      }
+    },
+    "q6": {
+      "num": 6,
+      "finalAnswer": "canteen",
+      "inputWidth": "110px",
+      "highlightId": "hl-q6",
+      "socratic": {
+        "steps": [
+          {
+            "title": "Xác định từ cần điền",
+            "question": "Câu 6 nói trong Thế chiến 1, hai chị em đã làm việc ở đâu ('worked in a 6 ______') để phục vụ binh lính tại Pháp?",
+            "guide": "Sau 'worked in a' cần một danh từ chỉ nơi chốn, khu nhà ăn hay cơ sở phục vụ quân đội.",
+            "bridge": "Hãy tìm mốc thời gian Thế chiến 1 ('First World War') ở Paragraph 6."
+          },
+          {
+            "title": "Tìm câu chứa thông tin",
+            "question": "Paragraph 6 nói hai chị em đã tình nguyện làm việc ở đâu tại thị trấn Troyes miền bắc nước Pháp?",
+            "guide": "Paragraph 6 viết: '...both sisters decided to volunteer at a canteen for troops at Troyes, in northern France...' (hai chị em quyết định làm tình nguyện tại một căng-tin phục vụ quân đội).",
+            "bridge": "'troops' chính là binh lính ('soldiers'). Nơi họ làm việc là gì?"
+          },
+          {
+            "title": "Chọn từ nguyên văn",
+            "question": "Từ danh từ chỉ nơi làm việc đó là gì?",
+            "guide": "Đáp án là 'canteen' (căng-tin / nhà ăn quân đội).",
+            "bridge": "Chốt câu 6: canteen."
+          }
+        ]
+      },
+      "explanation": {
+        "steps": [
+          "<b>Vị trí ngữ pháp:</b> Cần danh từ sau mạo từ <i>a</i>.",
+          "<b>Paragraph 6 (câu cuối):</b> <i>'...both sisters decided to volunteer at a canteen for troops at Troyes, in northern France...'</i>",
+          "<b>Khớp từ:</b> <i>soldiers</i> = <i>troops</i>; <i>worked in a</i> = <i>volunteer at a</i>; từ cần lấy là <i>canteen</i>.",
+          "<b>Từ cần điền:</b> <b>canteen</b>."
+        ]
+      }
+    },
+    "q7": {
+      "num": 7,
+      "finalAnswer": "friends",
+      "inputWidth": "100px",
+      "highlightId": "hl-q7",
+      "socratic": {
+        "steps": [
+          {
+            "title": "Xác định từ cần điền",
+            "question": "Câu 7 nói hai chị em sống cách biệt ở vùng quê và không có bất kỳ người nào ('did not have any 7 ______') là nghệ sĩ?",
+            "guide": "Sau từ 'any' cần một danh từ chỉ người (bạn bè, người quen) có quan hệ với hai chị em.",
+            "bridge": "Hãy đọc Paragraph 8 nơi người ta đưa ra nhận xét về lối sống của hai chị em."
+          },
+          {
+            "title": "Tìm câu chứa thông tin",
+            "question": "Paragraph 8 nói hai chị em sống tách biệt ở vùng nông thôn xứ Wales và không làm điều gì với các nghệ sĩ?",
+            "guide": "Paragraph 8 viết: '...and the fact that they didn't make friends with artists or gallery owners.' (và thực tế là họ không kết bạn với bất kỳ nghệ sĩ hay chủ phòng tranh nào).",
+            "bridge": "'didn't make friends with' chính là không có bất kỳ người bạn nào (friends) là nghệ sĩ.",
+            "answer": "friends"
+          },
+          {
+            "title": "Chọn từ nguyên văn",
+            "question": "Từ danh từ số nhiều cần điền là gì?",
+            "guide": "Đáp án là 'friends' (những người bạn).",
+            "bridge": "Hoàn thành phần điền từ! Chốt câu 7: friends."
+          }
+        ]
+      },
+      "explanation": {
+        "steps": [
+          "<b>Vị trí ngữ pháp:</b> Cần danh từ sau <i>any</i>.",
+          "<b>Paragraph 8 (dòng 2-3):</b> <i>'...and the fact that they didn't make friends with artists or gallery owners.'</i>",
+          "<b>Khớp từ:</b> <i>did not have any friends who were artists</i> = <i>didn't make friends with artists</i>.",
+          "<b>Từ cần điền:</b> <b>friends</b>."
+        ]
+      }
+    },
+    "q8": {
+      "num": 8,
+      "text": "The Davies sisters' childhood influenced the way they decided to use their wealth.",
+      "finalAnswer": "TRUE",
+      "highlightId": "hl-q8",
+      "socratic": {
+        "steps": [
+          {
+            "title": "Hiểu nội dung nhận định",
+            "question": "Câu 8 nói gì? Thời thơ ấu của hai chị em nhà Davies ('childhood') đã ảnh hưởng đến cách họ quyết định sử dụng khối tài sản của mình ('use their wealth').",
+            "guide": "Em hãy đọc lại phần cuối Paragraph 1 xem sự nuôi dạy từ nhỏ có tác động đến việc dùng tiền của họ không.",
+            "bridge": "Cùng đọc câu cuối Paragraph 1 nhé."
+          },
+          {
+            "title": "Đối chiếu với bài đọc",
+            "question": "Paragraph 1 nói sự nuôi dưỡng thời thơ ấu tại vùng quê xứ Wales đã mang lại cho họ điều gì?",
+            "guide": "Paragraph 1 viết: 'Their religious upbringing in rural Wales gave them a deep sense of social responsibility and they chose to use their inheritance for cultural and philanthropic* purposes.' (Sự nuôi dưỡng mang tính tôn giáo ở vùng quê đã trao cho họ ý thức trách nhiệm xã hội sâu sắc và họ chọn dùng tài sản thừa kế cho mục đích văn hóa và từ thiện).",
+            "bridge": "'religious upbringing' chính là thời thơ ấu (childhood); việc này định hình cách họ chọn dùng tài sản thừa kế (use their inheritance/wealth)."
+          },
+          {
+            "title": "Đưa ra kết luận",
+            "question": "Thông tin bài đọc có trùng khớp hoàn toàn với nhận định không?",
+            "guide": "Thông tin trùng khớp 100%, chọn TRUE.",
+            "bridge": "Chốt câu 8: TRUE."
+          }
+        ]
+      },
+      "explanation": {
+        "steps": [
+          "<b>Ý nhận định:</b> Thời thơ ấu của chị em Davies đã ảnh hưởng đến cách họ sử dụng tài sản.",
+          "<b>Paragraph 1 (câu cuối):</b> <i>'Their religious upbringing in rural Wales gave them a deep sense of social responsibility and they chose to use their inheritance for cultural and philanthropic purposes.'</i>",
+          "<b>Khớp từ:</b> <i>childhood</i> = <i>upbringing</i>; <i>the way they decided to use their wealth</i> = <i>they chose to use their inheritance for...</i>",
+          "<b>Kết luận:</b> Chọn <b>TRUE</b>."
+        ]
+      }
+    },
+    "q9": {
+      "num": 9,
+      "text": "The Jean-Baptiste-Camille Corot paintings in the Davies sisters' collection were purchased from a gallery in France.",
+      "finalAnswer": "NOT GIVEN",
+      "highlightId": "hl-q9",
+      "socratic": {
+        "steps": [
+          {
+            "title": "Phân tích từ khóa câu hỏi",
+            "question": "Câu 9 nói gì? Những bức tranh của họa sĩ Jean-Baptiste-Camille Corot trong bộ sưu tập đã được mua từ một phòng tranh ở Pháp ('from a gallery in France').",
+            "guide": "Em cần kiểm tra xem bài đọc có nói rõ tranh của họa sĩ này được mua ở đâu hay không.",
+            "bridge": "Hãy tìm tên họa sĩ Corot ở cuối Paragraph 4."
+          },
+          {
+            "title": "Đối chiếu với bài đọc",
+            "question": "Paragraph 4 viết gì về những bức tranh của họa sĩ Corot?",
+            "guide": "Paragraph 4 viết: '...their early purchases were of the fashionable, safe variety, and included, for example, paintings by the French artist Jean-Baptiste-Camille Corot.' (những bức tranh mua thuở đầu thuộc loại an toàn và hợp thời, ví dụ như tranh của họa sĩ người Pháp Jean-Baptiste-Camille Corot).",
+            "bridge": "Bài chỉ nói Corot là họa sĩ người Pháp, có nói họ mua tranh này tại một phòng tranh ở Pháp không?"
+          },
+          {
+            "title": "Đưa ra kết luận",
+            "question": "Bài không nhắc đến địa điểm hay phòng tranh nơi họ mua các bức tranh này. Vậy ta chọn đáp án gì?",
+            "guide": "Thiếu thông tin nên chọn NOT GIVEN.",
+            "bridge": "Chốt câu 9: NOT GIVEN."
+          }
+        ]
+      },
+      "explanation": {
+        "steps": [
+          "<b>Ý nhận định:</b> Các bức tranh của Corot được mua từ một phòng tranh ở Pháp.",
+          "<b>Paragraph 4 (câu cuối):</b> Bài đọc chỉ giới thiệu Corot là họa sĩ người Pháp (<i>the French artist</i>) và họ mua tranh của ông trong giai đoạn đầu.",
+          "<b>Đối chiếu:</b> Không có thông tin nào cho biết những bức tranh này được mua cụ thể từ một phòng tranh tại Pháp (<i>from a gallery in France</i>).",
+          "<b>Kết luận:</b> Chọn <b>NOT GIVEN</b>."
+        ]
+      }
+    },
+    "q10": {
+      "num": 10,
+      "text": "Hugh Blaker opposed the Davies sisters' decision to buy art by French Impressionists.",
+      "finalAnswer": "FALSE",
+      "highlightId": "hl-q10",
+      "socratic": {
+        "steps": [
+          {
+            "title": "Hiểu nội dung nhận định",
+            "question": "Câu 10 nói gì? Ông Hugh Blaker đã phản đối ('opposed') quyết định mua tranh trường phái Ấn tượng Pháp của hai chị em.",
+            "guide": "Em cần kiểm tra xem Hugh Blaker ủng hộ hay phản đối việc mua tranh Ấn tượng.",
+            "bridge": "Cùng đọc Paragraph 5 nơi nhắc đến vai trò của Hugh Blaker nhé."
+          },
+          {
+            "title": "Đối chiếu với bài đọc",
+            "question": "Paragraph 5 nói Hugh Blaker có vai trò thế nào trong quyết định mua tranh Ấn tượng?",
+            "guide": "Paragraph 5 viết: 'We know that Hugh Blaker, as a champion of contemporary French art had a hand in the decision...' (chúng ta biết rằng Hugh Blaker, với tư cách là người ủng hộ nhiệt thành nghệ thuật Pháp đương đại, đã góp một tay vào quyết định này).",
+            "bridge": "'had a hand in the decision' (góp phần thúc đẩy đưa ra quyết định) trái ngược hoàn toàn với việc phản đối (opposed)."
+          },
+          {
+            "title": "Đưa ra kết luận",
+            "question": "Một bên bảo ông ấy phản đối, một bên chỉ ra ông ấy là người ủng hộ và góp phần thúc đẩy quyết định. Hai ý này ngược nhau, đúng không?",
+            "guide": "Thông tin trái ngược 100%, chọn FALSE.",
+            "bridge": "Chốt câu 10: FALSE."
+          }
+        ]
+      },
+      "explanation": {
+        "steps": [
+          "<b>Ý nhận định:</b> Hugh Blaker phản đối quyết định mua tranh Ấn tượng Pháp của hai chị em.",
+          "<b>Paragraph 5 (dòng 2-3):</b> <i>'We know that Hugh Blaker, as a champion of contemporary French art had a hand in the decision...'</i>",
+          "<b>Đối chiếu:</b> Blaker là người ủng hộ nghệ thuật Pháp (<i>champion</i>) và đã góp phần vào quyết định này (<i>had a hand in the decision</i>). Điều này trái ngược hoàn toàn với từ phản đối (<i>opposed</i>).",
+          "<b>Kết luận:</b> Chọn <b>FALSE</b>."
+        ]
+      }
+    },
+    "q11": {
+      "num": 11,
+      "text": "The exhibition of Cézanne paintings at the Bath gallery was very popular with the public.",
+      "finalAnswer": "NOT GIVEN",
+      "highlightId": "hl-q11",
+      "socratic": {
+        "steps": [
+          {
+            "title": "Phân tích từ khóa câu hỏi",
+            "question": "Câu 11 nói gì? Buổi triển lãm tranh Cézanne ở phòng tranh thành phố Bath đã rất được công chúng yêu thích ('very popular with the public').",
+            "guide": "Em cần tìm xem bài đọc có nói về phản ứng hay mức độ yêu thích của công chúng đối với buổi trưng bày tranh này không.",
+            "bridge": "Hãy đọc câu cuối cùng của Paragraph 7."
+          },
+          {
+            "title": "Đối chiếu với bài đọc",
+            "question": "Paragraph 7 nói gì về hai bức tranh của Cézanne khi được chuyển đến Bath?",
+            "guide": "Bài viết: 'The paintings were shipped directly to Bath, England, where they became the first works by Cézanne to go on display in a public gallery in Britain.' (trở thành những tác phẩm đầu tiên của Cézanne được trưng bày ở một phòng tranh công cộng tại Anh).",
+            "bridge": "Bài có nói buổi trưng bày này có 'rất được công chúng yêu thích' hay không?"
+          },
+          {
+            "title": "Đưa ra kết luận",
+            "question": "Bài chỉ nói tranh được trưng bày ở phòng tranh công cộng, hoàn toàn không nhắc gì đến việc công chúng đón nhận nhiệt tình hay thờ ơ. Vậy chọn đáp án gì?",
+            "guide": "Thiếu thông tin nên chọn NOT GIVEN.",
+            "bridge": "Chốt câu 11: NOT GIVEN."
+          }
+        ]
+      },
+      "explanation": {
+        "steps": [
+          "<b>Ý nhận định:</b> Triển lãm tranh Cézanne ở Bath rất được công chúng ưa chuộng.",
+          "<b>Paragraph 7 (câu cuối):</b> Bài đọc nói những bức tranh này trở thành các tác phẩm đầu tiên của Cézanne được đem trưng bày ở phòng tranh công cộng tại Anh (<i>go on display in a public gallery</i>).",
+          "<b>Đối chiếu:</b> Không có bất kỳ thông tin nào đề cập đến việc triển lãm có đông khách hay được công chúng yêu mến nhiều hay không (<i>very popular with the public</i>).",
+          "<b>Kết luận:</b> Chọn <b>NOT GIVEN</b>."
+        ]
+      }
+    },
+    "q12": {
+      "num": 12,
+      "text": "The impact of the First World War encouraged Gwendoline to reconsider her interest in collecting art.",
+      "finalAnswer": "TRUE",
+      "highlightId": "hl-q12",
+      "socratic": {
+        "steps": [
+          {
+            "title": "Hiểu nội dung nhận định",
+            "question": "Câu 12 nói gì? Tác động của Thế chiến 1 đã thôi thúc Gwendoline suy nghĩ lại ('reconsider') về sở thích sưu tầm nghệ thuật của mình.",
+            "guide": "Em cần tìm xem sau chiến tranh, Gwendoline có thay đổi thái độ đối với việc bỏ tiền mua tranh hay không.",
+            "bridge": "Cùng đọc những câu đầu tiên của Paragraph 9 nhé."
+          },
+          {
+            "title": "Đối chiếu với bài đọc",
+            "question": "Paragraph 9 miêu tả tâm lý của Gwendoline trước hậu quả của Thế chiến 1 ra sao?",
+            "guide": "Paragraph 9 viết: 'By the early 1920s, Gwendoline felt increasingly uncomfortable buying art works when faced with the poverty and social upheaval created by the First World War. Her philanthropic pursuits then became focused almost exclusively on social causes...' (cô cảm thấy ngày càng không thoải mái khi mua các tác phẩm nghệ thuật trước cảnh nghèo đói do chiến tranh gây ra, và chuyển hướng sang các hoạt động xã hội).",
+            "bridge": "Cảm thấy không thoải mái khi mua tranh và dừng lại chính là suy nghĩ lại (reconsider) về việc sưu tầm nghệ thuật."
+          },
+          {
+            "title": "Đưa ra kết luận",
+            "question": "Thông tin bài đọc có trùng khớp hoàn toàn với câu hỏi không?",
+            "guide": "Thông tin hoàn toàn trùng khớp, chọn TRUE.",
+            "bridge": "Chốt câu 12: TRUE."
+          }
+        ]
+      },
+      "explanation": {
+        "steps": [
+          "<b>Ý nhận định:</b> Tác động của Thế chiến 1 đã khiến Gwendoline cân nhắc lại việc sưu tầm nghệ thuật.",
+          "<b>Paragraph 9 (dòng 1-3):</b> <i>'By the early 1920s, Gwendoline felt increasingly uncomfortable buying art works when faced with the poverty and social upheaval created by the First World War. Her philanthropic pursuits then became focused almost exclusively on social causes...'</i>",
+          "<b>Khớp ý:</b> Cảm thấy không thoải mái khi mua tác phẩm nghệ thuật và sau đó dừng mua tranh để làm từ thiện = suy nghĩ lại về sở thích sưu tập tranh (<i>reconsider her interest in collecting art</i>).",
+          "<b>Kết luận:</b> Chọn <b>TRUE</b>."
+        ]
+      }
+    },
+    "q13": {
+      "num": 13,
+      "text": "The Davies sisters bought French Impressionist art during a period when very few people were doing so.",
+      "finalAnswer": "TRUE",
+      "highlightId": "hl-q13",
+      "socratic": {
+        "steps": [
+          {
+            "title": "Hiểu nội dung nhận định",
+            "question": "Câu 13 nói gì? Chị em nhà Davies đã mua tranh Ấn tượng Pháp trong giai đoạn mà rất ít người làm việc đó ('when very few people were doing so').",
+            "guide": "Em hãy đọc câu đầu tiên của Paragraph 10 xem lúc hai chị em sưu tầm tranh thì thái độ của xã hội đối với dòng tranh này như thế nào.",
+            "bridge": "Cùng đọc câu đầu Paragraph 10 nhé."
+          },
+          {
+            "title": "Đối chiếu với bài đọc",
+            "question": "Paragraph 10 nói vào thời điểm hai chị em sưu tầm tranh Ấn tượng Pháp, dòng tranh này bị đối xử ra sao?",
+            "guide": "Paragraph 10 viết: 'The sisters collected French Impressionist paintings at a time when such art was routinely ignored by individuals and institutions alike.' (hai chị em sưu tầm tranh Ấn tượng Pháp vào thời điểm mà dòng nghệ thuật này thường xuyên bị cả cá nhân lẫn các viện bảo tàng ngó lơ).",
+            "bridge": "Bị cả cá nhân lẫn tổ chức ngó lơ (routinely ignored) đồng nghĩa với việc rất ít người mua tranh này (very few people were doing so)."
+          },
+          {
+            "title": "Đưa ra kết luận",
+            "question": "Nhận định này có phản ánh chính xác sự thật trong bài đọc không?",
+            "guide": "Thông tin hoàn toàn chính xác, chọn TRUE.",
+            "bridge": "Hoàn thành toàn bộ Passage 1! Chốt câu 13: TRUE."
+          }
+        ]
+      },
+      "explanation": {
+        "steps": [
+          "<b>Ý nhận định:</b> Chị em Davies mua tranh Ấn tượng Pháp vào thời kỳ mà rất ít người làm như vậy.",
+          "<b>Paragraph 10 (câu đầu):</b> <i>'The sisters collected French Impressionist paintings at a time when such art was routinely ignored by individuals and institutions alike.'</i>",
+          "<b>Khớp từ:</b> <i>routinely ignored by individuals and institutions alike</i> (thường xuyên bị ngó lơ bởi cả cá nhân lẫn tổ chức) = rất hiếm người mua vào lúc đó (<i>very few people were doing so</i>).",
+          "<b>Kết luận:</b> Chọn <b>TRUE</b>."
+        ]
+      }
+    }
+  }
+}
