@@ -1,0 +1,648 @@
+{
+  "title": "IELTS Academic 21 - Test 2 - Passage 3: Artificial Intelligence",
+  "answers": {
+    "q27": "B",
+    "q28": "A",
+    "q29": "C",
+    "q30": "F",
+    "q31": "G",
+    "q32": "I",
+    "q33": "C",
+    "q34": "A",
+    "q35": "D",
+    "q36": "NO",
+    "q37": "NOT GIVEN",
+    "q38": "NO",
+    "q39": "YES",
+    "q40": "B"
+  },
+  "passageHtml": "<h2>READING PASSAGE 3</h2><h3>Artificial Intelligence</h3><p><strong>Paragraph 1.</strong> <span class=\"hl\" id=\"hl-q27\" data-q=\"[Q27]\">In many countries in the West, hysteria about the future of artificial intelligence (AI) is everywhere. There seems to be no shortage of sensationalist news about how AI could cure diseases, accelerate human innovation and improve human creativity. Just looking at the media headlines, you might think that we are already living in a future where AI has infiltrated every aspect of society</span>.</p><p><strong>Paragraph 2.</strong> <span class=\"hl\" id=\"hl-q28\" data-q=\"[Q28]\">While it is undeniable that AI has opened up a wealth of promising opportunities, it has also led to the emergence of a mindset that can be best described as 'AI solutionism'. This is the philosophy that, given enough data, machine learning algorithms can solve all of humanity's problems. But, in fact, instead of supporting AI progress, this mindset actually jeopardises the value of machine intelligence by disregarding important AI safety principles and setting unrealistic expectations about what AI can really do for humanity</span>.</p><p><strong>Paragraph 3.</strong> In only a few years, AI solutionism has made its way from the technology evangelists' mouths in Silicon Valley in California to the minds of government officials and policymakers around the world. The pendulum has swung from the dystopian notion that AI will destroy humanity to the utopian belief that our algorithmic saviour is here.</p><p><strong>Paragraph 4.</strong> <span class=\"hl\" id=\"hl-q29\" data-q=\"[Q29]\">We are now seeing governments pledge support to national AI initiatives and compete in a technological race to dominate the burgeoning machine-learning sector. While many politicians proclaim the transformative effects of the coming 'AI revolution', they fail to realise the complexity around deploying advanced machine learning systems in the real world</span>.</p><p><strong>Paragraph 5.</strong> One of the most promising varieties of AI technologies are neural networks. This form of machine learning is loosely modelled on the neuronal structure of the human brain, but on a much smaller scale. But what many politicians do not understand is that simply adding a neural network to a problem will not automatically mean that you'll find a solution. <span class=\"hl\" id=\"hl-q30\" data-q=\"[Q30]\">Similarly, adding a neural network to a system of government does not mean it will be instantaneously more inclusive or fair</span>.</p><p><strong>Paragraph 6.</strong> AI systems need a lot of data to function, but <span class=\"hl\" id=\"hl-q31\" data-q=\"[Q31]\">the public sector typically does not have the appropriate data infrastructure to support advanced machine learning</span>. Most of the data remains stored in offline archives. The few digitised sources of data that exist tend to be buried in bureaucracy. More often than not, <span class=\"hl\" id=\"hl-q32\" data-q=\"[Q32]\">data is spread across different government departments that each require special permissions to be accessed</span>. Above all, <span class=\"hl\" id=\"hl-q33\" data-q=\"[Q33]\">the public sector typically lacks the human talent with the right technological capabilities to fully reap the benefits of machine intelligence</span>.</p><p><strong>Paragraph 7.</strong> For these reasons, the sensationalism over AI has attracted many critics. <span class=\"hl\" id=\"hl-q36\" data-q=\"[Q36]\">Stuart Russell, a professor of computer science at the University of California, Berkeley, has long advocated a more sensible and realistic approach that focuses on simple everyday applications of AI instead of the hypothetical takeover by super-intelligent robots</span>. <span class=\"hl\" id=\"hl-q37\" data-q=\"[Q37]\">Similarly, Rodney Brooks, professor of robotics at Massachusetts Institute of Technology, writes that 'almost all innovations in robotics and AI take far, far, longer to be really widely deployed than people in the field and outside the field imagine'</span>.</p><p><strong>Paragraph 8.</strong> One of the many difficulties in deploying machine learning systems is that AI is extremely susceptible to adversarial attacks. This means that a malicious AI can target another AI to make it behave in a certain way, such as forcing it to make wrong predictions. Many researchers have warned against the rolling out of AI without appropriate security standards and defence mechanisms. <span class=\"hl\" id=\"hl-q38\" data-q=\"[Q38]\">Still, AI security remains an often overlooked topic when machine learning systems are installed</span>.</p><p><strong>Paragraph 9.</strong> <span class=\"hl\" id=\"hl-q39\" data-q=\"[Q39]\">If we are to reap the benefits and minimise the potential harms of AI, we must start thinking about how machine learning can be meaningfully applied to specific areas of government, business and society. This means we need to have a discussion about AI ethics and the distrust that many people have towards machine learning</span>.</p><p><strong>Paragraph 10.</strong> Most importantly, we need to be aware of the limitations of AI and where people still need to take the lead. Instead of painting an unrealistic picture of the power of AI, it is important to take a step back and separate the actual technological capabilities of AI from fantasy.</p><p><strong>Paragraph 11.</strong> The medical profession has also recognised the drawbacks to AI. <span class=\"hl\" id=\"hl-q34\" data-q=\"[Q34]\">The IBM Watson for Oncology programme was a piece of AI that was meant to help doctors treat cancer. Even though it was developed to deliver the best recommendations, human experts found it hard to trust the machine. As a result, the AI programme was abandoned</span> in most hospitals where it was trialled.</p><p><strong>Paragraph 12.</strong> Similar difficulties arose in the legal domain when algorithms were used in courts in the US to sentence criminals. An algorithm calculated risk assessment scores and advised judges on the sentencing. <span class=\"hl\" id=\"hl-q35\" data-q=\"[Q35]\">The system was found to amplify structural racial discrimination and was later abandoned</span>.</p><p><strong>Paragraph 13.</strong> <span class=\"hl\" id=\"hl-q40\" data-q=\"[Q40]\">There are some crucial lessons here for everyone aiming to boost investments in national AI programmes. These examples demonstrate that there is no AI solution for everything. Using AI simply for the sake of AI may not always be productive or useful, and not every issue is best addressed by applying machine intelligence to it. All solutions come with a cost and not everything that can be automated should be</span>.</p>",
+  "groups": [
+    {
+      "id": "g1",
+      "type": "mcq",
+      "title": "Questions 27-29",
+      "instructions": "<i>Choose the correct letter, <b>A, B, C or D</b>.<br>Write the correct letter in boxes 27-29 on your answer sheet.</i>",
+      "questionIds": ["q27", "q28", "q29"]
+    },
+    {
+      "id": "g2",
+      "type": "summary_options",
+      "title": "Questions 30-35",
+      "instructions": "<i>Complete the summary using the list of words, <b>A-I</b>, below.<br>Write the correct letter, <b>A-I</b>, in boxes 30-35 on your answer sheet.</i><br><br><b>A.</b> reliability<br><b>B.</b> funding<br><b>C.</b> skills<br><b>D.</b> prejudices<br><b>E.</b> computers<br><b>F.</b> equality<br><b>G.</b> framework<br><b>H.</b> confidentiality<br><b>I.</b> approval",
+      "summaryTitle": "AI in government, medicine and the law",
+      "questionIds": ["q30", "q31", "q32", "q33", "q34", "q35"],
+      "template": "<p>Neural networks are a promising area of AI technology for governments. However, many politicians overestimate their capabilities, believing that the mere addition of a neural network will produce solutions and promote <b>30.</b> {{q30}}.</p><p>Most public sector organisations have not set up the necessary <b>31.</b> {{q31}} to manage the huge amount of data required to enable AI to function. Complex bureaucracy is another issue, as each person involved needs <b>32.</b> {{q32}} to access the relevant data, which is often spread across different departments. But the main problem is that few public sector employees have the <b>33.</b> {{q33}} to take full advantage of machine intelligence.</p><p>The medical profession experimented with an AI programme, but their experts had little faith in its <b>34.</b> {{q34}}, and the programme was abandoned. US courts also abandoned the use of algorithms when it was found that these reflected and magnified the existing <b>35.</b> {{q35}} within the legal profession.</p>"
+    },
+    {
+      "id": "g3",
+      "type": "ynng",
+      "title": "Questions 36-39",
+      "instructions": "<i>Do the following statements agree with the claims of the writer in Reading Passage 3?<br>In boxes 36-39 on your answer sheet, write:<br><b>YES</b> if the statement agrees with the claims of the writer<br><b>NO</b> if the statement contradicts the claims of the writer<br><b>NOT GIVEN</b> if it is impossible to say what the writer thinks about this</i>",
+      "questionIds": ["q36", "q37", "q38", "q39"]
+    },
+    {
+      "id": "g4",
+      "type": "mcq",
+      "title": "Question 40",
+      "instructions": "<i>Choose the correct letter, <b>A, B, C or D</b>.<br>Write the correct letter in box 40 on your answer sheet.</i>",
+      "questionIds": ["q40"]
+    }
+  ],
+  "questions": {
+    "q27": {
+      "num": 27,
+      "text": "What is the writer doing in the first paragraph?",
+      "options": [
+        "A. predicting the future impact of AI",
+        "B. describing a public perception of AI",
+        "C. outlining some possible benefits of AI",
+        "D. highlighting the breadth of the influence of AI"
+      ],
+      "finalAnswer": "B",
+      "highlightId": "hl-q27",
+      "socratic": {
+        "steps": [
+          {
+            "title": "Đọc câu hỏi và định vị",
+            "question": "Câu 27 hỏi: Tác giả đang làm gì trong đoạn văn đầu tiên (first paragraph)?",
+            "guide": "Em hãy đọc kỹ các từ mô tả tâm lý và tin tức dư luận ở Đoạn 1.",
+            "bridge": "Cùng xem thái độ của truyền thông và công chúng được tác giả nêu ra như thế nào."
+          },
+          {
+            "title": "Tìm câu dẫn chứng",
+            "question": "Đoạn 1 dùng những từ ngữ nào để tả làn sóng thông tin về AI?",
+            "guide": "Đoạn 1 viết: 'hysteria about the future of artificial intelligence (AI) is everywhere... sensationalist news... you might think that we are already living in a future...'",
+            "bridge": "Sự cuồng loạn (hysteria), tin giật gân (sensationalist news) và suy nghĩ 'bạn có thể ngỡ rằng' mô tả cách nhìn nhận của số đông công chúng."
+          },
+          {
+            "title": "Chọn phương án đúng",
+            "question": "Phương án nào mang ý nghĩa 'miêu tả nhận thức của công chúng về AI'?",
+            "guide": "Đó là phương án B: 'describing a public perception of AI'.",
+            "bridge": "Chốt câu 27: B."
+          }
+        ]
+      },
+      "explanation": {
+        "steps": [
+          "<b>Ý câu hỏi:</b> Tác giả đang làm gì trong đoạn văn thứ nhất?",
+          "<b>Đoạn 1:</b> <i>'hysteria... is everywhere. There seems to be no shortage of sensationalist news... you might think that we are already living in a future...'</i>",
+          "<b>Khớp ý:</b> Tác giả miêu tả tâm lý đám đông và truyền thông thổi phồng về AI = miêu tả cách công chúng cảm nhận (<i>public perception</i>).",
+          "<b>Kết luận:</b> Chọn <b>B</b>."
+        ]
+      }
+    },
+    "q28": {
+      "num": 28,
+      "text": "When discussing AI solutionism in the second paragraph, the writer",
+      "options": [
+        "A. points out a risk involved.",
+        "B. specifies its probable origins.",
+        "C. mentions its chief supporters.",
+        "D. weighs up some pros and cons."
+      ],
+      "finalAnswer": "A",
+      "highlightId": "hl-q28",
+      "socratic": {
+        "steps": [
+          {
+            "title": "Đọc câu hỏi và định vị",
+            "question": "Câu 28 hỏi: Khi bàn về 'AI solutionism' ở đoạn 2, tác giả làm gì?",
+            "guide": "Hãy tìm thuật ngữ 'AI solutionism' ở Đoạn 2 và đọc câu sau liên từ đối lập 'But, in fact...'.",
+            "bridge": "Cùng xem tác giả cảnh báo điều gì về tư duy này nhé."
+          },
+          {
+            "title": "Tìm câu dẫn chứng",
+            "question": "Câu sau chữ 'But, in fact' ở Đoạn 2 cảnh báo điều gì?",
+            "guide": "Đoạn 2 viết: '...this mindset actually jeopardises the value of machine intelligence by disregarding important AI safety principles and setting unrealistic expectations...'",
+            "bridge": "'Jeopardises' mang nghĩa gây nguy hiểm, đe dọa giá trị và bỏ qua các nguyên tắc an toàn."
+          },
+          {
+            "title": "Chọn phương án đúng",
+            "question": "Phương án nào thể hiện việc tác giả chỉ ra mối nguy hiểm / rủi ro đi kèm?",
+            "guide": "Đó là phương án A: 'points out a risk involved'.",
+            "bridge": "Chốt câu 28: A."
+          }
+        ]
+      },
+      "explanation": {
+        "steps": [
+          "<b>Ý câu hỏi:</b> Khi bàn về AI solutionism ở đoạn 2, tác giả làm gì?",
+          "<b>Đoạn 2:</b> <i>'...this mindset actually jeopardises the value of machine intelligence by disregarding important AI safety principles...'</i>",
+          "<b>Khớp ý:</b> <i>jeopardises</i> (đe dọa/gây nguy hiểm) + <i>disregarding safety</i> = chỉ ra rủi ro liên quan (<i>points out a risk involved</i>).",
+          "<b>Kết luận:</b> Chọn <b>A</b>."
+        ]
+      }
+    },
+    "q29": {
+      "num": 29,
+      "text": "In the fourth paragraph, the writer suggests that many politicians may",
+      "options": [
+        "A. have failed to appreciate the true potential of AI initiatives.",
+        "B. have misunderstood the function of the machine-learning sector.",
+        "C. be unaware of the challenges of implementing national AI initiatives.",
+        "D. be too keen to enter the race to dominate the machine-learning sector."
+      ],
+      "finalAnswer": "C",
+      "highlightId": "hl-q29",
+      "socratic": {
+        "steps": [
+          {
+            "title": "Đọc câu hỏi và định vị",
+            "question": "Câu 29 hỏi: Ở đoạn 4, tác giả ngụ ý nhiều chính trị gia có thể như thế nào?",
+            "guide": "Em hãy tìm từ 'politicians' ở Đoạn 4 và đọc vế câu nhận xét về họ.",
+            "bridge": "Cùng xem các chính trị gia đang thiếu sót điều gì khi nói về AI."
+          },
+          {
+            "title": "Tìm câu dẫn chứng",
+            "question": "Đoạn 4 nói các chính trị gia thất bại trong việc nhận thức điều gì?",
+            "guide": "Đoạn 4 viết: 'While many politicians proclaim the transformative effects of the coming 'AI revolution', they fail to realise the complexity around deploying advanced machine learning systems in the real world.'",
+            "bridge": "'fail to realise the complexity' chính là không nhận thức được độ phức tạp và thách thức."
+          },
+          {
+            "title": "Chọn phương án đúng",
+            "question": "Phương án nào đồng nghĩa với việc không ý thức được các thách thức khi triển khai AI?",
+            "guide": "Đó là phương án C: 'be unaware of the challenges of implementing national AI initiatives'.",
+            "bridge": "Chốt câu 29: C."
+          }
+        ]
+      },
+      "explanation": {
+        "steps": [
+          "<b>Ý câu hỏi:</b> Ở đoạn 4, tác giả gợi ý các chính trị gia có thể như thế nào?",
+          "<b>Đoạn 4:</b> <i>'...they fail to realise the complexity around deploying advanced machine learning systems in the real world.'</i>",
+          "<b>Khớp ý:</b> <i>fail to realise</i> = <i>be unaware of</i>; <i>complexity around deploying</i> = <i>challenges of implementing</i>.",
+          "<b>Kết luận:</b> Chọn <b>C</b>."
+        ]
+      }
+    },
+    "q30": {
+      "num": 30,
+      "text": "believing that the mere addition of a neural network will produce solutions and promote 30 .............",
+      "options": [
+        "A. reliability",
+        "B. funding",
+        "C. skills",
+        "D. prejudices",
+        "E. computers",
+        "F. equality",
+        "G. framework",
+        "H. confidentiality",
+        "I. approval"
+      ],
+      "finalAnswer": "F",
+      "highlightId": "hl-q30",
+      "socratic": {
+        "steps": [
+          {
+            "title": "Hiểu nội dung câu tóm tắt",
+            "question": "Câu 30 nói: Nhiều chính trị gia lầm tưởng việc chỉ cần thêm mạng nơ-ron sẽ giải quyết vấn đề và thúc đẩy giá trị gì ('promote 30 ______')?",
+            "guide": "Sau 'promote' cần danh từ chỉ giá trị xã hội tích cực hoặc công bằng.",
+            "bridge": "Tìm câu cuối cùng của Đoạn 5 có nhắc tới 'neural network' và 'system of government'."
+          },
+          {
+            "title": "Đối chiếu với bài đọc",
+            "question": "Câu cuối Đoạn 5 nói việc thêm mạng nơ-ron vào chính quyền không đồng nghĩa với điều gì?",
+            "guide": "Đoạn 5 viết: 'Similarly, adding a neural network to a system of government does not mean it will be instantaneously more inclusive or fair.'",
+            "bridge": "'inclusive or fair' (công bằng, bình đẳng) tương đương với danh từ nào trong bảng từ A-I?"
+          },
+          {
+            "title": "Chọn từ trong khung",
+            "question": "Từ nào trong danh sách A-I đồng nghĩa với sự bình đẳng / công bằng?",
+            "guide": "Đó là F: 'equality'.",
+            "bridge": "Chốt câu 30: F."
+          }
+        ]
+      },
+      "explanation": {
+        "steps": [
+          "<b>Ý tóm tắt:</b> Thúc đẩy sự công bằng/bình đẳng (<i>promote 30 ______</i>).",
+          "<b>Đoạn 5:</b> <i>'...adding a neural network to a system of government does not mean it will be instantaneously more inclusive or fair.'</i>",
+          "<b>Khớp từ:</b> <i>inclusive or fair</i> (hòa nhập và công bằng) = sự bình đẳng (<i>equality</i>).",
+          "<b>Kết luận:</b> Chọn <b>F (equality)</b>."
+        ]
+      }
+    },
+    "q31": {
+      "num": 31,
+      "text": "Most public sector organisations have not set up the necessary 31 ............. to manage the huge amount of data",
+      "options": [
+        "A. reliability",
+        "B. funding",
+        "C. skills",
+        "D. prejudices",
+        "E. computers",
+        "F. equality",
+        "G. framework",
+        "H. confidentiality",
+        "I. approval"
+      ],
+      "finalAnswer": "G",
+      "highlightId": "hl-q31",
+      "socratic": {
+        "steps": [
+          {
+            "title": "Hiểu nội dung câu tóm tắt",
+            "question": "Câu 31 nói: Đa số tổ chức khu vực công chưa thiết lập cái gì cần thiết ('set up the necessary 31 ______') để quản lý khối lượng dữ liệu khổng lồ?",
+            "guide": "Cần danh từ chỉ hạ tầng, khung sườn, hoặc hệ sinh thái để quản lý dữ liệu.",
+            "bridge": "Đọc câu đầu tiên của Đoạn 6."
+          },
+          {
+            "title": "Đối chiếu với bài đọc",
+            "question": "Đoạn 6 nói khu vực công thiếu cái gì về dữ liệu?",
+            "guide": "Đoạn 6 viết: 'the public sector typically does not have the appropriate data infrastructure to support advanced machine learning.'",
+            "bridge": "'data infrastructure' (cơ sở hạ tầng dữ liệu) đồng nghĩa với từ nào trong khung?"
+          },
+          {
+            "title": "Chọn từ trong khung",
+            "question": "Từ nào trong danh sách A-I mang nghĩa là cơ cấu, khung sườn, hạ tầng?",
+            "guide": "Đó là G: 'framework'.",
+            "bridge": "Chốt câu 31: G."
+          }
+        ]
+      },
+      "explanation": {
+        "steps": [
+          "<b>Ý tóm tắt:</b> Thiết lập nền tảng/hạ tầng cần thiết để quản lý dữ liệu.",
+          "<b>Đoạn 6:</b> <i>'...the public sector typically does not have the appropriate data infrastructure...'</i>",
+          "<b>Khớp từ:</b> <i>data infrastructure</i> (cơ sở hạ tầng/khung sườn dữ liệu) = <i>framework</i>.",
+          "<b>Kết luận:</b> Chọn <b>G (framework)</b>."
+        ]
+      }
+    },
+    "q32": {
+      "num": 32,
+      "text": "as each person involved needs 32 ............. to access the relevant data",
+      "options": [
+        "A. reliability",
+        "B. funding",
+        "C. skills",
+        "D. prejudices",
+        "E. computers",
+        "F. equality",
+        "G. framework",
+        "H. confidentiality",
+        "I. approval"
+      ],
+      "finalAnswer": "I",
+      "highlightId": "hl-q32",
+      "socratic": {
+        "steps": [
+          {
+            "title": "Hiểu nội dung câu tóm tắt",
+            "question": "Câu 32 nói: Mỗi người liên quan cần phải có cái gì ('needs 32 ______') để được truy cập dữ liệu?",
+            "guide": "Trong bối cảnh thủ tục rườm rà ở cơ quan nhà nước, muốn truy cập dữ liệu thì phải cần cái gì?",
+            "bridge": "Đọc dòng 4-5 của Đoạn 6."
+          },
+          {
+            "title": "Đối chiếu với bài đọc",
+            "question": "Đoạn 6 nói việc truy cập dữ liệu ở các phòng ban khác nhau đòi hỏi điều gì?",
+            "guide": "Đoạn 6 viết: '...data is spread across different government departments that each require special permissions to be accessed.'",
+            "bridge": "'require special permissions' (đòi hỏi sự cho phép đặc biệt) đồng nghĩa với từ nào trong khung?"
+          },
+          {
+            "title": "Chọn từ trong khung",
+            "question": "Từ nào trong bảng A-I mang nghĩa là sự cho phép, phê chuẩn?",
+            "guide": "Đó là I: 'approval'.",
+            "bridge": "Chốt câu 32: I."
+          }
+        ]
+      },
+      "explanation": {
+        "steps": [
+          "<b>Ý tóm tắt:</b> Cần có sự đồng ý/cho phép để truy cập dữ liệu.",
+          "<b>Đoạn 6:</b> <i>'...departments that each require special permissions to be accessed.'</i>",
+          "<b>Khớp từ:</b> <i>permissions</i> (sự cho phép) = <i>approval</i> (sự phê duyệt / chấp thuận).",
+          "<b>Kết luận:</b> Chọn <b>I (approval)</b>."
+        ]
+      }
+    },
+    "q33": {
+      "num": 33,
+      "text": "few public sector employees have the 33 ............. to take full advantage of machine intelligence.",
+      "options": [
+        "A. reliability",
+        "B. funding",
+        "C. skills",
+        "D. prejudices",
+        "E. computers",
+        "F. equality",
+        "G. framework",
+        "H. confidentiality",
+        "I. approval"
+      ],
+      "finalAnswer": "C",
+      "highlightId": "hl-q33",
+      "socratic": {
+        "steps": [
+          {
+            "title": "Hiểu nội dung câu tóm tắt",
+            "question": "Câu 33 nói: Rất ít nhân viên khu vực công có cái gì ('have the 33 ______') để tận dụng tối đa trí tuệ máy móc?",
+            "guide": "Sau 'have the' cần danh từ chỉ trình độ chuyên môn hoặc năng lực làm việc.",
+            "bridge": "Đọc câu cuối cùng của Đoạn 6."
+          },
+          {
+            "title": "Đối chiếu với bài đọc",
+            "question": "Câu cuối Đoạn 6 nói khu vực công thiếu nhân tài có năng lực gì?",
+            "guide": "Đoạn 6 viết: 'the public sector typically lacks the human talent with the right technological capabilities to fully reap the benefits of machine intelligence.'",
+            "bridge": "'lacks talent with capabilities' = ít người có năng lực / kỹ năng công nghệ."
+          },
+          {
+            "title": "Chọn từ trong khung",
+            "question": "Từ nào trong danh sách A-I đồng nghĩa với năng lực / kỹ năng (capabilities)?",
+            "guide": "Đó là C: 'skills'.",
+            "bridge": "Chốt câu 33: C."
+          }
+        ]
+      },
+      "explanation": {
+        "steps": [
+          "<b>Ý tóm tắt:</b> Ít nhân viên có kỹ năng để tận dụng công nghệ.",
+          "<b>Đoạn 6:</b> <i>'...lacks the human talent with the right technological capabilities...'</i>",
+          "<b>Khớp từ:</b> <i>technological capabilities</i> (năng lực công nghệ) = <i>skills</i> (kỹ năng).",
+          "<b>Kết luận:</b> Chọn <b>C (skills)</b>."
+        ]
+      }
+    },
+    "q34": {
+      "num": 34,
+      "text": "The medical profession experimented with an AI programme, but their experts had little faith in its 34 .............",
+      "options": [
+        "A. reliability",
+        "B. funding",
+        "C. skills",
+        "D. prejudices",
+        "E. computers",
+        "F. equality",
+        "G. framework",
+        "H. confidentiality",
+        "I. approval"
+      ],
+      "finalAnswer": "A",
+      "highlightId": "hl-q34",
+      "socratic": {
+        "steps": [
+          {
+            "title": "Hiểu nội dung câu tóm tắt",
+            "question": "Câu 34 nói: Giới y khoa thử nghiệm phần mềm AI, nhưng các chuyên gia có rất ít niềm tin vào cái gì của nó ('had little faith in its 34 ______')?",
+            "guide": "Sau 'its' cần danh từ chỉ phẩm chất, độ chính xác hoặc độ tin cậy của cỗ máy.",
+            "bridge": "Hãy đọc Đoạn 11 kể về phần mềm IBM Watson điều trị ung thư."
+          },
+          {
+            "title": "Đối chiếu với bài đọc",
+            "question": "Đoạn 11 nói các bác sĩ cảm thấy thế nào về cỗ máy?",
+            "guide": "Đoạn 11 viết: 'Even though it was developed to deliver the best recommendations, human experts found it hard to trust the machine. As a result, the AI programme was abandoned...'",
+            "bridge": "'found it hard to trust' (khó tin tưởng) = 'had little faith in its reliability' (ít tin vào độ tin cậy)."
+          },
+          {
+            "title": "Chọn từ trong khung",
+            "question": "Từ nào trong danh sách A-I đồng nghĩa với độ tin cậy (trust)?",
+            "guide": "Đó là A: 'reliability'.",
+            "bridge": "Chốt câu 34: A."
+          }
+        ]
+      },
+      "explanation": {
+        "steps": [
+          "<b>Ý tóm tắt:</b> Bác sĩ ít tin vào độ tin cậy của phần mềm AI.",
+          "<b>Đoạn 11:</b> <i>'...human experts found it hard to trust the machine. As a result, the AI programme was abandoned...'</i>",
+          "<b>Khớp từ:</b> <i>hard to trust</i> (khó tin tưởng) = <i>little faith in its reliability</i> (ít tin vào độ tin cậy).",
+          "<b>Kết luận:</b> Chọn <b>A (reliability)</b>."
+        ]
+      }
+    },
+    "q35": {
+      "num": 35,
+      "text": "when it was found that these reflected and magnified the existing 35 ............. within the legal profession.",
+      "options": [
+        "A. reliability",
+        "B. funding",
+        "C. skills",
+        "D. prejudices",
+        "E. computers",
+        "F. equality",
+        "G. framework",
+        "H. confidentiality",
+        "I. approval"
+      ],
+      "finalAnswer": "D",
+      "highlightId": "hl-q35",
+      "socratic": {
+        "steps": [
+          {
+            "title": "Hiểu nội dung câu tóm tắt",
+            "question": "Câu 35 nói: Tòa án Mỹ từ bỏ thuật toán khi phát hiện nó phản ánh và khuếch đại cái gì sẵn có ('magnified the existing 35 ______') trong ngành luật?",
+            "guide": "Sau 'existing' cần danh từ chỉ điều tiêu cực, thành kiến hoặc bất công xã hội.",
+            "bridge": "Đọc Đoạn 12 nói về tòa án Mỹ (courts in the US)."
+          },
+          {
+            "title": "Đối chiếu với bài đọc",
+            "question": "Đoạn 12 nói thuật toán đã khuếch đại điều gì trong xã hội?",
+            "guide": "Đoạn 12 viết: 'The system was found to amplify structural racial discrimination and was later abandoned.'",
+            "bridge": "'amplify racial discrimination' (khuếch đại sự phân biệt chủng tộc) tương đương với từ nào chỉ định kiến/thành kiến trong khung?"
+          },
+          {
+            "title": "Chọn từ trong khung",
+            "question": "Từ nào trong danh sách A-I đồng nghĩa với thành kiến, định kiến, phân biệt?",
+            "guide": "Đó là D: 'prejudices'.",
+            "bridge": "Chốt câu 35: D."
+          }
+        ]
+      },
+      "explanation": {
+        "steps": [
+          "<b>Ý tóm tắt:</b> Thuật toán khuếch đại các định kiến/thành kiến sẵn có.",
+          "<b>Đoạn 12:</b> <i>'The system was found to amplify structural racial discrimination and was later abandoned.'</i>",
+          "<b>Khớp từ:</b> <i>racial discrimination</i> (phân biệt chủng tộc) = <i>prejudices</i> (thành kiến/định kiến); <i>amplify</i> = <i>magnified</i>.",
+          "<b>Kết luận:</b> Chọn <b>D (prejudices)</b>."
+        ]
+      }
+    },
+    "q36": {
+      "num": 36,
+      "text": "Stuart Russell's proposals regarding the use of AI are impractical.",
+      "finalAnswer": "NO",
+      "highlightId": "hl-q36",
+      "socratic": {
+        "steps": [
+          {
+            "title": "Hiểu nội dung nhận định",
+            "question": "Câu 36 khẳng định: Các đề xuất của giáo sư Stuart Russell về việc sử dụng AI là phi thực tế ('impractical').",
+            "guide": "Tìm tên riêng 'Stuart Russell' ở Đoạn 7 xem tác giả đánh giá đề xuất của ông ra sao.",
+            "bridge": "Cùng đọc dòng 2-4 của Đoạn 7."
+          },
+          {
+            "title": "Đối chiếu với bài đọc",
+            "question": "Đoạn 7 miêu tả cách tiếp cận của Russell như thế nào?",
+            "guide": "Đoạn 7 viết: 'Stuart Russell... has long advocated a more sensible and realistic approach that focuses on simple everyday applications of AI...'",
+            "bridge": "'realistic' (thực tế) và 'sensible' (hợp lý) đối lập hoàn toàn với 'impractical' (phi thực tế)."
+          },
+          {
+            "title": "Đưa ra kết luận",
+            "question": "Đề bảo đề xuất của ông phi thực tế, bài khen hợp lý và thực tế. Hai thông tin trái ngược 100%, chọn đáp án gì?",
+            "guide": "Chọn NO.",
+            "bridge": "Chốt câu 36: NO."
+          }
+        ]
+      },
+      "explanation": {
+        "steps": [
+          "<b>Ý nhận định:</b> Các đề xuất dùng AI của Stuart Russell là không thực tế (<i>impractical</i>).",
+          "<b>Đoạn 7:</b> <i>'Stuart Russell... has long advocated a more sensible and realistic approach...'</i>",
+          "<b>Đối chiếu:</b> Bài khẳng định đề xuất của Russell là hợp lý và thực tế (<i>sensible and realistic</i>), trái ngược hoàn toàn với <i>impractical</i>.",
+          "<b>Kết luận:</b> Chọn <b>NO</b>."
+        ]
+      }
+    },
+    "q37": {
+      "num": 37,
+      "text": "Rodney Brooks' view has attracted unfair criticism from supporters of AI.",
+      "finalAnswer": "NOT GIVEN",
+      "highlightId": "hl-q37",
+      "socratic": {
+        "steps": [
+          {
+            "title": "Hiểu nội dung nhận định",
+            "question": "Câu 37 nói: Quan điểm của Rodney Brooks đã thu hút sự chỉ trích bất công ('unfair criticism') từ những người ủng hộ AI.",
+            "guide": "Tìm tên riêng 'Rodney Brooks' ở nửa sau Đoạn 7.",
+            "bridge": "Cùng đọc phát biểu của Brooks ở Đoạn 7."
+          },
+          {
+            "title": "Đối chiếu với bài đọc",
+            "question": "Đoạn 7 nói gì về Rodney Brooks và phản ứng của người khác đối với ông?",
+            "guide": "Đoạn 7 viết: 'Similarly, Rodney Brooks... writes that 'almost all innovations in robotics and AI take far, far, longer to be really widely deployed than people... imagine''.",
+            "bridge": "Bài chỉ trích lời Brooks nhận xét rằng AI mất nhiều thời gian phát triển hơn tưởng tượng, có câu nào nói ông 'bị chỉ trích bất công' không?"
+          },
+          {
+            "title": "Đưa ra kết luận",
+            "question": "Bài không hề nhắc đến việc người ủng hộ AI có chỉ trích ông hay không. Ta chọn đáp án gì?",
+            "guide": "Thiếu thông tin nên chọn NOT GIVEN.",
+            "bridge": "Chốt câu 37: NOT GIVEN."
+          }
+        ]
+      },
+      "explanation": {
+        "steps": [
+          "<b>Ý nhận định:</b> Quan điểm của Rodney Brooks bị những người ủng hộ AI chỉ trích bất công.",
+          "<b>Đoạn 7:</b> Bài đọc trích dẫn ý kiến của Rodney Brooks về thời gian ứng dụng AI.",
+          "<b>Đối chiếu:</b> Không có bất kỳ thông tin nào đề cập đến phản ứng hay sự chỉ trích của người khác đối với Rodney Brooks (<i>attracted unfair criticism</i>).",
+          "<b>Kết luận:</b> Chọn <b>NOT GIVEN</b>."
+        ]
+      }
+    },
+    "q38": {
+      "num": 38,
+      "text": "Nowadays, the need to protect AI systems is always taken into account when they are set up.",
+      "finalAnswer": "NO",
+      "highlightId": "hl-q38",
+      "socratic": {
+        "steps": [
+          {
+            "title": "Hiểu nội dung nhận định",
+            "question": "Câu 38 khẳng định: Ngày nay, nhu cầu bảo vệ hệ thống AI LUÔN LUÔN được tính đến ('is always taken into account') khi cài đặt.",
+            "guide": "Chú ý từ tuyệt đối 'always'. Đọc câu cuối của Đoạn 8 nói về bảo mật AI.",
+            "bridge": "Cùng xem vấn đề bảo mật an ninh AI có thực sự luôn được chú ý không."
+          },
+          {
+            "title": "Đối chiếu với bài đọc",
+            "question": "Câu cuối Đoạn 8 nói gì về an ninh AI khi cài đặt hệ thống?",
+            "guide": "Đoạn 8 viết: 'Still, AI security remains an often overlooked topic when machine learning systems are installed.' (An ninh AI vẫn là một chủ đề THƯỜNG BỊ BỎ QUA khi các hệ thống được cài đặt).",
+            "bridge": "'often overlooked' (thường bị bỏ qua/ngó lơ) trái ngược hoàn toàn với 'always taken into account' (luôn được tính đến)."
+          },
+          {
+            "title": "Đưa ra kết luận",
+            "question": "Hai thông tin trái ngược 100%, chọn đáp án gì?",
+            "guide": "Chọn NO.",
+            "bridge": "Chốt câu 38: NO."
+          }
+        ]
+      },
+      "explanation": {
+        "steps": [
+          "<b>Ý nhận định:</b> Việc bảo vệ an ninh AI luôn luôn được tính đến khi cài đặt hệ thống.",
+          "<b>Đoạn 8:</b> <i>'Still, AI security remains an often overlooked topic when machine learning systems are installed.'</i>",
+          "<b>Đối chiếu:</b> Bài đọc nêu rõ an ninh AI thường xuyên bị ngó lơ/bỏ qua (<i>often overlooked</i>), trái ngược trực tiếp với việc luôn được tính đến (<i>always taken into account</i>).",
+          "<b>Kết luận:</b> Chọn <b>NO</b>."
+        ]
+      }
+    },
+    "q39": {
+      "num": 39,
+      "text": "In order to benefit from AI and minimise the harms, we have to explore people's concerns about its use.",
+      "finalAnswer": "YES",
+      "highlightId": "hl-q39",
+      "socratic": {
+        "steps": [
+          {
+            "title": "Hiểu nội dung nhận định",
+            "question": "Câu 39 nói: Để hưởng lợi từ AI và giảm thiểu tác hại, chúng ta phải tìm hiểu/thảo luận những mối lo ngại của con người về việc sử dụng nó.",
+            "guide": "Đọc câu mở đầu của Đoạn 9.",
+            "bridge": "Cùng xem điều kiện để phát triển AI an toàn được tác giả nêu ra là gì."
+          },
+          {
+            "title": "Đối chiếu với bài đọc",
+            "question": "Đoạn 9 nói chúng ta cần làm gì để tối ưu lợi ích và giảm tác hại của AI?",
+            "guide": "Đoạn 9 viết: 'If we are to reap the benefits and minimise the potential harms of AI... This means we need to have a discussion about AI ethics and the distrust that many people have towards machine learning.'",
+            "bridge": "'have a discussion about distrust that people have' (thảo luận về sự thiếu tin tưởng của mọi người) chính là tìm hiểu những quan ngại (explore people's concerns)."
+          },
+          {
+            "title": "Đưa ra kết luận",
+            "question": "Ý kiến của tác giả và câu nhận định có trùng khớp hoàn toàn không?",
+            "guide": "Trùng khớp 100%, chọn YES.",
+            "bridge": "Chốt câu 39: YES."
+          }
+        ]
+      },
+      "explanation": {
+        "steps": [
+          "<b>Ý nhận định:</b> Muốn hưởng lợi và giảm tác hại của AI, ta phải tìm hiểu những mối lo ngại của người dân.",
+          "<b>Đoạn 9:</b> <i>'If we are to reap the benefits and minimise the potential harms of AI... This means we need to have a discussion about AI ethics and the distrust that many people have towards machine learning.'</i>",
+          "<b>Khớp ý:</b> <i>have a discussion about distrust</i> = <i>explore people's concerns</i>.",
+          "<b>Kết luận:</b> Chọn <b>YES</b>."
+        ]
+      }
+    },
+    "q40": {
+      "num": 40,
+      "text": "What would be a suitable subtitle for Reading Passage 3?",
+      "options": [
+        "A. How to make the most of what AI has to offer",
+        "B. Why AI may not be the answer to our problems",
+        "C. Why governments should not invest in AI systems",
+        "D. How AI could improve the efficiency of the public sector"
+      ],
+      "finalAnswer": "B",
+      "highlightId": "hl-q40",
+      "socratic": {
+        "steps": [
+          {
+            "title": "Hiểu yêu cầu câu hỏi",
+            "question": "Câu 40 hỏi: Tiêu đề phụ (subtitle) nào là phù hợp nhất cho toàn bộ bài đọc?",
+            "guide": "Tiêu đề phụ phải tóm gọn thông điệp xuyên suốt toàn bài, được đúc kết rõ nhất ở đoạn kết luận cuối cùng (Đoạn 13).",
+            "bridge": "Đọc 3 câu cuối bài ở Đoạn 13."
+          },
+          {
+            "title": "Tìm thông điệp cốt lõi",
+            "question": "Đoạn 13 đúc kết bài học quan trọng gì về AI?",
+            "guide": "Đoạn 13 viết: 'These examples demonstrate that there is no AI solution for everything. Using AI simply for the sake of AI may not always be productive or useful, and not every issue is best addressed by applying machine intelligence to it.'",
+            "bridge": "'no AI solution for everything' (không có giải pháp AI cho mọi thứ) tóm tắt luận điểm: AI không phải là lời giải cho mọi vấn đề của con người."
+          },
+          {
+            "title": "Chọn phương án đúng",
+            "question": "Phương án nào phản ánh chính xác thông điệp này?",
+            "guide": "Đó là phương án B: 'Why AI may not be the answer to our problems'.",
+            "bridge": "Chốt câu 40: B."
+          }
+        ]
+      },
+      "explanation": {
+        "steps": [
+          "<b>Ý câu hỏi:</b> Tiêu đề phụ phù hợp nhất cho bài đọc là gì?",
+          "<b>Đoạn 13 (kết bài):</b> <i>'These examples demonstrate that there is no AI solution for everything... not every issue is best addressed by applying machine intelligence to it.'</i>",
+          "<b>Khớp ý:</b> Toàn bộ bài viết phản bác quan niệm ảo tưởng 'AI giải quyết được mọi việc' bằng các ví dụ thất bại ở chính phủ, y tế, tòa án -> AI có thể không phải là câu trả lời cho mọi vấn đề (<i>Why AI may not be the answer to our problems</i>).",
+          "<b>Kết luận:</b> Chọn <b>B</b>."
+        ]
+      }
+    }
+  }
+}
