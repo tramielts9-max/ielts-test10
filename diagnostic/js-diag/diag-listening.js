@@ -1,8 +1,8 @@
 /**
  * diagnostic/js-diag/diag-listening.js
- * BỘ ĐIỀU KHIỂN LISTENING KHẢO THÍ CHUYÊN BIỆT (TEST 1, 2, 3)
- * BẢN FULL ĐẦY ĐỦ 100% - CHUYỂN PART TỰ ĐỘNG NHẢY GIÂY STARTTIME,
- * NÚT NGHE TỪNG CÂU, KÉO THẢ MATCHING, BẢN ĐỒ MAP LABELLING, ĐIỀN TỪ & REVIEW TRANSCRIPT
+ * BỘ ĐIỀU KHIỂN LISTENING THÍCH ỨNG 3 TRONG 1 (TEST 1, TEST 2, TEST 3 & 3 SET XOAY TUA)
+ * TỰ ĐỘNG NẠP TRỰC TIẾP FILE P1, P2, P3, P4 TỪ DATA-DIAG/LISTENING/ HOẶC DATA-L/
+ * TỰ TUA AUDIO THEO PART, HỖ TRỢ MAP, MATCHING, MCQ & REVIEW TRANSCRIPT 3D DUOLINGO
  */
 
 export class DiagListeningEngine {
@@ -11,247 +11,228 @@ export class DiagListeningEngine {
     this.audioElementId = options.audioElementId || 'diagAudioPlayer';
     this.audioLabelId = options.audioLabelId || 'currentAudioLabel';
 
-    this.testMeta = {};
+    this.testId = "test_01";
+    this.setNum = 1;
     this.parts = [];
-    this.audioUrl = "";
-    this.activePartIndex = 0;
-
-    // Bộ nhớ đáp án học sinh: { [qId]: "A" | "text" }
+    this.activePartIdx = 0;
     this.userAnswers = {};
-
-    // Bộ đo phản xạ Telemetry
     this.metrics = {};
     this.isReviewMode = false;
   }
 
   // =========================================================================
-  // 1. NẠP DỮ LIỆU BÀI NGHE TỪ FILE JSON RIÊNG BIỆT
+  // 1. NẠP DỮ LIỆU ĐỀ THI LINH HOẠT THEO TỪNG TEST VÀ SET
   // =========================================================================
   async loadTestFromJson(jsonUrl) {
-    try {
-      const res = await fetch(jsonUrl);
-      if (!res.ok) throw new Error(`HTTP ${res.status}: Không thể tải ${jsonUrl}`);
-      const data = await res.json();
+    const urlParams = new URLSearchParams(window.location.search);
+    this.testId = urlParams.get('testId') || 'test_01';
+    const rawSet = parseInt(urlParams.get('set') || urlParams.get('ver'), 10);
+    this.setNum = (!isNaN(rawSet) && rawSet >= 1 && rawSet <= 3) ? rawSet : 1;
 
-      this.testMeta = {
-        testId: data.testId || "unknown_test",
-        set: data.set || 1,
-        title: data.title || "Listening Diagnostic"
-      };
+    this.parts = [];
+    this.userAnswers = {};
+    this.isReviewMode = false;
 
-      this.audioUrl = data.audioUrl || "";
-      this.parts = data.parts || [];
-      this.activePartIndex = 0;
-      this.userAnswers = {};
-      this.metrics = {};
+    // XÁC ĐỊNH CÁC PART CẦN NẠP THEO Ý ĐỒ SƯ PHẠM:
+    // • Test 1: Khảo sát nền tảng -> Part 1
+    // • Test 2: Nửa đầu đề thi Cam -> Part 1 & Part 2
+    // • Test 3: Nửa sau đề thi Cam -> Part 3 & Part 4
+    let partsToLoad = [1];
+    if (this.testId === 'test_02') partsToLoad = [1, 2];
+    if (this.testId === 'test_03') partsToLoad = [3, 4];
 
-      return true;
-    } catch (err) {
-      console.warn("[DiagListeningEngine] Không thể nạp JSON ngoài:", err);
-      return false;
+    for (const pNum of partsToLoad) {
+      const tryUrls = [
+        `data-diag/listening/cam21-lis-test${this.setNum}-p${pNum}.json`,
+        `data-diag/listening/cam21-test${this.setNum}-p${pNum}.json`,
+        `../listening/data-l/cam21-lis-test${this.setNum}/cam21-lis-test${this.setNum}-p${pNum}.json`,
+        jsonUrl
+      ];
+
+      let partData = null;
+      for (const u of tryUrls) {
+        try {
+          const res = await fetch(`${u}?t=${Date.now()}`);
+          if (res.ok) {
+            partData = await res.json();
+            break;
+          }
+        } catch (e) {}
+      }
+
+      if (partData) {
+        partData.partNum = pNum;
+        this.parts.push(partData);
+      }
     }
+
+    return this.parts.length > 0;
   }
 
   // =========================================================================
-  // 2. RENDER GIAO DIỆN BÀI THI LISTENING RA MÀN HÌNH
+  // 2. RENDER GIAO DIỆN PHÒNG THI NGHE TRÀN VIỀN
   // =========================================================================
   render() {
     const mount = document.getElementById(this.containerId);
-    const audioEl = document.getElementById(this.audioElementId);
     if (!mount || this.parts.length === 0) return;
 
-    // Gán file âm thanh chung vào Audio Player
-    if (audioEl && this.audioUrl) {
-      audioEl.src = this.audioUrl;
-      audioEl.preload = "auto";
+    // Tự động gán link audio của Part đầu tiên
+    const audioEl = document.getElementById(this.audioElementId);
+    if (audioEl && this.parts[0].audioUrl) {
+      audioEl.src = this.parts[0].audioUrl;
     }
 
-    let html = `
-      <!-- THANH SUB-TAB CHUYỂN PART VỚI MỐC THỜI GIAN STARTTIME -->
-      <div style="display:flex; gap:10px; margin-bottom:18px; flex-wrap:wrap; align-items:center; background:#FFFFFF; border:2px solid #E8E2D8; border-radius:16px; padding:8px 12px;">
-        <span style="font-size:12.5px; font-weight:900; color:#0369A1; text-transform:uppercase; margin-right:4px;">
-          Chọn Phần Nghe:
-        </span>
-        ${this.parts.map((p, idx) => `
-          <button type="button" 
-                  id="btnPartTab_${idx}" 
-                  class="btn-3d ${idx === this.activePartIndex ? 'btn-3d-blue' : 'btn-3d-white'}" 
-                  style="padding:8px 16px; font-size:13px;"
-                  onclick="window.diagListeningEngine.switchPart(${idx}, true)">
-            Part ${p.partNum} (Từ ${this.formatSecondsToTime(p.startTime)})
-          </button>
-        `).join('')}
-      </div>
+    let tabsHtml = '';
+    if (this.parts.length > 1) {
+      tabsHtml = `
+        <div style="display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap;">
+          ${this.parts.map((p, idx) => `
+            <button type="button" id="btnLisSubPart_${idx}" 
+              class="btn-3d ${idx === 0 ? 'btn-3d-blue' : 'btn-3d-white'}" 
+              style="padding:8px 16px; font-size:13px;"
+              onclick="window.diagListeningEngine.switchPart(${idx})">
+              Part ${p.partNum}
+            </button>
+          `).join('')}
+        </div>
+      `;
+    }
 
-      <!-- VÙNG RENDER NỘI DUNG CÂU HỎI CỦA PART HIỆN TẠI -->
-      <div id="activePartContainer"></div>
-
-      <!-- KHUNG BĂNG KÝ ÂM TRANSCRIPT (TỰ MỞ KHI XEM LẠI BÀI) -->
-      <div id="listeningTranscriptContainer" style="display:none; margin-top:24px; background:#FFFFFF; border:2px solid #BAE6FD; border-left:6px solid #0284C7; border-radius:16px; padding:18px 22px; max-height:450px; overflow-y:auto; line-height:1.75; font-size:14px;">
-        <h4 style="margin:0 0 10px 0; color:#0284C7; font-size:16px; font-weight:900;">
-          📜 BĂNG KÝ ÂM TRANSCRIPT (BẤM VÀO TỪNG CÂU ĐỂ TUA AUDIO ĐẾN ĐÚNG ĐOẠN ĐÓ):
-        </h4>
-        <div id="transcriptLinesMount"></div>
-      </div>
+    mount.innerHTML = `
+      ${tabsHtml}
+      <div id="activeLisQuestionsMount"></div>
     `;
 
-    mount.innerHTML = html;
-    this.switchPart(this.activePartIndex, false);
+    this.switchPart(0);
   }
 
   // =========================================================================
-  // 3. CHUYỂN PART & CƠ CHẾ NHẢY GIÂY AUDIO (SEEK TO STARTTIME)
+  // 3. CHUYỂN PART & TỰ ĐỘNG TUA AUDIO ĐẾN ĐÚNG ĐOẠN
   // =========================================================================
-  switchPart(partIndex, shouldSeekAndPlay = true) {
-    if (!this.parts[partIndex]) return;
+  switchPart(idx) {
+    this.activePartIdx = idx;
+    const part = this.parts[idx];
+    if (!part) return;
 
-    this.activePartIndex = partIndex;
-    const part = this.parts[partIndex];
-
-    // Cập nhật trạng thái Active trên nút Sub-tab
-    this.parts.forEach((_, idx) => {
-      const btn = document.getElementById(`btnPartTab_${idx}`);
-      if (btn) {
-        btn.className = `btn-3d ${idx === partIndex ? 'btn-3d-blue' : 'btn-3d-white'}`;
-      }
+    this.parts.forEach((_, i) => {
+      const btn = document.getElementById(`btnLisSubPart_${i}`);
+      if (btn) btn.className = `btn-3d ${i === idx ? 'btn-3d-blue' : 'btn-3d-white'}`;
     });
 
-    // Cập nhật tiêu đề audio và nhảy giây
-    const audioEl = document.getElementById(this.audioElementId);
     const labelEl = document.getElementById(this.audioLabelId);
-    if (labelEl) {
-      labelEl.innerText = `${part.title} (Từ ${this.formatSecondsToTime(part.startTime)})`;
+    if (labelEl) labelEl.innerText = part.title || `Listening Part ${part.partNum}`;
+
+    // Tìm mốc thời gian bắt đầu của Part để tua audio
+    const audioEl = document.getElementById(this.audioElementId);
+    if (audioEl) {
+      let startTime = 0;
+      // Trích xuất từ câu hỏi đầu tiên
+      const firstQKey = (part.groups?.[0]?.questionIds || [])[0];
+      if (firstQKey && part.questions?.[firstQKey]?.time) {
+        startTime = Math.max(0, part.questions[firstQKey].time - 25);
+      }
+      if (startTime > 0 && Math.abs(audioEl.currentTime - startTime) > 10) {
+        audioEl.currentTime = startTime;
+      }
     }
 
-    if (audioEl && shouldSeekAndPlay && part.startTime !== undefined) {
-      audioEl.currentTime = parseFloat(part.startTime);
-      audioEl.play().catch(() => {});
-    }
+    const box = document.getElementById('activeLisQuestionsMount');
+    if (!box) return;
 
-    // Render danh sách câu hỏi của Part
-    const container = document.getElementById('activePartContainer');
-    if (container) {
-      container.innerHTML = this.buildPartQuestionsHtml(part);
-      this.restoreUserInputsUI(part);
-    }
-
-    // Nạp Transcript nếu đang ở Review Mode
-    const tMount = document.getElementById('transcriptLinesMount');
-    if (tMount && part.transcriptHtml) {
-      tMount.innerHTML = part.transcriptHtml;
-      this.bindTranscriptClickEvents();
-    }
+    box.innerHTML = this.renderPartContentHtml(part);
+    this.restoreUserInputsUI(part);
   }
 
-  buildPartQuestionsHtml(part) {
-    let html = `
-      <div style="border-bottom:2px solid #E8E2D8; padding-bottom:10px; margin-bottom:16px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
-        <b style="font-size:16px; color:#0C4A6E;">${part.title}</b>
-        <button type="button" class="btn-3d btn-3d-white" style="padding:6px 12px; font-size:12px;" onclick="window.diagListeningEngine.seekAudio(${part.startTime})">
-          ▶ Phát lại từ đầu Part này (${this.formatSecondsToTime(part.startTime)})
-        </button>
-      </div>
-    `;
+  // =========================================================================
+  // 4. RENDER CHI TIẾT CÂU HỎI (TABLE, MAP, MATCHING, MCQ)
+  // =========================================================================
+  renderPartContentHtml(part) {
+    let html = `<b style="font-size:16px; color:#0369A1; display:block; margin-bottom:12px;">${part.title}</b>`;
 
-    (part.groups || []).forEach(group => {
-      html += `<div style="font-size:15px; font-weight:900; color:#1E293B; margin:16px 0 6px 0;">${group.title}</div>`;
-      if (group.instructions) {
-        html += `<div style="background:#FAF7F2; border:1.5px solid #E8E2D8; border-radius:10px; padding:8px 12px; font-size:13px; font-weight:700; color:#475569; margin-bottom:12px;">${group.instructions}</div>`;
+    (part.groups || []).forEach(g => {
+      html += `<div style="font-size:15px; font-weight:900; margin:16px 0 6px 0; color:#1E293B;">${g.title}</div>`;
+      if (g.instructions) {
+        html += `<div style="background:#FAF7F2; border:1.5px solid #E8E2D8; border-radius:10px; padding:8px 12px; font-size:13px; font-weight:700; color:#475569; margin-bottom:12px;">${g.instructions}</div>`;
       }
 
-      // A. Điền từ dạng Bảng (Table) hoặc Ghi chú (Notes)
-      if (group.type === 'table' || group.type === 'notes' || group.tableHtml || group.template) {
-        let contentBody = group.tableHtml || group.template || '';
-        (group.questionIds || []).forEach(qId => {
-          const q = part.questions[qId];
+      // A. DẠNG BẢNG (TABLE) HOẶC NOTES (TEMPLATE CÓ {{q1}})
+      if (g.tableHtml || g.template) {
+        let content = g.tableHtml || g.template;
+        (g.questionIds || []).forEach(qId => {
+          const q = (part.questions || {})[qId];
           const width = q?.inputWidth || "120px";
-          const audioTimeBtn = q?.time ? `<button type="button" class="btn-3d btn-3d-white" style="padding:2px 7px; font-size:11px; margin-left:4px;" onclick="window.diagListeningEngine.seekAudio(${q.time})">▶ ${this.formatSecondsToTime(q.time)}</button>` : '';
-
+          const num = q?.num || qId.replace('q', '');
           const inputHtml = `
-            <span style="display:inline-block; vertical-align:middle; margin:2px 0;">
-              <input type="text" 
-                     id="inp_${qId}" 
-                     class="diag-input" 
-                     style="width:${width}; padding:5px 8px; text-align:center; font-weight:800; color:#0284C7; display:inline-block;" 
-                     placeholder="[Câu ${q?.num || qId}]"
-                     oninput="window.diagListeningEngine.recordAnswer('${qId}', this.value)">
-              ${audioTimeBtn}
-              <div id="fb_${qId}" style="display:none; font-size:12px; font-weight:800; padding:2px 6px; border-radius:4px; margin-top:2px;"></div>
-            </span>
+            <input type="text" class="diag-input" id="inp_diag_lis_${qId}" 
+              style="width:${width}; display:inline-block; padding:4px 8px; text-align:center; font-weight:800; color:#0284C7; margin:0 3px;" 
+              placeholder="[${num}]" 
+              oninput="window.diagListeningEngine.recordAnswer('${qId}', this.value)">
           `;
-          contentBody = contentBody.replace(new RegExp(`{{${qId}}}`, 'g'), inputHtml);
+          content = content.replace(new RegExp(`{{${qId}}}`, 'g'), inputHtml);
         });
-        html += `<div style="margin-bottom:18px; font-size:14px; line-height:1.8;">${contentBody}</div>`;
+        html += `<div style="background:#FFFFFF; border:1.5px solid #CBD5E1; border-radius:12px; padding:16px; font-size:14px; line-height:1.85; margin-bottom:16px;">${content}</div>`;
 
-      // B. Dạng Bản đồ (Map Labelling)
-      } else if (group.type === 'map' || group.imageUrl) {
-        const optsLetters = ['A','B','C','D','E','F','G','H','I'].slice(0, group.optionsCount || 9);
-        const imgPath = group.imageUrl || '../listening/data-l/images/cam21-t2-p2-map.png';
+      // B. DẠNG BẢN ĐỒ MAP LABELLING
+      } else if (g.type === 'map' || g.imageUrl) {
+        const letters = ['A','B','C','D','E','F','G','H','I'].slice(0, g.optionsCount || 9);
+        const imgPath = g.imageUrl?.startsWith('../') ? g.imageUrl : `../listening/${g.imageUrl}`;
 
         html += `
-          <div style="background:#FFFFFF; border:2px solid #E8E2D8; border-radius:14px; padding:12px; text-align:center; margin-bottom:14px;">
-            <img src="${imgPath}" alt="Map" style="max-width:100%; height:auto; border-radius:8px; border:1px solid #CBD5E1;">
+          <div style="background:#FFFFFF; border:2px solid #E8E2D8; border-radius:14px; padding:12px; text-align:center; margin-bottom:12px;">
+            <img src="${imgPath}" alt="Map" style="max-width:100%; max-height:360px; border-radius:8px; border:1px solid #CBD5E1; object-fit:contain;">
           </div>
-          <table style="width:100%; border-collapse:collapse; background:#FFFFFF; border:2px solid #E8E2D8; border-radius:12px; overflow:hidden; margin-bottom:18px;">
-            <thead>
-              <tr style="background:#FAF7F2;">
-                <th style="padding:8px 12px; text-align:left; font-size:13px;">Địa điểm cần xác định</th>
-                ${optsLetters.map(l => `<th style="padding:8px 4px; text-align:center; font-size:12.5px;">${l}</th>`).join('')}
-              </tr>
-            </thead>
-            <tbody>
-              ${(group.questionIds || []).map(qId => {
-                const q = part.questions[qId];
-                return `
-                  <tr style="border-top:1px solid #E8E2D8;" id="row_${qId}">
-                    <td style="padding:8px 12px; font-weight:800; font-size:13px;">
-                      Câu ${q?.num || qId}: ${q?.text || ''}
-                      ${q?.time ? `<button type="button" class="btn-3d btn-3d-white" style="padding:2px 6px; font-size:11px; margin-left:4px;" onclick="window.diagListeningEngine.seekAudio(${q.time})">▶</button>` : ''}
-                      <div id="fb_${qId}" style="display:none; font-size:12px; font-weight:800; margin-top:2px;"></div>
-                    </td>
-                    ${optsLetters.map(letter => `
-                      <td style="text-align:center; padding:4px;">
-                        <input type="radio" name="ans_${qId}" value="${letter}" onchange="window.diagListeningEngine.recordAnswer('${qId}', '${letter}')" style="cursor:pointer; width:16px; height:16px;">
-                      </td>
-                    `).join('')}
-                  </tr>
-                `;
-              }).join('')}
-            </tbody>
-          </table>
+          <div style="overflow-x:auto; background:#FFFFFF; border:1.5px solid #E8E2D8; border-radius:12px; margin-bottom:16px;">
+            <table style="width:100%; border-collapse:collapse; font-size:13px;">
+              <thead>
+                <tr style="background:#FAF7F2;">
+                  <th style="padding:10px 12px; text-align:left;">Địa điểm cần xác định</th>
+                  ${letters.map(l => `<th style="padding:10px 4px; text-align:center;">${l}</th>`).join('')}
+                </tr>
+              </thead>
+              <tbody>
+                ${(g.questionIds || []).map(qId => {
+                  const q = (part.questions || {})[qId];
+                  return `
+                    <tr style="border-top:1px solid #E8E2D8;" id="diag_row_lis_${qId}">
+                      <td style="padding:10px 12px; font-weight:800;">Câu ${q?.num || qId}. ${q?.text || ''}</td>
+                      ${letters.map(l => `
+                        <td style="text-align:center; padding:6px;">
+                          <input type="radio" name="rad_diag_lis_${qId}" value="${l}" onchange="window.diagListeningEngine.recordAnswer('${qId}', '${l}')">
+                        </td>
+                      `).join('')}
+                    </tr>
+                  `;
+                }).join('')}
+              </tbody>
+            </table>
+          </div>
         `;
 
-      // C. Dạng Nối thông tin (Matching 2 cột)
-      } else if (group.type === 'matching' && Array.isArray(group.options)) {
+      // C. DẠNG NỐI THÔNG TIN MATCHING
+      } else if (g.type === 'matching' && Array.isArray(g.options)) {
         html += `
-          <div style="display:flex; gap:16px; margin-bottom:18px; flex-wrap:wrap;">
+          <div style="display:flex; gap:16px; margin-bottom:16px; flex-wrap:wrap;">
             <div style="flex:1.4; min-width:280px; display:flex; flex-direction:column; gap:8px;">
-              ${(group.questionIds || []).map(qId => {
-                const q = part.questions[qId];
+              ${(g.questionIds || []).map(qId => {
+                const q = (part.questions || {})[qId];
                 return `
-                  <div class="q-item-box" id="box_${qId}" style="margin-bottom:0; padding:12px 14px;">
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                      <b style="font-size:13.5px; color:#1E293B;">Câu ${q?.num || qId}: ${q?.text || ''}</b>
-                      ${q?.time ? `<button type="button" class="btn-3d btn-3d-white" style="padding:2px 6px; font-size:11px;" onclick="window.diagListeningEngine.seekAudio(${q.time})">▶ ${this.formatSecondsToTime(q.time)}</button>` : ''}
-                    </div>
-                    <div style="display:flex; gap:8px; align-items:center; margin-top:8px;">
-                      <span style="font-size:12.5px; font-weight:800; color:#64748B;">Đáp án chọn:</span>
-                      <select id="sel_${qId}" class="diag-input" style="width:auto; min-width:180px; padding:6px 10px; font-size:13px;" onchange="window.diagListeningEngine.recordAnswer('${qId}', this.value)">
-                        <option value="">-- Chọn đáp án A-H --</option>
-                        ${group.options.map(opt => `<option value="${opt.key}">${opt.key}. ${opt.text}</option>`).join('')}
+                  <div class="q-item-box" id="diag_box_lis_${qId}" style="margin-bottom:0; padding:12px 14px;">
+                    <b style="font-size:13.5px; color:#1E293B;">Câu ${q?.num || qId}: ${q?.text || ''}</b>
+                    <div style="margin-top:8px;">
+                      <select id="sel_diag_lis_${qId}" class="diag-input" style="padding:6px 10px; font-size:13px;" onchange="window.diagListeningEngine.recordAnswer('${qId}', this.value)">
+                        <option value="">-- Chọn đáp án A-${String.fromCharCode(64 + g.options.length)} --</option>
+                        ${g.options.map(opt => `<option value="${opt.key}">${opt.key}. ${opt.text}</option>`).join('')}
                       </select>
                     </div>
-                    <div id="fb_${qId}" style="display:none; font-size:12px; font-weight:800; margin-top:4px;"></div>
                   </div>
                 `;
               }).join('')}
             </div>
-
-            <!-- Ngân hàng đáp án bên phải -->
-            <div style="flex:1; min-width:240px; background:#FFFFFF; border:2px solid #E8E2D8; border-radius:14px; padding:12px; align-self:flex-start;">
-              <b style="font-size:13px; color:#0369A1; display:block; margin-bottom:8px;">📋 ${group.optionsTitle || 'Danh mục lựa chọn'}:</b>
+            <!-- Hộp danh mục lựa chọn -->
+            <div style="flex:1; min-width:240px; background:#FFFFFF; border:2px solid #E8E2D8; border-radius:14px; padding:14px; align-self:flex-start;">
+              <b style="font-size:13px; color:#0369A1; display:block; margin-bottom:8px;">📋 ${g.optionsTitle || 'Danh mục lựa chọn'}:</b>
               <div style="display:flex; flex-direction:column; gap:6px;">
-                ${group.options.map(opt => `
+                ${g.options.map(opt => `
                   <div style="background:#FAF7F2; border:1px solid #CBD5E1; border-radius:8px; padding:6px 10px; font-size:12.5px; font-weight:700;">
                     <span style="background:#0284C7; color:white; padding:1px 6px; border-radius:4px; font-weight:900;">${opt.key}</span>
                     <span style="color:#1E293B; margin-left:4px;">${opt.text}</span>
@@ -262,30 +243,30 @@ export class DiagListeningEngine {
           </div>
         `;
 
-      // D. Dạng Trắc nghiệm Multiple Choice (MCQ)
+      // D. DẠNG TRẮC NGHIỆM MCQ (KỂ CẢ CHOOSE TWO)
       } else {
-        (group.questionIds || []).forEach(qId => {
-          const q = part.questions[qId];
+        (g.questionIds || []).forEach(qId => {
+          const q = (part.questions || {})[qId];
           if (!q) return;
 
           html += `
-            <div class="q-item-box" id="box_${qId}">
-              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                <b style="font-size:14px; color:#1E293B;">Câu ${q.num || qId}: ${q.text || ''}</b>
-                ${q.time ? `<button type="button" class="btn-3d btn-3d-white" style="padding:2px 7px; font-size:11px;" onclick="window.diagListeningEngine.seekAudio(${q.time})">▶ ${this.formatSecondsToTime(q.time)}</button>` : ''}
-              </div>
-              <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:8px;">
-                ${(q.options || []).map(opt => {
-                  const letter = opt.charAt(0);
-                  return `
-                    <label class="option-label" onclick="window.diagListeningEngine.recordAnswer('${qId}', '${letter}')">
-                      <input type="radio" name="ans_${qId}" value="${letter}">
-                      <span>${opt}</span>
-                    </label>
-                  `;
-                }).join('')}
-              </div>
-              <div id="fb_${qId}" style="display:none; font-size:12px; font-weight:800; margin-top:6px;"></div>
+            <div class="q-item-box" id="diag_box_lis_${qId}" style="margin-bottom:12px;">
+              <b style="font-size:14px; color:#1E293B; display:block; margin-bottom:8px;">Câu ${q.num || qId}. ${q.text || ''}</b>
+              ${q.options && Array.isArray(q.options) ? `
+                <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:6px;">
+                  ${q.options.map(opt => {
+                    const l = opt.charAt(0);
+                    return `
+                      <label class="option-label" onclick="window.diagListeningEngine.recordAnswer('${qId}', '${l}')">
+                        <input type="radio" name="rad_diag_lis_${qId}" value="${l}">
+                        <span>${opt}</span>
+                      </label>
+                    `;
+                  }).join('')}
+                </div>
+              ` : `
+                <input type="text" class="diag-input" id="inp_diag_lis_${qId}" placeholder="Điền đáp án..." oninput="window.diagListeningEngine.recordAnswer('${qId}', this.value)">
+              `}
             </div>
           `;
         });
@@ -295,7 +276,6 @@ export class DiagListeningEngine {
     return html;
   }
 
-  // Ghi nhận đáp án học sinh nhập
   recordAnswer(qId, val) {
     if (this.isReviewMode) return;
     this.userAnswers[qId] = String(val).trim();
@@ -303,45 +283,27 @@ export class DiagListeningEngine {
 
   restoreUserInputsUI(part) {
     Object.entries(this.userAnswers).forEach(([qId, val]) => {
-      const inp = document.getElementById(`inp_${qId}`);
+      const inp = document.getElementById(`inp_diag_lis_${qId}`);
       if (inp) inp.value = val;
 
-      const sel = document.getElementById(`sel_${qId}`);
+      const sel = document.getElementById(`sel_diag_lis_${qId}`);
       if (sel) sel.value = val;
 
-      const radio = document.querySelector(`input[name="ans_${qId}"][value="${val}"]`);
-      if (radio) radio.checked = true;
+      const rad = document.querySelector(`input[name="rad_diag_lis_${qId}"][value="${val}"]`);
+      if (rad) rad.checked = true;
     });
   }
 
-  seekAudio(seconds) {
+  seekAudio(sec) {
     const audio = document.getElementById(this.audioElementId);
-    if (audio && seconds !== undefined) {
-      audio.currentTime = parseFloat(seconds);
+    if (audio && sec !== undefined) {
+      audio.currentTime = parseFloat(sec);
       audio.play().catch(() => {});
     }
   }
 
-  bindTranscriptClickEvents() {
-    document.querySelectorAll('#transcriptLinesMount .transcript-line[data-time]').forEach(line => {
-      line.style.cursor = 'pointer';
-      line.title = 'Bấm để nghe từ đoạn này';
-      line.onclick = () => {
-        const t = line.getAttribute('data-time');
-        if (t) this.seekAudio(parseFloat(t));
-      };
-    });
-  }
-
-  formatSecondsToTime(sec) {
-    if (!sec && sec !== 0) return "00:00";
-    const m = Math.floor(sec / 60);
-    const s = Math.floor(sec % 60);
-    return `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
-  }
-
   // =========================================================================
-  // 4. CHẤM ĐIỂM TỔNG HỢP (EVALUATE 20 CÂU 2 PARTS)
+  // 5. CHẤM ĐIỂM CHUẨN XÁC TUYỆT ĐỐI (EVALUATE)
   // =========================================================================
   evaluate() {
     let score = 0;
@@ -357,37 +319,31 @@ export class DiagListeningEngine {
       qKeys.forEach(qId => {
         const expected = answersMap[qId];
         const userVal = (this.userAnswers[qId] || '').trim();
-        let isCorrect = false;
+        const isCorrect = this.checkMatch(userVal, expected);
 
-        if (userVal && expected) {
-          if (Array.isArray(expected)) {
-            isCorrect = expected.map(a => a.toLowerCase().trim()).includes(userVal.toLowerCase());
-          } else {
-            isCorrect = userVal.toLowerCase() === String(expected).toLowerCase().trim();
-          }
-        }
+        if (isCorrect) score++;
 
-        const expStr = Array.isArray(expected) ? expected.join(' / ') : expected;
-        const qTitle = part.questions[qId]?.text || part.questions[qId]?.q || `Câu ${part.questions[qId]?.num || qId}`;
+        const expStr = Array.isArray(expected) ? expected.join(' / ') : String(expected);
+        const qTitle = part.questions?.[qId]?.text || `Câu ${part.questions?.[qId]?.num || qId}`;
 
-        if (isCorrect) {
-          score++;
-        } else {
+        const item = {
+          questionId: qId,
+          partNum: part.partNum,
+          userAnswer: userVal || "(Bỏ trống)",
+          expectedAnswer: expStr,
+          isCorrect: isCorrect,
+          explanation: part.questions?.[qId]?.explanation?.steps?.join(' ') || ''
+        };
+
+        details.push(item);
+        if (!isCorrect) {
           wrongList.push({
-            num: part.questions[qId]?.num || qId,
+            num: part.questions?.[qId]?.num || qId,
             q: `${part.title} - ${qTitle}`,
-            chosen: userVal || "Bỏ trống",
+            chosen: userVal || "(Bỏ trống)",
             expected: expStr
           });
         }
-
-        details.push({
-          questionId: qId,
-          partNum: part.partNum,
-          userAnswer: userVal || "Bỏ trống",
-          expectedAnswer: expStr,
-          isCorrect: isCorrect
-        });
       });
     });
 
@@ -400,50 +356,148 @@ export class DiagListeningEngine {
     };
   }
 
+  checkMatch(userVal, exp) {
+    if (!userVal) return false;
+    const u = userVal.toLowerCase().replace(/\s+/g, ' ').trim();
+
+    if (Array.isArray(exp)) {
+      return exp.some(e => {
+        const cleanE = String(e).toLowerCase().replace(/\s+/g, ' ').trim();
+        return u === cleanE;
+      });
+    }
+    const cleanE = String(exp).toLowerCase().replace(/\s+/g, ' ').trim();
+    return u === cleanE;
+  }
+
   // =========================================================================
-  // 5. REVIEW MODE (XEM LẠI BÀI THI & TÔ MÀU ĐÚNG SAI)
+  // 6. CHẾ ĐỘ XEM LẠI 2 CỘT SPLIT SCREEN + THANH KÉO 3D DUOLINGO
   // =========================================================================
   renderReviewMode(evalResult) {
     this.isReviewMode = true;
     this.userAnswers = evalResult.answersSnapshot || this.userAnswers;
 
-    // Mở khung Transcript
-    const tBox = document.getElementById('listeningTranscriptContainer');
-    if (tBox) tBox.style.display = 'block';
+    const mount = document.getElementById(this.containerId);
+    if (!mount || this.parts.length === 0) return;
 
-    // Mở Part đầu tiên
-    this.switchPart(0, false);
+    // Gộp toàn bộ Transcript các Part
+    const fullTranscriptHtml = this.parts.map(p => `
+      <div style="margin-bottom:20px;">
+        <h4 style="color:#0284C7; border-bottom:2px solid #BAE6FD; padding-bottom:6px; margin:0 0 10px 0;">📜 ${p.title}</h4>
+        <div>${p.transcriptHtml || 'Chưa có bản ký âm transcript.'}</div>
+      </div>
+    `).join('');
 
-    // Tô viền xanh/đỏ cho các câu hỏi
-    (evalResult.details || []).forEach(item => {
-      const fb = document.getElementById(`fb_${item.questionId}`);
-      const inp = document.getElementById(`inp_${item.questionId}`);
-      const box = document.getElementById(`box_${item.questionId}`);
-      const row = document.getElementById(`row_${item.questionId}`);
+    mount.innerHTML = `
+      <div id="lisSplitWrap" style="display:flex; height:calc(100vh - 215px); position:relative; user-select:none;">
+        <!-- CỘT TRÁI: TRANSCRIPT BẤM NGHE TỪNG CÂU -->
+        <div id="lisLeftPane" style="width:48%; height:100%; overflow-y:auto; background:#FFFFFF; border:2px solid #E8E2D8; border-left:6px solid #0284C7; border-radius:18px; padding:22px 24px; box-sizing:border-box; line-height:1.75; font-size:14px;">
+          ${fullTranscriptHtml}
+        </div>
+
+        <!-- THANH KÉO 3D DUOLINGO -->
+        <div id="lisResizerBar" style="width:20px; cursor:col-resize; display:flex; align-items:center; justify-content:center; z-index:10; flex-shrink:0;">
+          <div style="width:34px; height:60px; background:#FFFFFF; border:2.5px solid #E8E2D8; border-bottom:5px solid #D3CBC0; border-radius:18px; display:flex; align-items:center; justify-content:center; color:#0284C7; font-size:14px; box-shadow:0 4px 12px rgba(0,0,0,0.08);">
+            <i class="fa-solid fa-arrows-left-right"></i>
+          </div>
+        </div>
+
+        <!-- CỘT PHẢI: CÂU HỎI VÀ ĐÁP ÁN ĐÚNG SAI -->
+        <div id="lisRightPane" style="flex:1; height:100%; overflow-y:auto; padding-right:4px; box-sizing:border-box;">
+          <div id="activeLisQuestionsMount"></div>
+        </div>
+      </div>
+    `;
+
+    // Render lại câu hỏi Part đầu tiên
+    this.switchPart(0);
+
+    // Kích hoạt bấm dòng Transcript tua Audio
+    document.querySelectorAll('#lisLeftPane .transcript-line[data-time]').forEach(line => {
+      line.style.cursor = 'pointer';
+      line.onclick = () => {
+        const t = line.getAttribute('data-time');
+        if (t) this.seekAudio(parseFloat(t));
+      };
+    });
+
+    // Tô màu đúng/sai cho các câu hỏi
+    (evalResult.details || []).forEach(d => {
+      const inp = document.getElementById(`inp_diag_lis_${d.questionId}`);
+      const row = document.getElementById(`diag_row_lis_${d.questionId}`);
+      const box = document.getElementById(`diag_box_lis_${d.questionId}`);
 
       if (inp) {
-        inp.style.borderColor = item.isCorrect ? '#22C55E' : '#EF4444';
-        inp.style.backgroundColor = item.isCorrect ? '#F0FDF4' : '#FEF2F2';
         inp.disabled = true;
+        inp.style.background = d.isCorrect ? '#DCFCE7' : '#FEE2E2';
+        inp.style.borderColor = d.isCorrect ? '#16A34A' : '#DC2626';
+        inp.style.color = d.isCorrect ? '#166534' : '#991B1B';
       }
-
+      if (row) row.style.background = d.isCorrect ? '#F0FDF4' : '#FEF2F2';
       if (box) {
-        box.style.borderColor = item.isCorrect ? '#22C55E' : '#EF4444';
-      }
-
-      if (row) {
-        row.style.backgroundColor = item.isCorrect ? '#F0FDF4' : '#FEF2F2';
-      }
-
-      if (fb) {
-        fb.style.display = 'block';
-        fb.style.color = item.isCorrect ? '#166534' : '#DC2626';
-        fb.innerText = item.isCorrect ? '✓ Đúng' : `✗ Sai (Đáp án: ${item.expectedAnswer})`;
+        box.style.borderColor = d.isCorrect ? '#86EFAC' : '#FCA5A5';
+        box.style.background = d.isCorrect ? '#F0FDF4' : '#FFF5F5';
       }
     });
+
+    this.initDraggableResizer('lisSplitWrap', 'lisLeftPane', 'lisResizerBar', 'lisRightPane');
+  }
+
+  initDraggableResizer(wrapId, leftId, resizerId, rightId) {
+    const wrap = document.getElementById(wrapId);
+    const left = document.getElementById(leftId);
+    const resizer = document.getElementById(resizerId);
+    if (!wrap || !left || !resizer) return;
+
+    let isDragging = false;
+    const handle = resizer.querySelector('div');
+
+    const onMouseDown = () => {
+      isDragging = true;
+      document.body.style.cursor = 'col-resize';
+      document.body.style.userSelect = 'none';
+      if (handle) {
+        handle.style.transform = 'scale(0.92)';
+        handle.style.borderBottomWidth = '2px';
+        handle.style.background = '#F0F9FF';
+      }
+    };
+
+    const onMouseMove = (e) => {
+      if (!isDragging) return;
+      const wrapRect = wrap.getBoundingClientRect();
+      const pointerX = e.clientX || (e.touches && e.touches[0].clientX);
+      if (!pointerX) return;
+
+      const offset = pointerX - wrapRect.left;
+      let pct = (offset / wrapRect.width) * 100;
+      if (pct < 25) pct = 25;
+      if (pct > 75) pct = 75;
+
+      left.style.width = `${pct}%`;
+    };
+
+    const onMouseUp = () => {
+      if (!isDragging) return;
+      isDragging = false;
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+      if (handle) {
+        handle.style.transform = 'scale(1)';
+        handle.style.borderBottomWidth = '5px';
+        handle.style.background = '#FFFFFF';
+      }
+    };
+
+    resizer.addEventListener('mousedown', onMouseDown);
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
+
+    resizer.addEventListener('touchstart', onMouseDown);
+    window.addEventListener('touchmove', onMouseMove);
+    window.addEventListener('touchend', onMouseUp);
   }
 }
 
-// Khởi tạo đối tượng toàn cục
 export const diagListeningEngine = new DiagListeningEngine();
 window.diagListeningEngine = diagListeningEngine;
