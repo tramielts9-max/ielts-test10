@@ -1,0 +1,585 @@
+{
+  "title": "IELTS Academic 21 - Test 3 - Passage 3: Rethinking the Past",
+  "answers": {
+    "q27": "A",
+    "q28": "A",
+    "q29": "D",
+    "q30": "A",
+    "q31": "E",
+    "q32": "F",
+    "q33": "D",
+    "q34": "B",
+    "q35": "NO",
+    "q36": "NOT GIVEN",
+    "q37": "NOT GIVEN",
+    "q38": "YES",
+    "q39": "YES",
+    "q40": "NO"
+  },
+  "passageHtml": "<h2>READING PASSAGE 3</h2><h3>Rethinking the Past</h3><p>It is by now a truism that the story of human evolution is being rethought. Discoveries have come thick and fast over the last decade or so, and these have forced us to rethink many crucial points, such as how old our species is - about 300,000 years old as opposed to 200,000 - and what extinct hominins, such as our cousins the Neanderthals, were really like. But because there are so many species and eras involved, it's hard to discern the common threads linking them.</p><p><span class=\"hl\" id=\"hl-q27\" data-q=\"[Q27]\">However, I do think it's possible to draw out some overall messages from the blizzard of archaeological finds in recent years. Two things stand out to me. One is the growing evidence that many supposedly 'advanced' behaviours, such as architecture and art, can be traced much further back in time than we thought, often to hominin species that existed before modern humans. And the other is that we have badly misunderstood gender roles in prehistoric societies, imposing patriarchal values onto cultures that had very different ideas about how women should behave.</span></p><p>Let's start with architecture. <span class=\"hl\" id=\"hl-q31\" data-q=\"[Q31]\">At Kalambo Falls in Zambia, researchers found buried logs that had been shaped with stone tools so that they interlocked. They seem to have once been part of a larger structure, perhaps a building. This would be unsurprising if they weren't 476,000 years old. That's almost 200,000 years before our species, Homo sapiens, evolved.</span> Extinct hominins also managed to settle in extreme places. <span class=\"hl\" id=\"hl-q32\" data-q=\"[Q32]\">For instance, we now know that extinct hominins such as the Denisovans lived on the frozen heights of high-altitude regions 200,000 years ago - upending the old notion that such environments were only settled by modern humans around 3,600 years ago.</span></p><p>Art also seems to have been invented by older hominins. <span class=\"hl\" id=\"hl-q35\" data-q=\"[Q35]\">We have had evidence for a long time now that Neanderthals painted on cave walls.</span> <span class=\"hl\" id=\"hl-q36\" data-q=\"[Q36]\">Even earlier species, such as Homo erectus, may also have made art, for example by engraving patterns on shells.</span> By far the most contentious claim in this area is that Homo naledi made art. H. naledi lived around 250,000 years ago, making it a contemporary of our species. However, it had quite a small brain, typical of older hominins - and was therefore, according to palaeoanthropological dogma, incapable of complex behaviours. <span class=\"hl\" id=\"hl-q37\" data-q=\"[Q37]\"><span class=\"hl\" id=\"hl-q38\" data-q=\"[Q38]\">Nevertheless, in the Rising Star cave system in South Africa where the H. naledi remains were found, researchers have found what seem to be etchings - resembling rudimentary artwork - on the cave walls, though these have yet to be firmly dated.</span></span></p><p>To say these claims about H. naledi are controversial is to understate the situation. Many experts say the evidence presented so far is completely inadequate to support them. <span class=\"hl\" id=\"hl-q39\" data-q=\"[Q39]\">The dispute has only been heightened by the way the results were released, in a non-traditional journal that publishes peer reviews publicly alongside the paper.</span> My views on the H. naledi controversy are complicated. I do think more evidence is needed: in particular with regard to the dating of the etchings. <span class=\"hl\" id=\"hl-q40\" data-q=\"[Q40]\">At the same time, I think the species' small brains are a distraction.</span> Palaeoanthropologists got fixated on brain size because it was what they could see: if what you have is skeletons, then all you know about brains are their shapes and sizes. But other properties, such as the brain's internal wiring, are surely equally important and may explain how a species like H. naledi might have been capable of complex behaviours, despite their small brains.</p><p><span class=\"hl\" id=\"hl-q28\" data-q=\"[Q28]\">In a sense, we shouldn't be surprised that so many of these behaviours had their origins in older, extinct hominins. Evolution usually works by incremental steps and so does technology. The first birds weren't great at flying, and the first mobile phones weren't great at, well, anything really.</span> The idea that there was a sudden explosion of intelligence and creativity at some point in our evolution isn't inherently ridiculous: sometimes a system hits a tipping point and undergoes runaway change. But there was never that much evidence that human evolution worked this way. Instead, it seems the Neanderthals and many others all walked so we could run.</p><p>One way or another, the H. naledi story is going to be an example of letting our preconceptions get in the way of the evidence. The same is true for our ideas about gender in prehistory. <span class=\"hl\" id=\"hl-q29\" data-q=\"[Q29]\">Archaeology was invented by individuals with now unfashionably patriarchal views about gender, and those notions fed into their research. Today's researchers are trying to unpick this stuff, and there have been some significant steps in recent years.</span></p><p>Perhaps the most dramatic was the demolition of 'Man the Hunter'. This was the idea, promoted for decades, that in most prehistoric societies the men went out to hunt and the women looked after the home. <span class=\"hl\" id=\"hl-q33\" data-q=\"[Q33]\">However, a meta-analysis published in June 2023 compiled data on several dozen foraging societies and found women hunted in 80 per cent of them.</span> In line with this, it emerged that an ancient spear-throwing tool called an atlatl enables women to launch projectiles at the same speed as men. We have also seen growing evidence of women occupying positions of authority in ancient societies. The Viking queen Thyra may have helped unify Denmark in the 900s. <span class=\"hl\" id=\"hl-q34\" data-q=\"[Q34]\">Going further back, an Iberian leader from around 4000 years ago turned out to be female, not male as many had assumed, when proteins in her teeth were analysed.</span></p><p><span class=\"hl\" id=\"hl-q30\" data-q=\"[Q30]\">It seems that the more we find out about past societies, the more our preconceptions about the ways society 'has to be' turn out to be wrong. Inequality, authoritarianism and patriarchy aren't inevitable. They're choices, and prehistory shows us that we can choose differently.</span></p>",
+  "groups": [
+    {
+      "id": "g1",
+      "type": "mcq",
+      "title": "Questions 27-30",
+      "instructions": "<i>Choose the correct letter, <b>A, B, C or D</b>.<br>Write the correct letter in boxes 27-30 on your answer sheet.</i>",
+      "questionIds": ["q27", "q28", "q29", "q30"]
+    },
+    {
+      "id": "g2",
+      "type": "matching_endings",
+      "title": "Questions 31-34",
+      "instructions": "<i>Complete each sentence with the correct ending, <b>A-F</b>, below.<br>Write the correct letter, <b>A-F</b>, in boxes 31-34 on your answer sheet.</i>",
+      "options": [
+        "A. Homo sapiens emerged at an earlier point in time than experts previously believed.",
+        "B. previous assumptions about who had power in the prehistoric world were inaccurate.",
+        "C. gender roles in extinct hominin species were different from those in Homo sapiens societies.",
+        "D. experts may have been mistaken about who looked for food in early human communities.",
+        "E. Homo sapiens was probably not the only species capable of sophisticated workmanship.",
+        "F. other species managed to survive in harsh environments before the arrival of Homo sapiens."
+      ],
+      "questionIds": ["q31", "q32", "q33", "q34"]
+    },
+    {
+      "id": "g3",
+      "type": "ynng",
+      "title": "Questions 35-40",
+      "instructions": "<i>Do the following statements agree with the views of the writer in Reading Passage 3?<br>In boxes 35-40 on your answer sheet, write:<br><b>YES</b> if the statement agrees with the views of the writer<br><b>NO</b> if the statement contradicts the views of the writer<br><b>NOT GIVEN</b> if it is impossible to say what the writer thinks about this</i>",
+      "questionIds": ["q35", "q36", "q37", "q38", "q39", "q40"]
+    }
+  ],
+  "questions": {
+    "q27": {
+      "num": 27,
+      "text": "What is the writer doing in the second paragraph?",
+      "options": [
+        "A. pinpointing some key changes in our understanding of prehistory",
+        "B. outlining some aspects of prehistory which are still poorly understood",
+        "C. summarising some attitudes towards recent archaeological revelations",
+        "D. giving an overview of some current disagreements among archaeologists"
+      ],
+      "finalAnswer": "A",
+      "highlightId": "hl-q27",
+      "socratic": {
+        "steps": [
+          {
+            "title": "Đọc câu hỏi và định vị",
+            "question": "Câu 27 hỏi: Tác giả đang làm gì trong đoạn văn thứ hai (second paragraph)?",
+            "guide": "Em hãy đọc toàn bộ Paragraph 2 và chú ý câu 'Two things stand out to me'.",
+            "bridge": "Cùng xem hai điều nổi bật mà tác giả rút ra là gì nhé."
+          },
+          {
+            "title": "Tìm câu dẫn chứng",
+            "question": "Paragraph 2 tóm tắt hai thông điệp tổng quát lớn nào từ các phát hiện khảo cổ gần đây?",
+            "guide": "Tác giả nêu: (1) các hành vi tân tiến như kiến trúc và nghệ thuật có nguồn gốc xa xưa hơn ta tưởng ('traced much further back in time'); (2) chúng ta đã hiểu sai nghiêm trọng về vai trò giới trong xã hội tiền sử ('badly misunderstood gender roles').",
+            "bridge": "Hai điểm này đại diện cho những thay đổi cốt lõi trong hiểu biết của chúng ta về thời tiền sử."
+          },
+          {
+            "title": "Chọn phương án đúng",
+            "question": "Lựa chọn nào mang ý nghĩa 'chỉ ra những thay đổi then chốt trong hiểu biết của chúng ta về thời tiền sử'?",
+            "guide": "Đó là phương án A: 'pinpointing some key changes in our understanding of prehistory'.",
+            "bridge": "Chốt câu 27: A."
+          }
+        ]
+      },
+      "explanation": {
+        "steps": [
+          "<b>Ý câu hỏi:</b> Tác giả đang làm gì ở Paragraph 2?",
+          "<b>Paragraph 2:</b> <i>'Two things stand out to me. One is the growing evidence that many supposedly \"advanced\" behaviours... can be traced much further back in time than we thought... And the other is that we have badly misunderstood gender roles in prehistoric societies...'</i>",
+          "<b>Khớp ý:</b> Tác giả nêu bật 2 điểm thay đổi nhận thức quan trọng (<i>key changes in our understanding</i>).",
+          "<b>Kết luận:</b> Chọn <b>A</b>."
+        ]
+      }
+    },
+    "q28": {
+      "num": 28,
+      "text": "In the sixth paragraph, the writer mentions mobile phones to make the point that",
+      "options": [
+        "A. most developments happen in a gradual way.",
+        "B. innovation can come from a variety of sources.",
+        "C. not all technological advancements are positive.",
+        "D. the path of evolution can often be unpredictable."
+      ],
+      "finalAnswer": "A",
+      "highlightId": "hl-q28",
+      "socratic": {
+        "steps": [
+          {
+            "title": "Đọc câu hỏi và định vị",
+            "question": "Câu 28 hỏi: Trong Paragraph 6, tác giả nhắc đến điện thoại di động ('mobile phones') để đưa ra luận điểm gì?",
+            "guide": "Em hãy tìm từ khóa 'mobile phones' ở Paragraph 6 và đọc câu chủ đề đứng ngay trước nó.",
+            "bridge": "Cùng xem tác giả so sánh điện thoại với quy luật nào nhé."
+          },
+          {
+            "title": "Tìm câu dẫn chứng",
+            "question": "Trước khi lấy ví dụ về điện thoại di động, tác giả đã viết gì về quy luật tiến hóa và công nghệ?",
+            "guide": "Paragraph 6 viết: 'Evolution usually works by incremental steps and so does technology. The first birds weren't great at flying, and the first mobile phones weren't great at, well, anything really.' (Tiến hóa diễn ra theo các bước tiệm tiến nhỏ và công nghệ cũng vậy).",
+            "bridge": "'incremental steps' chính là các bước nhỏ dần dần, từng chút một."
+          },
+          {
+            "title": "Chọn phương án đúng",
+            "question": "Phương án nào đồng nghĩa với 'hầu hết các sự phát triển đều diễn ra một cách dần dần'?",
+            "guide": "Đó là phương án A: 'most developments happen in a gradual way'.",
+            "bridge": "Chốt câu 28: A."
+          }
+        ]
+      },
+      "explanation": {
+        "steps": [
+          "<b>Ý câu hỏi:</b> Tác giả nhắc đến điện thoại di động nhằm chứng minh điều gì?",
+          "<b>Paragraph 6 (dòng 2-3):</b> <i>'Evolution usually works by incremental steps and so does technology. The first birds weren't great at flying, and the first mobile phones weren't great at, well, anything really.'</i>",
+          "<b>Khớp từ:</b> <i>incremental steps</i> (các bước tiệm tiến nhỏ) = <i>in a gradual way</i> (diễn ra dần dần).",
+          "<b>Kết luận:</b> Chọn <b>A</b>."
+        ]
+      }
+    },
+    "q29": {
+      "num": 29,
+      "text": "In the seventh paragraph, the phrase 'unpick this stuff' refers to the task of",
+      "options": [
+        "A. assessing the impact of certain recent research findings.",
+        "B. questioning the authenticity of evidence used in earlier research.",
+        "C. conducting research into how prehistoric societies were organised.",
+        "D. reevaluating research influenced by outdated beliefs about society."
+      ],
+      "finalAnswer": "D",
+      "highlightId": "hl-q29",
+      "socratic": {
+        "steps": [
+          {
+            "title": "Đọc câu hỏi và định vị",
+            "question": "Câu 29 hỏi: Trong Paragraph 7, cụm từ 'unpick this stuff' ám chỉ nhiệm vụ nào?",
+            "guide": "Em hãy tìm cụm 'unpick this stuff' ở cuối Paragraph 7 và đọc ngược câu trước đó xem 'this stuff' là gì.",
+            "bridge": "Cùng xem thứ cần phải tháo gỡ (unpick) là những quan niệm gì nhé."
+          },
+          {
+            "title": "Tìm câu dẫn chứng",
+            "question": "Paragraph 7 nói ngành khảo cổ học thuở ban đầu đã bị ảnh hưởng bởi tư tưởng gì?",
+            "guide": "Đoạn văn viết: 'Archaeology was invented by individuals with now unfashionably patriarchal views about gender, and those notions fed into their research. Today's researchers are trying to unpick this stuff...' (ngành khảo cổ do những người có quan điểm gia trưởng lỗi thời sáng lập, và những định kiến đó đã ăn sâu vào nghiên cứu của họ. Các nhà nghiên cứu ngày nay đang cố gắng gỡ bỏ đống tàn dư này).",
+            "bridge": "'patriarchal views' = quan niệm lỗi thời (outdated beliefs); 'unpick' = đánh giá, tháo gỡ lại (reevaluating)."
+          },
+          {
+            "title": "Chọn phương án đúng",
+            "question": "Phương án nào mang ý nghĩa 'đánh giá lại những nghiên cứu bị ảnh hưởng bởi niềm tin xã hội lỗi thời'?",
+            "guide": "Đó là phương án D: 'reevaluating research influenced by outdated beliefs about society'.",
+            "bridge": "Chốt câu 29: D."
+          }
+        ]
+      },
+      "explanation": {
+        "steps": [
+          "<b>Ý câu hỏi:</b> Cụm 'unpick this stuff' ám chỉ công việc gì?",
+          "<b>Paragraph 7:</b> <i>'Archaeology was invented by individuals with now unfashionably patriarchal views about gender, and those notions fed into their research. Today's researchers are trying to unpick this stuff...'</i>",
+          "<b>Khớp ý:</b> <i>unpick</i> = tháo gỡ / đánh giá lại (<i>reevaluating</i>); <i>this stuff</i> = những định kiến gia trưởng đã ngấm vào nghiên cứu (<i>research influenced by outdated beliefs</i>).",
+          "<b>Kết luận:</b> Chọn <b>D</b>."
+        ]
+      }
+    },
+    "q30": {
+      "num": 30,
+      "text": "What does the writer suggest in the final paragraph?",
+      "options": [
+        "A. Studying past societies could help us create a fairer society today.",
+        "B. We should not judge past societies by the standards of modern society.",
+        "C. We still have much to learn about how societies have evolved over history.",
+        "D. There is more than one way to interpret evidence about societies in prehistoric times."
+      ],
+      "finalAnswer": "A",
+      "highlightId": "hl-q30",
+      "socratic": {
+        "steps": [
+          {
+            "title": "Đọc câu hỏi và định vị",
+            "question": "Câu 30 hỏi: Tác giả gợi ý điều gì trong đoạn văn cuối cùng (Paragraph 9)?",
+            "guide": "Em hãy đọc kỹ các câu kết của Paragraph 9 nói về sự lựa chọn cho tương lai xã hội.",
+            "bridge": "Cùng xem quá khứ giúp chúng ta rút ra bài học gì nhé."
+          },
+          {
+            "title": "Tìm câu dẫn chứng",
+            "question": "Paragraph 9 viết gì về sự bất bình đẳng và chế độ gia quyền?",
+            "guide": "Đoạn văn viết: 'Inequality, authoritarianism and patriarchy aren't inevitable. They're choices, and prehistory shows us that we can choose differently.' (Bất bình đẳng, độc tài và chế độ gia trưởng không phải là điều tất yếu. Chúng chỉ là những sự lựa chọn, và thời tiền sử cho ta thấy ta có thể chọn khác đi).",
+            "bridge": "Chọn khác đi theo hướng không bất bình đẳng/độc tài chính là xây dựng một xã hội công bằng hơn cho ngày nay."
+          },
+          {
+            "title": "Chọn phương án đúng",
+            "question": "Phương án nào nêu lên việc nghiên cứu các xã hội quá khứ giúp ta xây dựng xã hội công bằng hơn?",
+            "guide": "Đó là phương án A: 'Studying past societies could help us create a fairer society today'.",
+            "bridge": "Chốt câu 30: A."
+          }
+        ]
+      },
+      "explanation": {
+        "steps": [
+          "<b>Ý câu hỏi:</b> Tác giả gợi ý điều gì trong đoạn cuối cùng?",
+          "<b>Paragraph 9:</b> <i>'Inequality, authoritarianism and patriarchy aren't inevitable. They're choices, and prehistory shows us that we can choose differently.'</i> (Bất bình đẳng, độc tài... không phải là điều tất yếu. Chúng là lựa chọn, và thời tiền sử cho ta thấy ta có thể chọn khác đi).",
+          "<b>Khớp ý:</b> Nhìn vào quá khứ giúp ta chọn lựa khác đi, từ bỏ bất bình đẳng để hướng tới xã hội công bằng hơn (<i>create a fairer society</i>).",
+          "<b>Kết luận:</b> Chọn <b>A</b>."
+        ]
+      }
+    },
+    "q31": {
+      "num": 31,
+      "text": "The findings at Kalambo Falls revealed that",
+      "options": ["A", "B", "C", "D", "E", "F"],
+      "finalAnswer": "E",
+      "highlightId": "hl-q31",
+      "socratic": {
+        "steps": [
+          {
+            "title": "Hiểu nội dung câu đề bài",
+            "question": "Câu 31 nói: Các phát hiện tại thác Kalambo ('findings at Kalambo Falls') đã tiết lộ điều gì?",
+            "guide": "Hãy tìm địa danh 'Kalambo Falls' ở Paragraph 3 để xem người ta phát hiện ra di vật gì.",
+            "bridge": "Cùng đọc những dòng đầu của Paragraph 3 nhé."
+          },
+          {
+            "title": "Đối chiếu với bài đọc",
+            "question": "Ở thác Kalambo (Zambia), các nhà nghiên cứu tìm thấy những khúc gỗ ghép được đẽo gọt từ bao nhiêu năm trước?",
+            "guide": "Bài viết: 'At Kalambo Falls in Zambia, researchers found buried logs that had been shaped with stone tools so that they interlocked... 476,000 years old. That's almost 200,000 years before our species, Homo sapiens, evolved.' (tìm thấy các thân gỗ đẽo gọt khớp vào nhau có niên đại 476.000 năm tuổi, trước khi Homo sapiens xuất hiện gần 200.000 năm).",
+            "bridge": "Một loài khác đã biết đẽo gọt chế tác công trình tinh xảo trước cả loài người hiện đại."
+          },
+          {
+            "title": "Chọn vế kết thúc phù hợp",
+            "question": "Vế kết thúc A-F nào nói rằng 'Homo sapiens có lẽ không phải loài duy nhất có năng lực chế tác tinh xảo'?",
+            "guide": "Đó là E: 'Homo sapiens was probably not the only species capable of sophisticated workmanship'.",
+            "bridge": "Chốt câu 31: E."
+          }
+        ]
+      },
+      "explanation": {
+        "steps": [
+          "<b>Ý câu hỏi:</b> Phát hiện ở Kalambo Falls cho thấy điều gì?",
+          "<b>Paragraph 3 (dòng 1-4):</b> <i>'At Kalambo Falls in Zambia, researchers found buried logs that had been shaped with stone tools so that they interlocked... That's almost 200,000 years before our species, Homo sapiens, evolved.'</i>",
+          "<b>Khớp ý:</b> Gỗ được đục đẽo khớp nhau 476.000 năm trước (trước Homo sapiens 200.000 năm) chứng minh loài khác cũng có khả năng chế tác tinh xảo (<i>capable of sophisticated workmanship</i>).",
+          "<b>Kết luận:</b> Chọn <b>E</b>."
+        ]
+      }
+    },
+    "q32": {
+      "num": 32,
+      "text": "Evidence from high-altitude regions suggests that",
+      "options": ["A", "B", "C", "D", "E", "F"],
+      "finalAnswer": "F",
+      "highlightId": "hl-q32",
+      "socratic": {
+        "steps": [
+          {
+            "title": "Hiểu nội dung câu đề bài",
+            "question": "Câu 32 nói: Bằng chứng từ các vùng núi cao ('high-altitude regions') cho thấy điều gì?",
+            "guide": "Em hãy quét cụm 'high-altitude regions' ở cuối Paragraph 3.",
+            "bridge": "Cùng xem loài nào đã từng sinh sống ở nơi băng giá này nhé."
+          },
+          {
+            "title": "Đối chiếu với bài đọc",
+            "question": "Cuối Paragraph 3 nói người Denisovans đã sinh sống ở vùng núi cao như thế nào?",
+            "guide": "Bài viết: 'Denisovans lived on the frozen heights of high-altitude regions 200,000 years ago - upending the old notion that such environments were only settled by modern humans around 3,600 years ago.' (người Denisovans đã sống trên các vùng núi cao băng giá từ 200.000 năm trước, đảo lộn quan niệm cũ cho rằng môi trường như vậy chỉ có người hiện đại mới định cư được từ 3.600 năm trước).",
+            "bridge": "Người Denisovans (loài khác) đã sống sót ở vùng khắc nghiệt từ trước khi Homo sapiens tới định cư."
+          },
+          {
+            "title": "Chọn vế kết thúc phù hợp",
+            "question": "Vế kết thúc A-F nào mang ý 'các loài khác đã sinh tồn được trong môi trường khắc nghiệt trước khi Homo sapiens xuất hiện'?",
+            "guide": "Đó là F: 'other species managed to survive in harsh environments before the arrival of Homo sapiens'.",
+            "bridge": "Chốt câu 32: F."
+          }
+        ]
+      },
+      "explanation": {
+        "steps": [
+          "<b>Ý câu hỏi:</b> Bằng chứng từ vùng núi cao cho thấy điều gì?",
+          "<b>Paragraph 3 (câu cuối):</b> <i>'...extinct hominins such as the Denisovans lived on the frozen heights of high-altitude regions 200,000 years ago - upending the old notion that such environments were only settled by modern humans around 3,600 years ago.'</i>",
+          "<b>Khớp từ:</b> <i>frozen heights / high-altitude regions</i> = môi trường khắc nghiệt (<i>harsh environments</i>); <i>Denisovans 200,000 years ago</i> = loài khác sinh tồn trước Homo sapiens (<i>other species managed to survive... before arrival of Homo sapiens</i>).",
+          "<b>Kết luận:</b> Chọn <b>F</b>."
+        ]
+      }
+    },
+    "q33": {
+      "num": 33,
+      "text": "An academic publication from June 2023 shows that",
+      "options": ["A", "B", "C", "D", "E", "F"],
+      "finalAnswer": "D",
+      "highlightId": "hl-q33",
+      "socratic": {
+        "steps": [
+          {
+            "title": "Hiểu nội dung câu đề bài",
+            "question": "Câu 33 nói: Một bài báo học thuật xuất bản tháng 6/2023 ('June 2023') đã chứng minh điều gì?",
+            "guide": "Em hãy tìm mốc thời gian 'June 2023' ở Paragraph 8.",
+            "bridge": "Cùng xem nghiên cứu này phát hiện sự thật gì về chuyện săn bắn nhé."
+          },
+          {
+            "title": "Đối chiếu với bài đọc",
+            "question": "Nghiên cứu tháng 6/2023 phát hiện phụ nữ làm công việc gì trong các xã hội hái lượm tiền sử?",
+            "guide": "Paragraph 8 viết: 'However, a meta-analysis published in June 2023 compiled data on several dozen foraging societies and found women hunted in 80 per cent of them.' (tìm thấy phụ nữ cũng đi săn bắn trong 80% các xã hội đó, phá vỡ định kiến 'đàn ông đi săn, phụ nữ ở nhà').",
+            "bridge": "'hunted' chính là đi tìm kiếm thức ăn; việc phụ nữ cũng săn bắn chứng minh giới chuyên gia trước đây đã nhầm lẫn."
+          },
+          {
+            "title": "Chọn vế kết thúc phù hợp",
+            "question": "Vế kết thúc A-F nào mang ý 'các chuyên gia có thể đã nhầm lẫn về việc ai là người đi kiếm thức ăn trong các cộng đồng người thời xưa'?",
+            "guide": "Đó là D: 'experts may have been mistaken about who looked for food in early human communities'.",
+            "bridge": "Chốt câu 33: D."
+          }
+        ]
+      },
+      "explanation": {
+        "steps": [
+          "<b>Ý câu hỏi:</b> Ấn phẩm tháng 6/2023 cho thấy điều gì?",
+          "<b>Paragraph 8 (dòng 3-4):</b> <i>'...a meta-analysis published in June 2023 compiled data on several dozen foraging societies and found women hunted in 80 per cent of them.'</i>",
+          "<b>Khớp ý:</b> Việc phát hiện phụ nữ tham gia săn bắn ở 80% xã hội làm sụp đổ quan niệm 'đàn ông săn bắn, phụ nữ ở nhà' = các chuyên gia trước đây đã nhầm về người đi kiếm ăn (<i>mistaken about who looked for food</i>).",
+          "<b>Kết luận:</b> Chọn <b>D</b>."
+        ]
+      }
+    },
+    "q34": {
+      "num": 34,
+      "text": "Analysis of a 4000-year-old Iberian leader indicates that",
+      "options": ["A", "B", "C", "D", "E", "F"],
+      "finalAnswer": "B",
+      "highlightId": "hl-q34",
+      "socratic": {
+        "steps": [
+          {
+            "title": "Hiểu nội dung câu đề bài",
+            "question": "Câu 34 nói: Việc phân tích thủ lĩnh người Iberia 4000 năm tuổi ('4000-year-old Iberian leader') đã chỉ ra điều gì?",
+            "guide": "Em hãy quét cụm 'Iberian leader' ở câu cuối của Paragraph 8.",
+            "bridge": "Cùng xem giới tính thực sự của vị thủ lĩnh quyền lực này nhé."
+          },
+          {
+            "title": "Đối chiếu với bài đọc",
+            "question": "Kết quả phân tích protein trong răng của vị thủ lĩnh Iberia 4000 năm trước cho thấy điều gì bất ngờ?",
+            "guide": "Bài viết: 'Going further back, an Iberian leader from around 4000 years ago turned out to be female, not male as many had assumed, when proteins in her teeth were analysed.' (vị thủ lĩnh hóa ra là phụ nữ, chứ không phải nam giới như nhiều người từng suy đoán).",
+            "bridge": "Thủ lĩnh (người nắm quyền lực) là nữ chứ không phải nam, chứng tỏ các giả định trước đây về việc ai nắm quyền lực đã bị sai."
+          },
+          {
+            "title": "Chọn vế kết thúc phù hợp",
+            "question": "Vế kết thúc A-F nào mang ý 'các giả định trước đây về việc ai nắm quyền lực trong thế giới tiền sử là không chính xác'?",
+            "guide": "Đó là B: 'previous assumptions about who had power in the prehistoric world were inaccurate'.",
+            "bridge": "Chốt câu 34: B."
+          }
+        ]
+      },
+      "explanation": {
+        "steps": [
+          "<b>Ý câu hỏi:</b> Phân tích thủ lĩnh Iberia 4000 năm tuổi chứng minh điều gì?",
+          "<b>Paragraph 8 (câu cuối):</b> <i>'...an Iberian leader from around 4000 years ago turned out to be female, not male as many had assumed, when proteins in her teeth were analysed.'</i>",
+          "<b>Khớp ý:</b> <i>Iberian leader</i> = người nắm quyền lực (<i>who had power</i>); <i>not male as many had assumed</i> = các giả định trước đây đã sai (<i>previous assumptions were inaccurate</i>).",
+          "<b>Kết luận:</b> Chọn <b>B</b>."
+        ]
+      }
+    },
+    "q35": {
+      "num": 35,
+      "text": "It seems likely that the Neanderthals' cave paintings were the first examples of artwork ever created.",
+      "finalAnswer": "NO",
+      "highlightId": "hl-q35",
+      "socratic": {
+        "steps": [
+          {
+            "title": "Hiểu nội dung nhận định",
+            "question": "Câu 35 khẳng định điều gì? Có khả năng các bức tranh hang động của người Neanderthal ('Neanderthals' cave paintings') là những tác phẩm nghệ thuật đầu tiên từng được tạo ra ('the first examples of artwork ever created').",
+            "guide": "Hãy tìm tên người 'Neanderthals' ở đầu Paragraph 4 để kiểm tra từ 'first'.",
+            "bridge": "Cùng xem có loài nào vẽ tranh/làm nghệ thuật trước họ không nhé."
+          },
+          {
+            "title": "Đối chiếu với bài đọc",
+            "question": "Paragraph 4 nói gì về các loài người còn cổ xưa hơn người Neanderthal?",
+            "guide": "Đoạn văn viết: 'We have had evidence for a long time now that Neanderthals painted on cave walls. Even earlier species, such as Homo erectus, may also have made art, for example by engraving patterns on shells.' (Ngay cả các loài còn sớm hơn nữa, như Homo erectus, cũng có thể đã làm nghệ thuật...).",
+            "bridge": "Bài đọc khẳng định có loài còn sớm hơn (even earlier species) đã làm nghệ thuật, hoàn toàn phủ nhận việc tranh của Neanderthal là tác phẩm nghệ thuật đầu tiên (first)."
+          },
+          {
+            "title": "Đưa ra kết luận",
+            "question": "Nhận định cho là 'đầu tiên' nhưng bài đọc khẳng định có loài 'sớm hơn nữa'. Vậy ta chọn gì?",
+            "guide": "Thông tin mâu thuẫn 100%, chọn NO.",
+            "bridge": "Chốt câu 35: NO."
+          }
+        ]
+      },
+      "explanation": {
+        "steps": [
+          "<b>Ý nhận định:</b> Tranh hang động của Neanderthal là những tác phẩm nghệ thuật đầu tiên từng được tạo ra.",
+          "<b>Paragraph 4 (dòng 1-3):</b> <i>'We have had evidence for a long time now that Neanderthals painted on cave walls. Even earlier species, such as Homo erectus, may also have made art...'</i>",
+          "<b>Đối chiếu:</b> Nhận định dùng từ <i>the first</i>, trong khi bài đọc nói rõ các loài còn xuất hiện sớm hơn (<i>even earlier species</i>) như Homo erectus cũng đã làm nghệ thuật.",
+          "<b>Kết luận:</b> Chọn <b>NO</b>."
+        ]
+      }
+    },
+    "q36": {
+      "num": 36,
+      "text": "It is very rare to find prehistoric artwork carved onto shells.",
+      "finalAnswer": "NOT GIVEN",
+      "highlightId": "hl-q36",
+      "socratic": {
+        "steps": [
+          {
+            "title": "Phân tích từ khóa nhận định",
+            "question": "Câu 36 khẳng định: Rất hiếm khi ('very rare') tìm thấy tác phẩm nghệ thuật tiền sử được khắc lên vỏ sò ('carved onto shells').",
+            "guide": "Em hãy tìm từ 'shells' ở dòng 2-3 của Paragraph 4.",
+            "bridge": "Cùng xem tác giả có nói về độ hiếm của việc này không nhé."
+          },
+          {
+            "title": "Đối chiếu với bài đọc",
+            "question": "Paragraph 4 viết gì về việc khắc mẫu hình lên vỏ sò của người Homo erectus?",
+            "guide": "Bài viết: 'Even earlier species, such as Homo erectus, may also have made art, for example by engraving patterns on shells.' (ví dụ như bằng cách khắc các hoa văn lên vỏ sò).",
+            "bridge": "Bài chỉ lấy việc khắc lên vỏ sò làm ví dụ, có thông tin nào đánh giá việc tìm thấy chúng là 'rất hiếm' (very rare) hay phổ biến không?"
+          },
+          {
+            "title": "Đưa ra kết luận",
+            "question": "Bài đọc hoàn toàn không nhắc tới mức độ hiếm (rare) hay nhiều. Vậy đáp án là gì?",
+            "guide": "Thiếu dữ kiện đối chiếu, chọn NOT GIVEN.",
+            "bridge": "Chốt câu 36: NOT GIVEN."
+          }
+        ]
+      },
+      "explanation": {
+        "steps": [
+          "<b>Ý nhận định:</b> Rất hiếm khi tìm thấy tác phẩm nghệ thuật tiền sử khắc trên vỏ sò.",
+          "<b>Paragraph 4 (dòng 2-3):</b> <i>'...for example by engraving patterns on shells.'</i>",
+          "<b>Đối chiếu:</b> Bài đọc chỉ đưa việc khắc vỏ sò làm ví dụ minh họa cho nghệ thuật của Homo erectus, hoàn toàn không có thông tin nói rằng di vật này là rất hiếm gặp (<i>very rare</i>) hay phổ biến.",
+          "<b>Kết luận:</b> Chọn <b>NOT GIVEN</b>."
+        ]
+      }
+    },
+    "q37": {
+      "num": 37,
+      "text": "The methods which the researchers used to examine the Rising Star cave system were rather unconventional.",
+      "finalAnswer": "NOT GIVEN",
+      "highlightId": "hl-q37",
+      "socratic": {
+        "steps": [
+          {
+            "title": "Phân tích từ khóa nhận định",
+            "question": "Câu 37 khẳng định: Các phương pháp mà nhóm nghiên cứu dùng để khảo sát hệ thống hang Rising Star ('Rising Star cave system') là khá khác thường ('rather unconventional').",
+            "guide": "Em hãy tìm tên hang 'Rising Star' ở cuối Paragraph 4.",
+            "bridge": "Cùng xem tác giả có miêu tả phương pháp khảo sát của họ không nhé."
+          },
+          {
+            "title": "Đối chiếu với bài đọc",
+            "question": "Cuối Paragraph 4 nói gì về các phát hiện trong hang Rising Star?",
+            "guide": "Bài viết: 'in the Rising Star cave system in South Africa where the H. naledi remains were found, researchers have found what seem to be etchings - resembling rudimentary artwork - on the cave walls, though these have yet to be firmly dated.'",
+            "bridge": "Bài chỉ kể họ tìm thấy các vết khắc trên vách hang, có câu chữ nào miêu tả hay đánh giá 'phương pháp' (methods) họ dùng là 'khác thường' (unconventional) không?"
+          },
+          {
+            "title": "Đưa ra kết luận",
+            "question": "Bài đọc không hề nói về phương pháp khảo sát của các nhà nghiên cứu. Vậy ta chọn đáp án gì?",
+            "guide": "Không có thông tin, chọn NOT GIVEN.",
+            "bridge": "Chốt câu 37: NOT GIVEN."
+          }
+        ]
+      },
+      "explanation": {
+        "steps": [
+          "<b>Ý nhận định:</b> Các phương pháp dùng để kiểm tra hang Rising Star khá độc lạ/khác thường.",
+          "<b>Paragraph 4 (câu cuối):</b> Bài đọc chỉ nói các nhà nghiên cứu tìm thấy các vết khắc trên vách hang Rising Star.",
+          "<b>Đối chiếu:</b> Không có bất kỳ chi tiết nào đề cập hay đánh giá tính chất của các phương pháp nghiên cứu (<i>methods were rather unconventional</i>).",
+          "<b>Kết luận:</b> Chọn <b>NOT GIVEN</b>."
+        ]
+      }
+    },
+    "q38": {
+      "num": 38,
+      "text": "It is unclear how old the etchings in the Rising Star cave system are.",
+      "finalAnswer": "YES",
+      "highlightId": "hl-q38",
+      "socratic": {
+        "steps": [
+          {
+            "title": "Hiểu nội dung nhận định",
+            "question": "Câu 38 khẳng định: Vẫn chưa rõ các vết khắc trong hang Rising Star có niên đại bao nhiêu năm ('unclear how old the etchings... are').",
+            "guide": "Em hãy đọc lại vế cuối cùng của câu cuối Paragraph 4.",
+            "bridge": "Cùng xem niên đại của các vết khắc này đã được xác định chưa nhé."
+          },
+          {
+            "title": "Đối chiếu với bài đọc",
+            "question": "Vế cuối Paragraph 4 nhận xét gì về việc xác định niên đại của các vết khắc ('etchings')?",
+            "guide": "Bài viết: '...researchers have found what seem to be etchings... on the cave walls, though these have yet to be firmly dated.' (mặc dù các vết khắc này vẫn chưa được xác định niên đại một cách chắc chắn).",
+            "bridge": "'yet to be firmly dated' (chưa được định tuổi chắc chắn) đồng nghĩa hoàn toàn với 'unclear how old... are' (chưa rõ niên đại bao nhiêu)."
+          },
+          {
+            "title": "Đưa ra kết luận",
+            "question": "Ý của nhận định có hoàn toàn trùng khớp với bài đọc không?",
+            "guide": "Thông tin trùng khớp 100%, chọn YES.",
+            "bridge": "Chốt câu 38: YES."
+          }
+        ]
+      },
+      "explanation": {
+        "steps": [
+          "<b>Ý nhận định:</b> Chưa rõ các vết khắc trong hang Rising Star có từ bao giờ.",
+          "<b>Paragraph 4 (câu cuối):</b> <i>'...researchers have found what seem to be etchings... on the cave walls, though these have yet to be firmly dated.'</i>",
+          "<b>Khớp từ:</b> <i>unclear how old the etchings are</i> = <i>have yet to be firmly dated</i> (vẫn chưa thể định ngày/tuổi một cách chắc chắn).",
+          "<b>Kết luận:</b> Chọn <b>YES</b>."
+        ]
+      }
+    },
+    "q39": {
+      "num": 39,
+      "text": "The means used to publicise the findings from the Rising Star cave system added to the controversy that surrounds them.",
+      "finalAnswer": "YES",
+      "highlightId": "hl-q39",
+      "socratic": {
+        "steps": [
+          {
+            "title": "Hiểu nội dung nhận định",
+            "question": "Câu 39 nói gì? Phương thức dùng để công bố các phát hiện ('The means used to publicise the findings') từ hang Rising Star đã làm gia tăng tranh cãi quanh chúng ('added to the controversy').",
+            "guide": "Em hãy đọc câu thứ ba của Paragraph 5 nói về tranh cãi xung quanh H. naledi.",
+            "bridge": "Cùng xem cách thức đăng tải kết quả có đẩy tranh cãi lên cao không nhé."
+          },
+          {
+            "title": "Đối chiếu với bài đọc",
+            "question": "Paragraph 5 miêu tả ảnh hưởng của cách công bố bài báo ra sao?",
+            "guide": "Bài viết: 'The dispute has only been heightened by the way the results were released, in a non-traditional journal that publishes peer reviews publicly alongside the paper.' (Cuộc tranh chấp chỉ càng bị đẩy lên cao bởi cách thức mà các kết quả được công bố, trên một tạp chí phi truyền thống...).",
+            "bridge": "'the way the results were released' = phương thức công bố; 'dispute has been heightened' = gia tăng tranh cãi (added to the controversy)."
+          },
+          {
+            "title": "Đưa ra kết luận",
+            "question": "Thông tin nhận định có trùng khớp hoàn toàn với bài đọc không?",
+            "guide": "Thông tin hoàn toàn chính xác, chọn YES.",
+            "bridge": "Chốt câu 39: YES."
+          }
+        ]
+      },
+      "explanation": {
+        "steps": [
+          "<b>Ý nhận định:</b> Cách công bố các phát hiện ở hang Rising Star làm tăng thêm các tranh cãi.",
+          "<b>Paragraph 5 (dòng 3-5):</b> <i>'The dispute has only been heightened by the way the results were released, in a non-traditional journal that publishes peer reviews publicly alongside the paper.'</i>",
+          "<b>Khớp từ:</b> <i>added to the controversy</i> = <i>the dispute has only been heightened</i>; <i>the means used to publicise</i> = <i>the way the results were released</i>.",
+          "<b>Kết luận:</b> Chọn <b>YES</b>."
+        ]
+      }
+    },
+    "q40": {
+      "num": 40,
+      "text": "The size of H. naledi brains is a key factor in the question of whether these hominins were able to produce art.",
+      "finalAnswer": "NO",
+      "highlightId": "hl-q40",
+      "socratic": {
+        "steps": [
+          {
+            "title": "Hiểu nội dung nhận định",
+            "question": "Câu 40 nói gì? Kích thước não bộ của loài H. naledi ('size of H. naledi brains') là yếu tố then chốt ('a key factor') trong câu hỏi liệu loài này có khả năng làm nghệ thuật hay không.",
+            "guide": "Em hãy đọc các câu giữa và cuối Paragraph 5 xem tác giả nhận định thế nào về kích thước não.",
+            "bridge": "Cùng xem tác giả đánh giá kích thước não là mấu chốt hay chỉ là điều gây xao nhãng nhé."
+          },
+          {
+            "title": "Đối chiếu với bài đọc",
+            "question": "Tác giả nêu quan điểm của mình về não bộ nhỏ của H. naledi như thế nào?",
+            "guide": "Bài viết: 'At the same time, I think the species' small brains are a distraction... But other properties, such as the brain's internal wiring, are surely equally important and may explain how a species like H. naledi might have been capable of complex behaviours, despite their small brains.'",
+            "bridge": "Tác giả khẳng định bộ não nhỏ chỉ là một yếu tố gây xao nhãng ('distraction'), chứ không phải yếu tố then chốt ('key factor') quyết định khả năng tạo tác nghệ thuật."
+          },
+          {
+            "title": "Đưa ra kết luận",
+            "question": "Một bên bảo là yếu tố then chốt, một bên khẳng định chỉ là sự xao nhãng gây lệch hướng chú ý. Hai ý này có đối lập hoàn toàn không?",
+            "guide": "Ý kiến hoàn toàn mâu thuẫn, chọn NO.",
+            "bridge": "Hoàn thành toàn bộ Passage 3! Chốt câu 40: NO."
+          }
+        ]
+      },
+      "explanation": {
+        "steps": [
+          "<b>Ý nhận định:</b> Kích thước não của H. naledi là yếu tố then chốt quyết định xem loài này có thể làm nghệ thuật hay không.",
+          "<b>Paragraph 5 (dòng 7-10):</b> Tác giả nêu rõ: <i>'At the same time, I think the species' small brains are a distraction... But other properties, such as the brain's internal wiring, are surely equally important...'</i>",
+          "<b>Đối chiếu:</b> Tác giả bác bỏ nhận định này khi coi kích thước não chỉ là điều gây xao nhãng (<i>a distraction</i>), trái ngược hoàn toàn với nhận định coi đó là yếu tố then chốt (<i>a key factor</i>).",
+          "<b>Kết luận:</b> Chọn <b>NO</b>."
+        ]
+      }
+    }
+  }
+}
