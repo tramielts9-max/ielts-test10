@@ -1,6 +1,6 @@
 /**
  * diagnostic/js-diag/diag-fulltest-engine.js
- * BỘ ĐIỀU PHỐI FULL TEST CHUẨN XÁC 100% - ĐÃ FIX TRIỆT ĐỂ LỖI RENDER READING CAM 21
+ * BỘ ĐIỀU PHỐI FULL TEST CHUẨN XÁC 100% - TOÀN BỘ GIAO DIỆN BUNG TRÀN VIỀN
  */
 
 const _WRITING_PREFIX = "AQ.Ab8RN6KGTRGy";
@@ -56,7 +56,7 @@ class DiagnosticFullTestEngine {
     // 2. Nạp liên hoàn 4 Parts Listening
     await this.loadCrossModuleListening();
 
-    // 3. Nạp liên hoàn 3 Passages Reading Cam 21 (ĐÃ FIX)
+    // 3. Nạp liên hoàn 3 Passages Reading Cam 21
     await this.loadCrossModuleReading();
 
     // 4. Render Writing Task 1 & 2
@@ -261,14 +261,13 @@ class DiagnosticFullTestEngine {
   }
 
   // =========================================================================
-  // 3. NẠP READING LIÊN HOÀN 3 PASSAGES (FIX 100% CẢ CÁCH 1 & CÁCH 2)
+  // 3. NẠP READING LIÊN HOÀN 3 PASSAGES
   // =========================================================================
   async loadCrossModuleReading() {
     const tNum = this.setNum;
     this.readPassages = [];
 
     for (let p = 1; p <= 3; p++) {
-      // Tìm file theo cả 2 đường dẫn (Cách 2 và Cách 1)
       const tryUrls = [
         `data-diag/reading/cam21-test${tNum}-p${p}.json`,
         `data-diag/reading/test${tNum}-reading-s${p}.json`,
@@ -299,17 +298,16 @@ class DiagnosticFullTestEngine {
     if (this.readPassages.length === 0) {
       mount.innerHTML = `
         <div style="text-align:center; padding:30px; color:#DC2626; font-weight:800;">
-          ⚠️ Không tìm thấy file JSON Reading trong thư mục <code>data-diag/reading/</code>!<br>
-          <span style="font-size:13px; color:#64748B;">Hãy đảm bảo file <code>cam21-test1-p1.json</code> đã nằm trong <code>diagnostic/data-diag/reading/</code></span>
+          ⚠️ Không tìm thấy file JSON Reading trong thư mục <code>data-diag/reading/</code>!
         </div>
       `;
       return;
     }
 
     let html = `
-      <div style="display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap;">
+      <div style="display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap;">
         ${this.readPassages.map((p, idx) => `
-          <button type="button" id="btnReadPassage_${idx}" class="btn-3d ${idx === 0 ? 'btn-3d-red' : 'btn-3d-white'}" style="padding:8px 14px; font-size:13px;" onclick="window.ftEngine.switchReadPassage(${idx})">
+          <button type="button" id="btnReadPassage_${idx}" class="btn-3d ${idx === 0 ? 'btn-3d-red' : 'btn-3d-white'}" style="padding:8px 16px; font-size:13px;" onclick="window.ftEngine.switchReadPassage(${idx})">
             Passage ${idx + 1}
           </button>
         `).join('')}
@@ -321,6 +319,7 @@ class DiagnosticFullTestEngine {
     this.switchReadPassage(0);
   }
 
+  // RENDER READING TRÀN VIỀN 2 CỘT
   switchReadPassage(idx) {
     this.activeReadPassageIdx = idx;
     const passage = this.readPassages[idx];
@@ -334,7 +333,6 @@ class DiagnosticFullTestEngine {
     const box = document.getElementById('ftReadActiveBox');
     if (!box) return;
 
-    // RENDER 2 CỘT SPLIT SCREEN CHUẨN MÁY THI
     let qContentHtml = '';
 
     (passage.groups || []).forEach((g, gIdx) => {
@@ -346,7 +344,6 @@ class DiagnosticFullTestEngine {
 
       let inner = '';
 
-      // A. Điền từ dạng template có {{q1}}
       if (g.template) {
         let tmpl = g.template;
         (g.questionIds || []).forEach(qId => {
@@ -354,18 +351,16 @@ class DiagnosticFullTestEngine {
           const num = q.num || qId.replace('q', '');
           const width = q.inputWidth || "120px";
           const inputEl = `
-            <input type="text" class="diag-input" id="inp_ft_read_${qId}" style="width:${width}; display:inline-block; vertical-align:middle; padding:4px 8px; text-align:center; font-weight:800; color:#8B1518; margin:0 4px;" placeholder="[${num}]" oninput="window.ftEngine.recordAnswer('reading', '${qId}', this.value)">
+            <input type="text" class="diag-input" id="inp_ft_read_${qId}" style="width:${width}; display:inline-block; vertical-align:middle; padding:5px 8px; text-align:center; font-weight:800; color:#8B1518; margin:0 4px;" placeholder="[${num}]" oninput="window.ftEngine.recordAnswer('reading', '${qId}', this.value)">
           `;
           tmpl = tmpl.replace(new RegExp(`{{${qId}}}`, 'g'), inputEl);
         });
         inner = `
-          <div style="background:#FFFFFF; border:1.5px solid #CBD5E1; border-radius:12px; padding:16px; font-size:14px; line-height:1.8;">
+          <div style="background:#FFFFFF; border:1.5px solid #CBD5E1; border-radius:12px; padding:18px; font-size:14.5px; line-height:1.85;">
             ${(g.noteTitle || g.summaryTitle) ? `<b style="font-size:15px; color:#8B1518; display:block; margin-bottom:8px;">${g.noteTitle || g.summaryTitle}</b>` : ''}
             ${tmpl}
           </div>
         `;
-
-      // B. Bảng ma trận Matching Information (A-G)
       } else if (isMatchingInfo) {
         let paras = ['A', 'B', 'C', 'D', 'E', 'F', 'G'];
         if (g.questionIds && g.questionIds.length > 0) {
@@ -374,14 +369,13 @@ class DiagnosticFullTestEngine {
             paras = firstQ.options.map(o => String(o).charAt(0).toUpperCase());
           }
         }
-
         inner = `
           <div style="overflow-x:auto; background:#FFFFFF; border:1.5px solid #E8E2D8; border-radius:12px; margin:10px 0;">
-            <table style="width:100%; border-collapse:collapse; font-size:13px;">
+            <table style="width:100%; border-collapse:collapse; font-size:13.5px;">
               <thead>
                 <tr style="background:#FAF7F2;">
-                  <th style="padding:8px 10px; text-align:left;">Câu hỏi</th>
-                  ${paras.map(p => `<th style="padding:8px 6px; text-align:center;">${p}</th>`).join('')}
+                  <th style="padding:10px 12px; text-align:left;">Câu hỏi</th>
+                  ${paras.map(p => `<th style="padding:10px 6px; text-align:center;">${p}</th>`).join('')}
                 </tr>
               </thead>
               <tbody>
@@ -389,7 +383,7 @@ class DiagnosticFullTestEngine {
                   const q = (passage.questions || {})[qId] || {};
                   return `
                     <tr style="border-top:1px solid #E8E2D8;">
-                      <td style="padding:8px 10px; font-weight:700;">Câu ${q.num || qId}. ${q.text || ''}</td>
+                      <td style="padding:10px 12px; font-weight:700;">Câu ${q.num || qId}. ${q.text || ''}</td>
                       ${paras.map(p => `
                         <td style="text-align:center; padding:6px;">
                           <input type="radio" name="rad_ft_read_${qId}" value="${p}" onchange="window.ftEngine.recordAnswer('reading', '${qId}', '${p}')">
@@ -402,24 +396,22 @@ class DiagnosticFullTestEngine {
             </table>
           </div>
         `;
-
-      // C. Trắc nghiệm / TFNG / YNNG
       } else {
         inner = (g.questionIds || []).map(qId => {
           const q = (passage.questions || {})[qId] || {};
           const num = q.num || qId.replace('q', '');
-
           let opts = '';
+
           if (isTFNG) {
             opts = ['TRUE', 'FALSE', 'NOT GIVEN'].map(ch => `
-              <label class="option-label" style="display:inline-flex; width:auto; padding:6px 14px; margin-right:6px;" onclick="window.ftEngine.recordAnswer('reading', '${qId}', '${ch}')">
+              <label class="option-label" style="display:inline-flex; width:auto; padding:7px 16px; margin-right:6px;" onclick="window.ftEngine.recordAnswer('reading', '${qId}', '${ch}')">
                 <input type="radio" name="rad_ft_read_${qId}" value="${ch}">
                 <span>${ch}</span>
               </label>
             `).join('');
           } else if (isYNNG) {
             opts = ['YES', 'NO', 'NOT GIVEN'].map(ch => `
-              <label class="option-label" style="display:inline-flex; width:auto; padding:6px 14px; margin-right:6px;" onclick="window.ftEngine.recordAnswer('reading', '${qId}', '${ch}')">
+              <label class="option-label" style="display:inline-flex; width:auto; padding:7px 16px; margin-right:6px;" onclick="window.ftEngine.recordAnswer('reading', '${qId}', '${ch}')">
                 <input type="radio" name="rad_ft_read_${qId}" value="${ch}">
                 <span>${ch}</span>
               </label>
@@ -437,7 +429,7 @@ class DiagnosticFullTestEngine {
 
           return `
             <div class="q-item-box" style="margin-bottom:12px;">
-              <b style="font-size:13.5px; color:#1E293B; display:block; margin-bottom:6px;">
+              <b style="font-size:14px; color:#1E293B; display:block; margin-bottom:6px;">
                 Câu ${num}. ${q.text || ''}
               </b>
               <div style="display:flex; flex-wrap:wrap; gap:6px;">${opts}</div>
@@ -447,8 +439,8 @@ class DiagnosticFullTestEngine {
       }
 
       qContentHtml += `
-        <div style="background:#FAF7F2; border:1.5px solid #E8E2D8; border-radius:14px; padding:16px; margin-bottom:18px;">
-          <b style="font-size:15px; color:#8B1518; display:block; margin-bottom:4px;">${g.title}</b>
+        <div style="background:#FAF7F2; border:1.5px solid #E8E2D8; border-radius:14px; padding:16px; margin-bottom:16px;">
+          <b style="font-size:15.5px; color:#8B1518; display:block; margin-bottom:4px;">${g.title}</b>
           ${g.instructions ? `<div style="font-size:13px; color:#64748B; margin-bottom:12px;">${g.instructions}</div>` : ''}
           ${inner}
         </div>
@@ -456,18 +448,19 @@ class DiagnosticFullTestEngine {
     });
 
     box.innerHTML = `
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:18px; min-height:550px;">
-        <div class="reading-passage-split" style="margin-bottom:0; max-height:calc(100vh - 240px); overflow-y:auto;">
-          <h4 style="margin:0 0 10px 0; color:var(--tram-red);">${passage.title || `READING PASSAGE ${idx + 1}`}</h4>
-          <div style="line-height:1.75; font-size:14.5px;">${passage.passageHtml || passage.passageText || ''}</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; height:calc(100vh - 215px);">
+        <!-- CỘT TRÁI: BÀI ĐỌC -->
+        <div class="reading-passage-split" style="margin-bottom:0; height:100%; overflow-y:auto; padding:24px 26px;">
+          <h3 style="margin:0 0 12px 0; color:var(--tram-red); font-size:18px;">${passage.title || `READING PASSAGE ${idx + 1}`}</h3>
+          <div style="line-height:1.8; font-size:15px; color:#1E293B;">${passage.passageHtml || passage.passageText || ''}</div>
         </div>
-        <div style="max-height:calc(100vh - 240px); overflow-y:auto; padding-right:4px;">
+        <!-- CỘT PHẢI: CÂU HỎI -->
+        <div style="height:100%; overflow-y:auto; padding-right:6px;">
           ${qContentHtml}
         </div>
       </div>
     `;
 
-    // Khôi phục các đáp án đã chọn
     Object.entries(this.userAnswers.reading).forEach(([qid, val]) => {
       const inp = document.getElementById(`inp_ft_read_${qid}`);
       if (inp) inp.value = val;
@@ -476,39 +469,54 @@ class DiagnosticFullTestEngine {
     });
   }
 
-  // =========================================================================
-  // 4. WRITING
-  // =========================================================================
+  // RENDER WRITING TRÀN VIỀN: ĐỀ TRÁI - GÕ PHẢI
   renderFullWriting() {
     const mount = document.getElementById('ftWritingMount');
     if (!mount) return;
 
     mount.innerHTML = `
-      <div class="q-item-box" style="margin-bottom:24px; border:2.5px solid #BFDBFE;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:8px;">
-          <b style="font-size:16px; color:#1E40AF;">📊 TASK 1: BÁO CÁO BIỂU ĐỒ (TỐI THIỂU 150 TỪ)</b>
-          <span style="font-size:12px; font-weight:800; background:#DBEAFE; color:#1E40AF; padding:3px 10px; border-radius:10px;">Khuyến nghị 20 phút</span>
+      <!-- TASK 1 -->
+      <div style="background:#FAF7F2; border:2.5px solid #BFDBFE; border-radius:18px; padding:20px; margin-bottom:24px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:8px;">
+          <b style="font-size:16.5px; color:#1E40AF;">📊 TASK 1: BÁO CÁO BIỂU ĐỒ (TỐI THIỂU 150 TỪ)</b>
+          <span style="font-size:12.5px; font-weight:800; background:#DBEAFE; color:#1E40AF; padding:4px 12px; border-radius:10px;">Khuyến nghị 20 phút</span>
         </div>
-        <p style="font-size:13.5px; color:#334155; line-height:1.6; margin-bottom:12px;">
-          <b>Đề bài:</b> "The graph below shows the price of different kinds of bread, in dollars, from 2001 to 2005. Summarise the information by selecting and reporting the main features, and make comparisons where relevant."
-        </p>
-        <div style="text-align:center; margin-bottom:12px;">
-          <img src="../writing task 1/images_task1/task1_img_104.jpeg" alt="Biểu đồ Task 1" style="max-width:100%; max-height:260px; border-radius:8px;">
+        <div style="display:grid; grid-template-columns:45% 55%; gap:20px; align-items:start;">
+          <div style="background:#FFFFFF; border:1.5px solid #CBD5E1; border-radius:14px; padding:16px;">
+            <p style="font-size:14px; color:#1E293B; line-height:1.6; margin:0 0 12px 0;">
+              <b>Đề bài:</b> "The graph below shows the price of different kinds of bread, in dollars, from 2001 to 2005. Summarise the information by selecting and reporting the main features, and make comparisons where relevant."
+            </p>
+            <div style="text-align:center;">
+              <img src="../writing task 1/images_task1/task1_img_104.jpeg" alt="Biểu đồ Task 1" style="max-width:100%; max-height:340px; border-radius:8px; object-fit:contain;">
+            </div>
+          </div>
+          <div>
+            <textarea id="ft_writing_task1" class="diag-textarea" style="height:380px;" placeholder="Bắt đầu viết bài Task 1 tại đây..." oninput="window.ftEngine.updateWordCount('ft_writing_task1', 'wc_task1')"></textarea>
+            <div style="text-align:right; font-size:13px; font-weight:800; color:#1E40AF; margin-top:6px;" id="wc_task1">0 từ (Yêu cầu tối thiểu 150 từ)</div>
+          </div>
         </div>
-        <textarea id="ft_writing_task1" class="diag-textarea" rows="9" placeholder="Viết toàn bộ bài báo cáo Task 1 tại đây..." oninput="window.ftEngine.updateWordCount('ft_writing_task1', 'wc_task1')"></textarea>
-        <div style="text-align:right; font-size:12px; font-weight:800; color:#1E40AF; margin-top:4px;" id="wc_task1">0 từ</div>
       </div>
 
-      <div class="q-item-box" style="border:2.5px solid #DDD6FE;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:8px;">
-          <b style="font-size:16px; color:#7C3AED;">📝 TASK 2: BÀI LUẬN NGHỊ LUẬN (TỐI THIỂU 250 TỪ)</b>
-          <span style="font-size:12px; font-weight:800; background:#EDE9FE; color:#6D28D9; padding:3px 10px; border-radius:10px;">Khuyến nghị 40 phút</span>
+      <!-- TASK 2 -->
+      <div style="background:#FAF7F2; border:2.5px solid #DDD6FE; border-radius:18px; padding:20px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:8px;">
+          <b style="font-size:16.5px; color:#7C3AED;">📝 TASK 2: BÀI LUẬN NGHỊ LUẬN (TỐI THIỂU 250 TỪ)</b>
+          <span style="font-size:12.5px; font-weight:800; background:#EDE9FE; color:#6D28D9; padding:4px 12px; border-radius:10px;">Khuyến nghị 40 phút</span>
         </div>
-        <p style="font-size:13.5px; color:#334155; line-height:1.6; margin-bottom:12px;">
-          <b>Đề bài:</b> "The typical teaching situation between students and teachers in the classroom will be gone by the year 2050. To what extent do you agree or disagree?"
-        </p>
-        <textarea id="ft_writing_task2" class="diag-textarea" rows="14" placeholder="Viết toàn bộ bài luận Task 2 tại đây..." oninput="window.ftEngine.updateWordCount('ft_writing_task2', 'wc_task2')"></textarea>
-        <div style="text-align:right; font-size:12px; font-weight:800; color:#7C3AED; margin-top:4px;" id="wc_task2">0 từ</div>
+        <div style="display:grid; grid-template-columns:40% 60%; gap:20px; align-items:start;">
+          <div style="background:#FFFFFF; border:1.5px solid #CBD5E1; border-radius:14px; padding:18px;">
+            <p style="font-size:14.5px; color:#1E293B; line-height:1.7; margin:0;">
+              <b>Đề bài:</b> "The typical teaching situation between students and teachers in the classroom will be gone by the year 2050. To what extent do you agree or disagree?"
+            </p>
+            <div style="margin-top:14px; padding:10px; background:#F8FAFC; border-left:4px solid #7C3AED; border-radius:6px; font-size:12.5px; color:#475569;">
+              💡 <b>Gợi ý:</b> Trả lời đầy đủ câu hỏi, chia đoạn rõ ràng theo cấu trúc PEEL (Introduction - Body 1 - Body 2 - Conclusion).
+            </div>
+          </div>
+          <div>
+            <textarea id="ft_writing_task2" class="diag-textarea" style="height:420px;" placeholder="Bắt đầu viết bài luận Task 2 tại đây..." oninput="window.ftEngine.updateWordCount('ft_writing_task2', 'wc_task2')"></textarea>
+            <div style="text-align:right; font-size:13px; font-weight:800; color:#7C3AED; margin-top:6px;" id="wc_task2">0 từ (Yêu cầu tối thiểu 250 từ)</div>
+          </div>
+        </div>
       </div>
     `;
   }
