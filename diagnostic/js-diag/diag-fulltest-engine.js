@@ -1,6 +1,6 @@
 /**
  * diagnostic/js-diag/diag-fulltest-engine.js
- * BỘ ĐIỀU PHỐI FULL TEST CHUẨN XÁC 100% - FIX LỖI RENDER CẢ 4 KỸ NĂNG & 100 CÂU NGỮ PHÁP
+ * BỘ ĐIỀU PHỐI FULL TEST CHUẨN XÁC 100% - ĐÃ FIX TRIỆT ĐỂ LỖI RENDER READING CAM 21
  */
 
 const _WRITING_PREFIX = "AQ.Ab8RN6KGTRGy";
@@ -38,7 +38,6 @@ class DiagnosticFullTestEngine {
     this.activeReadPassageIdx = 0;
     this.isRecording = false;
     this.speechRecognition = null;
-    this.prepInterval = null;
   }
 
   async init() {
@@ -51,13 +50,13 @@ class DiagnosticFullTestEngine {
       titleEl.innerText = `IELTS FULL MOCK TEST • CAMBRIDGE 21 (SET ${this.setNum})`;
     }
 
-    // 1. Nạp và render 100 câu ngữ pháp
+    // 1. Nạp 100 câu ngữ pháp
     await this.loadGrammar100();
 
-    // 2. Nạp liên hoàn 4 Parts Listening Cam 21
+    // 2. Nạp liên hoàn 4 Parts Listening
     await this.loadCrossModuleListening();
 
-    // 3. Nạp liên hoàn 3 Passages Reading Cam 21
+    // 3. Nạp liên hoàn 3 Passages Reading Cam 21 (ĐÃ FIX)
     await this.loadCrossModuleReading();
 
     // 4. Render Writing Task 1 & 2
@@ -72,7 +71,7 @@ class DiagnosticFullTestEngine {
   }
 
   // =========================================================================
-  // 1. FIX LỖI RENDER 100 CÂU NGỮ PHÁP (PARTS 1 - 5)
+  // 1. NẠP 100 CÂU NGỮ PHÁP
   // =========================================================================
   async loadGrammar100() {
     const mount = document.getElementById('ftGrammarMount');
@@ -96,7 +95,6 @@ class DiagnosticFullTestEngine {
         `;
 
         (part.questions || []).forEach(q => {
-          // A. Trắc nghiệm (Part 4)
           if (q.type === 'choice') {
             html += `
               <div class="q-item-box" style="margin-bottom:12px;">
@@ -113,7 +111,6 @@ class DiagnosticFullTestEngine {
                 </div>
               </div>
             `;
-          // B. Động từ bất quy tắc V2-V3 (Part 2)
           } else if (q.type === 'drill_v2_v3') {
             html += `
               <div class="q-item-box" style="margin-bottom:10px; display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
@@ -122,7 +119,6 @@ class DiagnosticFullTestEngine {
                 <input type="text" class="diag-input" style="flex:1; min-width:140px;" placeholder="Điền V3..." oninput="window.ftEngine.recordAnswer('grammar', '${q.id}_v3', this.value)">
               </div>
             `;
-          // C. Điền từ Word Form (Part 3) & Viết lại câu (Part 5)
           } else if (q.type === 'blank' || q.type === 'rewrite') {
             const promptText = q.type === 'blank' ? q.prompt.replace('[blank]', '_______') : q.prompt;
             html += `
@@ -136,7 +132,6 @@ class DiagnosticFullTestEngine {
                 </div>
               </div>
             `;
-          // D. Tự luận lý thuyết (Part 1)
           } else {
             html += `
               <div class="q-item-box" style="margin-bottom:12px;">
@@ -159,22 +154,17 @@ class DiagnosticFullTestEngine {
   }
 
   // =========================================================================
-  // 2. FIX LỖI RENDER LISTENING CAM 21 (THAY THẾ CHUẨN XÁC {{q1}} VÀO TABLE)
+  // 2. NẠP LISTENING
   // =========================================================================
   async loadCrossModuleListening() {
     const tNum = this.setNum;
     try {
-      const [p1, p2, p3, p4] = await Promise.all([
-        fetch(`../listening/data-l/cam21-lis-test${tNum}/cam21-lis-test${tNum}-p1.json`).then(r => r.json()),
-        fetch(`../listening/data-l/cam21-lis-test${tNum}/cam21-lis-test${tNum}-p2.json`).then(r => r.json()),
-        fetch(`../listening/data-l/cam21-lis-test${tNum}/cam21-lis-test${tNum}-p3.json`).then(r => r.json()),
-        fetch(`../listening/data-l/cam21-lis-test${tNum}/cam21-lis-test${tNum}-p4.json`).then(r => r.json())
-      ]);
-
-      this.lisParts = [p1, p2, p3, p4];
+      const urls = [1, 2, 3, 4].map(p => `../listening/data-l/cam21-lis-test${tNum}/cam21-lis-test${tNum}-p${p}.json`);
+      const results = await Promise.all(urls.map(u => fetch(`${u}?t=${Date.now()}`).then(r => r.ok ? r.json() : null).catch(() => null)));
+      this.lisParts = results.filter(Boolean);
       this.renderFullListeningUI();
     } catch (e) {
-      console.warn("Lỗi nạp liên hoàn bài nghe Cam 21:", e);
+      console.warn("Lỗi nạp bài nghe:", e);
     }
   }
 
@@ -223,11 +213,10 @@ class DiagnosticFullTestEngine {
         qHtml += `<div style="background:#FAF7F2; border:1.5px solid #E8E2D8; border-radius:10px; padding:8px 12px; font-size:13px; font-weight:700; color:#475569; margin-bottom:12px;">${g.instructions}</div>`;
       }
 
-      // 1. DẠNG BẢNG (TABLE) HOẶC NOTES: THAY THẾ CHUẨN XÁC {{q1}} THÀNH INPUT
       if (g.tableHtml || g.template) {
         let content = g.tableHtml || g.template;
         (g.questionIds || []).forEach(qId => {
-          const q = part.questions[qId];
+          const q = (part.questions || {})[qId];
           const width = q?.inputWidth || "120px";
           const inputHtml = `
             <input type="text" class="diag-input" id="inp_ft_lis_${qId}" style="width:${width}; display:inline-block; padding:4px 8px; text-align:center; font-weight:800; color:#0284C7;" placeholder="[${q?.num || qId}]" oninput="window.ftEngine.recordAnswer('listening', '${qId}', this.value)">
@@ -235,34 +224,9 @@ class DiagnosticFullTestEngine {
           content = content.replace(new RegExp(`{{${qId}}}`, 'g'), inputHtml);
         });
         qHtml += `<div style="margin-bottom:16px; font-size:14px; line-height:1.8;">${content}</div>`;
-
-      // 2. DẠNG BẢN ĐỒ MAP LABELLING
-      } else if (g.type === 'map' || g.imageUrl) {
-        const letters = ['A','B','C','D','E','F','G','H','I'].slice(0, g.optionsCount || 9);
-        qHtml += `
-          <div style="background:#FFFFFF; border:2px solid #E8E2D8; border-radius:14px; padding:10px; text-align:center; margin-bottom:12px;">
-            <img src="../listening/${g.imageUrl}" alt="Map" style="max-width:100%; border-radius:8px;">
-          </div>
-          <table style="width:100%; border-collapse:collapse; background:#FFFFFF; border:2px solid #E8E2D8; border-radius:12px; overflow:hidden; margin-bottom:16px;">
-            <thead><tr style="background:#FAF7F2;"><th style="padding:8px 12px; text-align:left;">Địa điểm</th>${letters.map(l => `<th style="padding:8px 4px; text-align:center;">${l}</th>`).join('')}</tr></thead>
-            <tbody>
-              ${(g.questionIds || []).map(qId => {
-                const q = part.questions[qId];
-                return `
-                  <tr style="border-top:1px solid #E8E2D8;">
-                    <td style="padding:8px 12px; font-weight:800; font-size:13px;">Câu ${q?.num || qId}. ${q?.text || ''}</td>
-                    ${letters.map(l => `<td style="text-align:center; padding:4px;"><input type="radio" name="rad_ft_lis_${qId}" value="${l}" onchange="window.ftEngine.recordAnswer('listening', '${qId}', '${l}')"></td>`).join('')}
-                  </tr>
-                `;
-              }).join('')}
-            </tbody>
-          </table>
-        `;
-
-      // 3. DẠNG TRẮC NGHIỆM / NỐI THÔNG TIN
       } else {
         (g.questionIds || []).forEach(qId => {
-          const q = part.questions[qId];
+          const q = (part.questions || {})[qId];
           if (!q) return;
 
           qHtml += `
@@ -288,7 +252,6 @@ class DiagnosticFullTestEngine {
 
     box.innerHTML = qHtml;
 
-    // Khôi phục giá trị
     Object.entries(this.userAnswers.listening).forEach(([qid, val]) => {
       const inp = document.getElementById(`inp_ft_lis_${qid}`);
       if (inp) inp.value = val;
@@ -298,27 +261,50 @@ class DiagnosticFullTestEngine {
   }
 
   // =========================================================================
-  // 3. FIX LỖI RENDER READING CAM 21 (PASSAGE 1, 2, 3)
+  // 3. NẠP READING LIÊN HOÀN 3 PASSAGES (FIX 100% CẢ CÁCH 1 & CÁCH 2)
   // =========================================================================
   async loadCrossModuleReading() {
     const tNum = this.setNum;
-    try {
-      const [r1, r2, r3] = await Promise.all([
-        fetch(`../reading/data-r/cam21-test${tNum}/cam21-test${tNum}-p1.json`).then(r => r.json()),
-        fetch(`../reading/data-r/cam21-test${tNum}/cam21-test${tNum}-p2.json`).then(r => r.json()),
-        fetch(`../reading/data-r/cam21-test${tNum}/cam21-test${tNum}-p3.json`).then(r => r.json())
-      ]);
+    this.readPassages = [];
 
-      this.readPassages = [r1, r2, r3];
-      this.renderFullReadingUI();
-    } catch (e) {
-      console.warn("Lỗi nạp liên hoàn bài đọc Cam 21:", e);
+    for (let p = 1; p <= 3; p++) {
+      // Tìm file theo cả 2 đường dẫn (Cách 2 và Cách 1)
+      const tryUrls = [
+        `data-diag/reading/cam21-test${tNum}-p${p}.json`,
+        `data-diag/reading/test${tNum}-reading-s${p}.json`,
+        `../reading/data-r/cam21-test${tNum}/cam21-test${tNum}-p${p}.json`
+      ];
+
+      let data = null;
+      for (const u of tryUrls) {
+        try {
+          const res = await fetch(`${u}?t=${Date.now()}`);
+          if (res.ok) {
+            data = await res.json();
+            break;
+          }
+        } catch (e) {}
+      }
+
+      if (data) this.readPassages.push(data);
     }
+
+    this.renderFullReadingUI();
   }
 
   renderFullReadingUI() {
     const mount = document.getElementById('ftReadingMount');
-    if (!mount || this.readPassages.length === 0) return;
+    if (!mount) return;
+
+    if (this.readPassages.length === 0) {
+      mount.innerHTML = `
+        <div style="text-align:center; padding:30px; color:#DC2626; font-weight:800;">
+          ⚠️ Không tìm thấy file JSON Reading trong thư mục <code>data-diag/reading/</code>!<br>
+          <span style="font-size:13px; color:#64748B;">Hãy đảm bảo file <code>cam21-test1-p1.json</code> đã nằm trong <code>diagnostic/data-diag/reading/</code></span>
+        </div>
+      `;
+      return;
+    }
 
     let html = `
       <div style="display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap;">
@@ -348,41 +334,140 @@ class DiagnosticFullTestEngine {
     const box = document.getElementById('ftReadActiveBox');
     if (!box) return;
 
-    let html = `
-      <div class="reading-passage-split">
-        <h4 style="margin:0 0 10px 0; color:var(--tram-red);">${passage.passageTitle || passage.title || `READING PASSAGE ${idx + 1}`}</h4>
-        <div style="white-space:pre-wrap;">${passage.passageText || passage.passageHtml || ''}</div>
-      </div>
-    `;
+    // RENDER 2 CỘT SPLIT SCREEN CHUẨN MÁY THI
+    let qContentHtml = '';
 
-    (passage.questions || []).forEach((q, qIdx) => {
-      const qNum = q.num || qIdx + 1;
-      const qText = q.questionText || q.prompt || q.statement || '';
+    (passage.groups || []).forEach((g, gIdx) => {
+      const gType = (g.type || '').toLowerCase();
+      const gMeta = ((g.title || '') + ' ' + (g.instructions || '')).toLowerCase();
+      const isTFNG = gType.includes('tfng') || gMeta.includes('true/false/not given');
+      const isYNNG = gType.includes('ynng') || gMeta.includes('yes/no/not given');
+      const isMatchingInfo = gType.includes('matching_info') || gMeta.includes('which section') || gMeta.includes('contains the following');
 
-      html += `
-        <div class="q-item-box" style="margin-bottom:12px;">
-          <b style="font-size:13.5px; color:#1E293B; display:block; margin-bottom:6px;">
-            Câu ${qNum}. ${qText}
-          </b>
-          ${q.options ? `
-            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:6px;">
-              ${q.options.map(opt => `
-                <label class="option-label" onclick="window.ftEngine.recordAnswer('reading', '${q.id || `r_${idx}_${qNum}`}', '${opt.charAt(0)}')">
-                  <input type="radio" name="rad_ft_read_${q.id || qNum}" value="${opt.charAt(0)}">
-                  <span>${opt}</span>
-                </label>
-              `).join('')}
+      let inner = '';
+
+      // A. Điền từ dạng template có {{q1}}
+      if (g.template) {
+        let tmpl = g.template;
+        (g.questionIds || []).forEach(qId => {
+          const q = (passage.questions || {})[qId] || {};
+          const num = q.num || qId.replace('q', '');
+          const width = q.inputWidth || "120px";
+          const inputEl = `
+            <input type="text" class="diag-input" id="inp_ft_read_${qId}" style="width:${width}; display:inline-block; vertical-align:middle; padding:4px 8px; text-align:center; font-weight:800; color:#8B1518; margin:0 4px;" placeholder="[${num}]" oninput="window.ftEngine.recordAnswer('reading', '${qId}', this.value)">
+          `;
+          tmpl = tmpl.replace(new RegExp(`{{${qId}}}`, 'g'), inputEl);
+        });
+        inner = `
+          <div style="background:#FFFFFF; border:1.5px solid #CBD5E1; border-radius:12px; padding:16px; font-size:14px; line-height:1.8;">
+            ${(g.noteTitle || g.summaryTitle) ? `<b style="font-size:15px; color:#8B1518; display:block; margin-bottom:8px;">${g.noteTitle || g.summaryTitle}</b>` : ''}
+            ${tmpl}
+          </div>
+        `;
+
+      // B. Bảng ma trận Matching Information (A-G)
+      } else if (isMatchingInfo) {
+        let paras = ['A', 'B', 'C', 'D', 'E', 'F', 'G'];
+        if (g.questionIds && g.questionIds.length > 0) {
+          const firstQ = (passage.questions || {})[g.questionIds[0]];
+          if (firstQ && Array.isArray(firstQ.options) && firstQ.options.length > 0) {
+            paras = firstQ.options.map(o => String(o).charAt(0).toUpperCase());
+          }
+        }
+
+        inner = `
+          <div style="overflow-x:auto; background:#FFFFFF; border:1.5px solid #E8E2D8; border-radius:12px; margin:10px 0;">
+            <table style="width:100%; border-collapse:collapse; font-size:13px;">
+              <thead>
+                <tr style="background:#FAF7F2;">
+                  <th style="padding:8px 10px; text-align:left;">Câu hỏi</th>
+                  ${paras.map(p => `<th style="padding:8px 6px; text-align:center;">${p}</th>`).join('')}
+                </tr>
+              </thead>
+              <tbody>
+                ${(g.questionIds || []).map(qId => {
+                  const q = (passage.questions || {})[qId] || {};
+                  return `
+                    <tr style="border-top:1px solid #E8E2D8;">
+                      <td style="padding:8px 10px; font-weight:700;">Câu ${q.num || qId}. ${q.text || ''}</td>
+                      ${paras.map(p => `
+                        <td style="text-align:center; padding:6px;">
+                          <input type="radio" name="rad_ft_read_${qId}" value="${p}" onchange="window.ftEngine.recordAnswer('reading', '${qId}', '${p}')">
+                        </td>
+                      `).join('')}
+                    </tr>
+                  `;
+                }).join('')}
+              </tbody>
+            </table>
+          </div>
+        `;
+
+      // C. Trắc nghiệm / TFNG / YNNG
+      } else {
+        inner = (g.questionIds || []).map(qId => {
+          const q = (passage.questions || {})[qId] || {};
+          const num = q.num || qId.replace('q', '');
+
+          let opts = '';
+          if (isTFNG) {
+            opts = ['TRUE', 'FALSE', 'NOT GIVEN'].map(ch => `
+              <label class="option-label" style="display:inline-flex; width:auto; padding:6px 14px; margin-right:6px;" onclick="window.ftEngine.recordAnswer('reading', '${qId}', '${ch}')">
+                <input type="radio" name="rad_ft_read_${qId}" value="${ch}">
+                <span>${ch}</span>
+              </label>
+            `).join('');
+          } else if (isYNNG) {
+            opts = ['YES', 'NO', 'NOT GIVEN'].map(ch => `
+              <label class="option-label" style="display:inline-flex; width:auto; padding:6px 14px; margin-right:6px;" onclick="window.ftEngine.recordAnswer('reading', '${qId}', '${ch}')">
+                <input type="radio" name="rad_ft_read_${qId}" value="${ch}">
+                <span>${ch}</span>
+              </label>
+            `).join('');
+          } else if (q.options && Array.isArray(q.options)) {
+            opts = q.options.map(opt => `
+              <label class="option-label" onclick="window.ftEngine.recordAnswer('reading', '${qId}', '${opt.charAt(0)}')">
+                <input type="radio" name="rad_ft_read_${qId}" value="${opt.charAt(0)}">
+                <span>${opt}</span>
+              </label>
+            `).join('');
+          } else {
+            opts = `<input type="text" class="diag-input" id="inp_ft_read_${qId}" placeholder="Điền đáp án..." oninput="window.ftEngine.recordAnswer('reading', '${qId}', this.value)">`;
+          }
+
+          return `
+            <div class="q-item-box" style="margin-bottom:12px;">
+              <b style="font-size:13.5px; color:#1E293B; display:block; margin-bottom:6px;">
+                Câu ${num}. ${q.text || ''}
+              </b>
+              <div style="display:flex; flex-wrap:wrap; gap:6px;">${opts}</div>
             </div>
-          ` : `
-            <input type="text" class="diag-input" id="inp_ft_read_${q.id || qNum}" placeholder="Điền đáp án..." oninput="window.ftEngine.recordAnswer('reading', '${q.id || `r_${idx}_${qNum}`}', this.value)">
-          `}
+          `;
+        }).join('');
+      }
+
+      qContentHtml += `
+        <div style="background:#FAF7F2; border:1.5px solid #E8E2D8; border-radius:14px; padding:16px; margin-bottom:18px;">
+          <b style="font-size:15px; color:#8B1518; display:block; margin-bottom:4px;">${g.title}</b>
+          ${g.instructions ? `<div style="font-size:13px; color:#64748B; margin-bottom:12px;">${g.instructions}</div>` : ''}
+          ${inner}
         </div>
       `;
     });
 
-    box.innerHTML = html;
+    box.innerHTML = `
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:18px; min-height:550px;">
+        <div class="reading-passage-split" style="margin-bottom:0; max-height:calc(100vh - 240px); overflow-y:auto;">
+          <h4 style="margin:0 0 10px 0; color:var(--tram-red);">${passage.title || `READING PASSAGE ${idx + 1}`}</h4>
+          <div style="line-height:1.75; font-size:14.5px;">${passage.passageHtml || passage.passageText || ''}</div>
+        </div>
+        <div style="max-height:calc(100vh - 240px); overflow-y:auto; padding-right:4px;">
+          ${qContentHtml}
+        </div>
+      </div>
+    `;
 
-    // Khôi phục đáp án
+    // Khôi phục các đáp án đã chọn
     Object.entries(this.userAnswers.reading).forEach(([qid, val]) => {
       const inp = document.getElementById(`inp_ft_read_${qid}`);
       if (inp) inp.value = val;
@@ -392,14 +477,13 @@ class DiagnosticFullTestEngine {
   }
 
   // =========================================================================
-  // 4. RENDER FULL WRITING (TASK 1 & TASK 2)
+  // 4. WRITING
   // =========================================================================
   renderFullWriting() {
     const mount = document.getElementById('ftWritingMount');
     if (!mount) return;
 
     mount.innerHTML = `
-      <!-- TASK 1 -->
       <div class="q-item-box" style="margin-bottom:24px; border:2.5px solid #BFDBFE;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:8px;">
           <b style="font-size:16px; color:#1E40AF;">📊 TASK 1: BÁO CÁO BIỂU ĐỒ (TỐI THIỂU 150 TỪ)</b>
@@ -415,7 +499,6 @@ class DiagnosticFullTestEngine {
         <div style="text-align:right; font-size:12px; font-weight:800; color:#1E40AF; margin-top:4px;" id="wc_task1">0 từ</div>
       </div>
 
-      <!-- TASK 2 -->
       <div class="q-item-box" style="border:2.5px solid #DDD6FE;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:8px;">
           <b style="font-size:16px; color:#7C3AED;">📝 TASK 2: BÀI LUẬN NGHỊ LUẬN (TỐI THIỂU 250 TỪ)</b>
@@ -440,7 +523,7 @@ class DiagnosticFullTestEngine {
   }
 
   // =========================================================================
-  // 5. RENDER FULL SPEAKING (3 PARTS)
+  // 5. SPEAKING
   // =========================================================================
   renderFullSpeaking() {
     const mount = document.getElementById('ftSpeakingMount');
@@ -477,7 +560,7 @@ class DiagnosticFullTestEngine {
   }
 
   // =========================================================================
-  // 6. TIỆN ÍCH LƯU ĐÁP ÁN & ĐIỀU HƯỚNG TAB
+  // 6. TIỆN ÍCH LƯU ĐÁP ÁN & ĐIỀU HƯỚNG
   // =========================================================================
   recordAnswer(skill, qId, val) {
     if (this.userAnswers[skill]) {
@@ -553,7 +636,7 @@ class DiagnosticFullTestEngine {
   }
 
   // =========================================================================
-  // 7. NỘP BÀI VÀ TÍNH ĐIỂM TỔNG HỢP OVERALL
+  // 7. NỘP BÀI VÀ CHẤM ĐIỂM
   // =========================================================================
   async submitFullMockTest() {
     if (!confirm("Em có chắc chắn muốn nộp toàn bộ bài Full Mock Test để xuất Overall Band Score?")) return;
@@ -598,15 +681,27 @@ class DiagnosticFullTestEngine {
     // Chấm Reading (40 câu)
     let rCorrect = 0;
     this.readPassages.forEach(p => {
-      (p.questions || []).forEach(q => {
-        const u = (this.userAnswers.reading[q.id] || '').toUpperCase().trim();
-        const exp = (q.correctAnswer || '').toUpperCase().trim();
-        if (u && exp && u === exp) rCorrect++;
+      const expAnswers = p.answers || {};
+      Object.entries(expAnswers).forEach(([qid, exp]) => {
+        const u = (this.userAnswers.reading[qid] || '').toLowerCase().trim();
+        let normUser = u;
+        if (u === 't') normUser = 'true';
+        if (u === 'f') normUser = 'false';
+        if (u === 'ng') normUser = 'not given';
+        if (u === 'y') normUser = 'yes';
+        if (u === 'n') normUser = 'no';
+
+        if (Array.isArray(exp)) {
+          if (exp.some(a => String(a).toLowerCase().trim() === normUser || String(a).toLowerCase().trim() === u)) rCorrect++;
+        } else {
+          const e = String(exp).toLowerCase().trim();
+          if (normUser === e || u === e) rCorrect++;
+        }
       });
     });
     const readBand = parseFloat(this.calculateBandScore(rCorrect, 40));
 
-    // Writing & Speaking ước tính
+    // Writing & Speaking
     const wt1Len = (document.getElementById('ft_writing_task1')?.value || '').trim().split(/\s+/).filter(Boolean).length;
     const wt2Len = (document.getElementById('ft_writing_task2')?.value || '').trim().split(/\s+/).filter(Boolean).length;
     const writeBand = (wt1Len >= 120 && wt2Len >= 200) ? 6.5 : (wt1Len >= 80 ? 5.5 : 4.5);
@@ -616,7 +711,7 @@ class DiagnosticFullTestEngine {
     const rawOverall = (lisBand + readBand + writeBand + spkBand) / 4;
     const overallBand = (Math.round(rawOverall * 2) / 2).toFixed(1);
 
-    // Bảng kết quả tổng hợp
+    // Xuất kết quả
     document.querySelector('.fulltest-container').innerHTML = `
       <div style="background:#FFFFFF; border:3px solid #E8E2D8; border-bottom:7px solid #D3CBC0; border-radius:24px; padding:36px; max-width:850px; margin:30px auto; text-align:center;">
         <div style="font-size:48px; margin-bottom:10px;">🏆</div>
