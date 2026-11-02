@@ -1,0 +1,507 @@
+{
+  "title": "IELTS Academic 21 - Test 3 - Passage 2: Dar es Salaam",
+  "answers": {
+    "q14": "NOT GIVEN",
+    "q15": "FALSE",
+    "q16": "NOT GIVEN",
+    "q17": "TRUE",
+    "q18": "FALSE",
+    "q19": "lanes",
+    "q20": "boarding",
+    "q21": "wheelchairs",
+    "q22": "fuel",
+    "q23": "flood",
+    "q24": "smartcards",
+    "q25": "gates",
+    "q26": "queues"
+  },
+  "passageHtml": "<h2>READING PASSAGE 2</h2><h3>The problems of getting around the city of Dar es Salaam</h3><p><span class=\"hl\" id=\"hl-q14\" data-q=\"[Q14]\">Dar es Salaam in Tanzania is one of the fastest growing cities in Africa. Its population has increased eightfold since 1980 and swells by half a million people every year. United Nations projections anticipate it will become a megacity within seven years as its population passes 10 million, reaching 13.4 million by 2035. Daniel Hoornweg for the Global Cities Institute forecasts the city could be home to an incredible 73.7 million people by 2100.</span></p><p><span class=\"hl\" id=\"hl-q15\" data-q=\"[Q15]\">Today, four out of five of its people live in single-storey informal settlements on the spreading edges of the city, where the journey to and from the centre regularly takes over two hours.</span> It can be longer if rain turns the dirt roads to mud.</p><p>Even in the middle of the day, traffic frequently slows to a stop without warning. It is not unusual for cars and minibuses to queue for 20 minutes at a key intersection. <span class=\"hl\" id=\"hl-q16\" data-q=\"[Q16]\">A single suburban rail line serves residents in a few areas to the south but is tiny in the context of the wider city.</span> Outside the centre many rely on boda boda (motorbike taxis) to navigate the narrow side streets and potholed mud roads that make up much of the metropolis. Their safety record is scandalous.</p><p>Dar es Salaam's reliance on four arterial roads into the city is a legacy of the colonial government that planned the city at the start of the 20th century to cater for a population of 35,000. Most of the current growth is made up of young people arriving from the countryside to find work, and as the population has exploded, Dar es Salaam has grown around those four highways. <span class=\"hl\" id=\"hl-q17\" data-q=\"[Q17]\">Nearly all the expansion is happening on the periphery, and nearly all takes place informally without any agreed strategy.</span></p><p><span class=\"hl\" id=\"hl-q18\" data-q=\"[Q18]\">But Dar es Salaam is pinning its hopes on a solution that could offer a different model for Africa's megacities, giving them an alternative to a future controlled by the private car. Unlike many cities on the continent, Dar es Salaam isn't trying to build a metro. It has chosen a less exciting but cheaper and more achievable method: the bus.</span></p><p>The DART bus rapid transit (BRT) system <span class=\"hl\" id=\"hl-q19\" data-q=\"[Q19]\">runs on bus <span class=\"kw\">lanes</span> separated from other traffic</span>, mostly in the middle of the road to reduce stoppages. <span class=\"hl\" id=\"hl-q20\" data-q=\"[Q20]\">Ticket purchase and control takes place at stations prior to <span class=\"kw\">boarding</span></span> and the buses are step-free, <span class=\"hl\" id=\"hl-q21\" data-q=\"[Q21]\">which means the entire route is accessible to people using <span class=\"kw\">wheelchairs</span> or who are travelling with baby buggies.</span></p><p>'The new buses are much, much better,' says Paulas George, a young IT worker. He takes the bus every day and it has cut his journey time by two-thirds. <span class=\"hl\" id=\"hl-q22\" data-q=\"[Q22]\">He says it is not perfect, though, complaining that drivers often refuse to turn on the air conditioning to save <span class=\"kw\">fuel</span>.</span></p><p>That is not the only problem. <span class=\"hl\" id=\"hl-q23\" data-q=\"[Q23]\">A shortage of buses after a serious <span class=\"kw\">flood</span> at the main depot during the rainy season</span> means the system is carrying 200,000 people a day - half the expected capacity. <span class=\"hl\" id=\"hl-q24\" data-q=\"[Q24]\"><span class=\"kw\">Smartcards</span> can't be used as the mechanical readers aren't working either</span>, forcing passengers to buy individual paper tickets for every journey. Each is printed with a scannable QR code, but there are no scanners. <span class=\"hl\" id=\"hl-q25\" data-q=\"[Q25]\">Staff stand by the <span class=\"kw\">gates</span> and tear tickets as people enter.</span> <span class=\"hl\" id=\"hl-q26\" data-q=\"[Q26]\">As a result, <span class=\"kw\">queues</span> are considerable at peak times.</span></p><p>Morogoro Road to the north-west of the city was phase I of the BRT project. Phases II and III will install bus lanes along Nyerere Road to the south-west and Kilwa Road to the south. Construction on both routes is due to start imminently. Phase IV, towards Bagamoyo in the north, is in the preliminary design stage. 'Much of the city will have access to a world-class transport system within the space of a few years,' says Chris Kost, the Africa director of ITDP (the Institute for Transportation and Development Policy). All phases are being planned to high standards and, once complete, a third of city residents will be within a short walk of the BRT network.</p><p>The ITDP regrets Africa's obsession with metros. 'With a metro, an international firm will often just parachute in its own system,' says Kost. 'Bus rapid transit allows existing stakeholders to get involved. That's what we did in Dar es Salaam and what we're planning in Nairobi, where the bus bodies will be built in the city and local operators will look after tickets, fare collection and IT ...Bus rapid transit has been transformational for Dar es Salaam. For millions of people in African cities, this is their best hope of ever being connected.'</p>",
+  "groups": [
+    {
+      "id": "g1",
+      "type": "tfng",
+      "title": "Questions 14-18",
+      "instructions": "<i>Do the following statements agree with the information given in Reading Passage 2?<br>In boxes 14-18 on your answer sheet, write:<br><b>TRUE</b> if the statement agrees with the information<br><b>FALSE</b> if the statement contradicts the information<br><b>NOT GIVEN</b> if there is no information on this</i>",
+      "questionIds": ["q14", "q15", "q16", "q17", "q18"]
+    },
+    {
+      "id": "g2",
+      "type": "notes",
+      "title": "Questions 19-26",
+      "instructions": "<i>Complete the notes below.<br>Choose <b>ONE WORD ONLY</b> from the passage for each answer.<br>Write your answers in boxes 19-26 on your answer sheet.</i>",
+      "noteTitle": "Dar es Salaam's DART Bus Rapid Transit system",
+      "questionIds": ["q19", "q20", "q21", "q22", "q23", "q24", "q25", "q26"],
+      "template": "<p><b>Features</b></p><ul><li style=\"margin-bottom: 12px;\">the buses use designated <b>19.</b> {{q19}} to cut down on delays.</li><li style=\"margin-bottom: 12px;\">passengers pay fares before <b>20.</b> {{q20}}.</li><li style=\"margin-bottom: 12px;\">passengers in <b>21.</b> {{q21}} can use every part of the system.</li></ul><p><b>Problems</b></p><ul><li style=\"margin-bottom: 12px;\">the temperature control is sometimes not activated in order to reduce <b>22.</b> {{q22}} use.</li><li style=\"margin-bottom: 12px;\">insufficient number of vehicles are available due to the effects of a severe <b>23.</b> {{q23}}.</li><li style=\"margin-bottom: 12px;\">passengers are unable to use <b>24.</b> {{q24}} because some equipment is out of action.</li><li style=\"margin-bottom: 12px;\">tickets have to be checked manually at station <b>25.</b> {{q25}}.</li><li style=\"margin-bottom: 12px;\"><b>26.</b> {{q26}} frequently build up during rush hours.</li></ul>"
+    }
+  ],
+  "questions": {
+    "q14": {
+      "num": 14,
+      "text": "The population of Dar es Salaam is rising more rapidly than was previously predicted.",
+      "finalAnswer": "NOT GIVEN",
+      "highlightId": "hl-q14",
+      "socratic": {
+        "steps": [
+          {
+            "title": "Phân tích từ khóa câu hỏi",
+            "question": "Câu 14 nói dân số Dar es Salaam đang tăng nhanh hơn so với dự đoán trước đây ('rising more rapidly than was previously predicted').",
+            "guide": "Em hãy đọc Paragraph 1 nơi đưa ra các dự báo dân số của Liên Hợp Quốc và viện Global Cities.",
+            "bridge": "Cùng đối chiếu xem có sự so sánh với dự đoán trước đây không."
+          },
+          {
+            "title": "Đối chiếu với bài đọc",
+            "question": "Paragraph 1 có so sánh tốc độ tăng thực tế với những dự đoán trong quá khứ không?",
+            "guide": "Paragraph 1 chỉ nêu dự báo hiện tại: sẽ đạt 10 triệu trong 7 năm tới, 13.4 triệu vào năm 2035, và 73.7 triệu vào năm 2100. Hoàn toàn không nhắc đến việc tốc độ này nhanh hơn hay chậm hơn các dự báo trước đó.",
+            "bridge": "Không có mốc dự đoán trước đây để so sánh."
+          },
+          {
+            "title": "Đưa ra kết luận",
+            "question": "Thiếu dữ kiện so sánh với quá khứ, ta chọn đáp án gì?",
+            "guide": "Đáp án là NOT GIVEN.",
+            "bridge": "Chốt câu 14: NOT GIVEN."
+          }
+        ]
+      },
+      "explanation": {
+        "steps": [
+          "<b>Ý nhận định:</b> Dân số Dar es Salaam đang tăng nhanh hơn so với mức từng được dự đoán trước đây.",
+          "<b>Paragraph 1:</b> Nêu các số liệu dự báo tương lai của UN và chuyên gia Daniel Hoornweg.",
+          "<b>Đối chiếu:</b> Không hề có thông tin so sánh tốc độ tăng dân số hiện tại với các dự báo trước đây (<i>more rapidly than was previously predicted</i>).",
+          "<b>Kết luận:</b> Chọn <b>NOT GIVEN</b>."
+        ]
+      }
+    },
+    "q15": {
+      "num": 15,
+      "text": "Most of the residents of Dar es Salaam live in high-rise blocks on the edge of the city.",
+      "finalAnswer": "FALSE",
+      "highlightId": "hl-q15",
+      "socratic": {
+        "steps": [
+          {
+            "title": "Hiểu nội dung nhận định",
+            "question": "Câu 15 nói phần lớn cư dân sống trong các tòa chung cư cao tầng ('high-rise blocks') ở ven đô.",
+            "guide": "Em hãy đọc câu đầu tiên của Paragraph 2 miêu tả kiểu nhà ở của người dân ven đô.",
+            "bridge": "Cùng xem họ sống trong nhà cao tầng hay nhà trệt nhé."
+          },
+          {
+            "title": "Đối chiếu với bài đọc",
+            "question": "Paragraph 2 nói 4/5 người dân (tức đa số) sống trong kiểu nhà nào?",
+            "guide": "Paragraph 2 viết: 'Today, four out of five of its people live in single-storey informal settlements on the spreading edges of the city...' (4/5 cư dân sống trong các khu định cư tạm bợ MỘT TẦNG ở vùng ven thành phố).",
+            "bridge": "'single-storey' (nhà một tầng / nhà cấp 4) trái ngược hoàn toàn với 'high-rise blocks' (tòa nhà cao tầng)."
+          },
+          {
+            "title": "Đưa ra kết luận",
+            "question": "Một bên bảo nhà một tầng, một bên bảo tòa cao tầng. Hai ý đối nghịch nhau thì chọn gì?",
+            "guide": "Thông tin trái ngược 100%, chọn FALSE.",
+            "bridge": "Chốt câu 15: FALSE."
+          }
+        ]
+      },
+      "explanation": {
+        "steps": [
+          "<b>Ý nhận định:</b> Đa số cư dân Dar es Salaam sống trong các tòa nhà cao tầng ở rìa thành phố.",
+          "<b>Paragraph 2 (câu đầu):</b> <i>'Today, four out of five of its people live in single-storey informal settlements on the spreading edges of the city...'</i>",
+          "<b>Đối chiếu:</b> 4/5 dân số sống trong các khu nhà một tầng (<i>single-storey</i>), trái ngược với các khối nhà cao tầng (<i>high-rise blocks</i>).",
+          "<b>Kết luận:</b> Chọn <b>FALSE</b>."
+        ]
+      }
+    },
+    "q16": {
+      "num": 16,
+      "text": "Residents have been consulted about their views on the suburban rail line in Dar es Salaam.",
+      "finalAnswer": "NOT GIVEN",
+      "highlightId": "hl-q16",
+      "socratic": {
+        "steps": [
+          {
+            "title": "Phân tích từ khóa câu hỏi",
+            "question": "Câu 16 nói người dân đã được lấy ý kiến / tham vấn ('consulted about their views') về tuyến đường sắt ngoại ô.",
+            "guide": "Hãy tìm cụm từ 'suburban rail line' ở Paragraph 3.",
+            "bridge": "Cùng đọc câu nói về tuyến đường sắt này."
+          },
+          {
+            "title": "Đối chiếu với bài đọc",
+            "question": "Paragraph 3 viết gì về tuyến đường sắt ngoại ô?",
+            "guide": "Paragraph 3 viết: 'A single suburban rail line serves residents in a few areas to the south but is tiny in the context of the wider city.' (một tuyến đường sắt đơn lẻ phục vụ cư dân ở vài khu vực phía nam nhưng quá nhỏ bé).",
+            "bridge": "Bài có nhắc gì đến việc chính quyền có hỏi ý kiến hay tham vấn người dân về tuyến tàu này không?"
+          },
+          {
+            "title": "Đưa ra kết luận",
+            "question": "Không hề có thông tin về việc hỏi ý kiến người dân. Vậy chọn đáp án gì?",
+            "guide": "Đáp án là NOT GIVEN.",
+            "bridge": "Chốt câu 16: NOT GIVEN."
+          }
+        ]
+      },
+      "explanation": {
+        "steps": [
+          "<b>Ý nhận định:</b> Người dân đã được tham vấn ý kiến về tuyến tàu ngoại ô.",
+          "<b>Paragraph 3 (dòng 3-4):</b> Bài đọc chỉ nói có một tuyến tàu ngoại ô phục vụ cư dân vài vùng phía nam nhưng quy mô rất nhỏ.",
+          "<b>Đối chiếu:</b> Không có bất kỳ thông tin nào đề cập đến việc người dân có được lấy ý kiến/tham vấn (<i>consulted about their views</i>) hay không.",
+          "<b>Kết luận:</b> Chọn <b>NOT GIVEN</b>."
+        ]
+      }
+    },
+    "q17": {
+      "num": 17,
+      "text": "The majority of the present residential development in Dar es Salaam is unplanned.",
+      "finalAnswer": "TRUE",
+      "highlightId": "hl-q17",
+      "socratic": {
+        "steps": [
+          {
+            "title": "Hiểu nội dung nhận định",
+            "question": "Câu 17 nói phần lớn các khu dân cư phát triển hiện nay ở Dar es Salaam là không có quy hoạch ('unplanned').",
+            "guide": "Em hãy đọc câu cuối của Paragraph 4 nói về sự mở rộng của thành phố.",
+            "bridge": "Cùng xem việc xây dựng mở rộng diễn ra theo kế hoạch hay tự phát nhé."
+          },
+          {
+            "title": "Đối chiếu với bài đọc",
+            "question": "Paragraph 4 nói sự mở rộng đô thị ở vùng ven diễn ra như thế nào?",
+            "guide": "Paragraph 4 viết: 'Nearly all the expansion is happening on the periphery, and nearly all takes place informally without any agreed strategy.' (gần như toàn bộ sự mở rộng diễn ra ở vùng ven, và gần như toàn bộ diễn ra tự phát mà không có bất kỳ chiến lược nào được thống nhất).",
+            "bridge": "'without any agreed strategy' và 'informally' chính là không có quy hoạch (unplanned); 'nearly all' chính là đa số (the majority)."
+          },
+          {
+            "title": "Đưa ra kết luận",
+            "question": "Thông tin bài đọc có trùng khớp hoàn toàn với nhận định không?",
+            "guide": "Thông tin trùng khớp 100%, chọn TRUE.",
+            "bridge": "Chốt câu 17: TRUE."
+          }
+        ]
+      },
+      "explanation": {
+        "steps": [
+          "<b>Ý nhận định:</b> Đa số các công trình nhà ở phát triển hiện nay ở Dar es Salaam là không theo quy hoạch.",
+          "<b>Paragraph 4 (câu cuối):</b> <i>'Nearly all the expansion is happening on the periphery, and nearly all takes place informally without any agreed strategy.'</i>",
+          "<b>Khớp ý:</b> <i>informally without any agreed strategy</i> = không theo quy hoạch (<i>unplanned</i>); <i>nearly all</i> = đa số (<i>the majority</i>).",
+          "<b>Kết luận:</b> Chọn <b>TRUE</b>."
+        ]
+      }
+    },
+    "q18": {
+      "num": 18,
+      "text": "Dar es Salaam's authorities have decided to follow the public transport plan adopted by a large number of African cities.",
+      "finalAnswer": "FALSE",
+      "highlightId": "hl-q18",
+      "socratic": {
+        "steps": [
+          {
+            "title": "Hiểu nội dung nhận định",
+            "question": "Câu 18 nói chính quyền Dar es Salaam quyết định làm theo ('follow') kế hoạch giao thông công cộng mà nhiều thành phố châu Phi khác đã áp dụng.",
+            "guide": "Em hãy đọc kỹ Paragraph 5 xem Dar es Salaam làm giống hay làm khác các thành phố châu Phi khác.",
+            "bridge": "Cùng xem họ chọn metro hay xe buýt nhé."
+          },
+          {
+            "title": "Đối chiếu với bài đọc",
+            "question": "Paragraph 5 nói sự lựa chọn của Dar es Salaam có giống số đông các thành phố châu Phi không?",
+            "guide": "Paragraph 5 viết: 'Unlike many cities on the continent, Dar es Salaam isn't trying to build a metro. It has chosen a less exciting but cheaper and more achievable method: the bus.' (Không giống như nhiều thành phố trên châu lục đang đua nhau xây metro, Dar es Salaam chọn xe buýt).",
+            "bridge": "'Unlike many cities' (không giống nhiều thành phố khác) mâu thuẫn hoàn toàn với 'follow the plan adopted by a large number of cities' (làm theo kế hoạch của số đông)."
+          },
+          {
+            "title": "Đưa ra kết luận",
+            "question": "Thực tế Dar es Salaam đi con đường khác biệt chứ không làm theo số đông. Vậy ta chọn đáp án gì?",
+            "guide": "Thông tin trái ngược, chọn FALSE.",
+            "bridge": "Chốt câu 18: FALSE."
+          }
+        ]
+      },
+      "explanation": {
+        "steps": [
+          "<b>Ý nhận định:</b> Chính quyền Dar es Salaam quyết định làm theo kế hoạch giao thông công cộng của nhiều thành phố châu Phi khác.",
+          "<b>Paragraph 5:</b> <i>'Unlike many cities on the continent, Dar es Salaam isn't trying to build a metro. It has chosen a less exciting but cheaper and more achievable method: the bus.'</i>",
+          "<b>Đối chiếu:</b> Thành phố làm khác (<i>unlike</i>) chứ không hề làm theo (<i>follow</i>) các thành phố châu Phi khác (vốn đang đổ xô xây metro).",
+          "<b>Kết luận:</b> Chọn <b>FALSE</b>."
+        ]
+      }
+    },
+    "q19": {
+      "num": 19,
+      "finalAnswer": "lanes",
+      "inputWidth": "100px",
+      "highlightId": "hl-q19",
+      "socratic": {
+        "steps": [
+          {
+            "title": "Xác định từ cần điền",
+            "question": "Câu 19 nói xe buýt BRT sử dụng cái gì dành riêng ('designated 19 ______') để giảm thiểu chậm trễ?",
+            "guide": "Sau tính từ 'designated' cần một danh từ chỉ làn đường dành riêng cho xe buýt.",
+            "bridge": "Hãy đọc câu đầu tiên của Paragraph 6."
+          },
+          {
+            "title": "Tìm câu chứa thông tin",
+            "question": "Paragraph 6 nói xe buýt nhanh DART chạy trên cái gì được tách biệt khỏi các phương tiện khác?",
+            "guide": "Paragraph 6 viết: 'The DART bus rapid transit (BRT) system runs on bus lanes separated from other traffic, mostly in the middle of the road to reduce stoppages.'",
+            "bridge": "'separated from other traffic' chính là 'designated' (tách riêng); 'reduce stoppages' tương đương 'cut down on delays'. Danh từ làn đường là gì?"
+          },
+          {
+            "title": "Chọn từ nguyên văn",
+            "question": "Từ danh từ số nhiều chỉ làn đường là gì?",
+            "guide": "Đáp án là 'lanes' (các làn đường).",
+            "bridge": "Chốt câu 19: lanes."
+          }
+        ]
+      },
+      "explanation": {
+        "steps": [
+          "<b>Vị trí ngữ pháp:</b> Cần danh từ sau tính từ <i>designated</i>.",
+          "<b>Paragraph 6 (dòng 1-2):</b> <i>'...runs on bus lanes separated from other traffic... to reduce stoppages.'</i>",
+          "<b>Khớp từ:</b> <i>designated</i> = <i>separated from other traffic</i>; <i>cut down on delays</i> = <i>reduce stoppages</i>; từ cần điền là <i>lanes</i>.",
+          "<b>Từ cần điền:</b> <b>lanes</b>."
+        ]
+      }
+    },
+    "q20": {
+      "num": 20,
+      "finalAnswer": "boarding",
+      "inputWidth": "110px",
+      "highlightId": "hl-q20",
+      "socratic": {
+        "steps": [
+          {
+            "title": "Xác định từ cần điền",
+            "question": "Câu 20 nói hành khách thanh toán vé trước thời điểm nào ('before 20 ______')?",
+            "guide": "Sau giới từ 'before' cần một danh từ hoặc động từ đuôi -ing chỉ hành động bước lên xe buýt.",
+            "bridge": "Cùng đọc câu thứ hai của Paragraph 6."
+          },
+          {
+            "title": "Tìm câu chứa thông tin",
+            "question": "Paragraph 6 nói việc mua và kiểm soát vé diễn ra tại nhà ga trước khi làm gì?",
+            "guide": "Paragraph 6 viết: 'Ticket purchase and control takes place at stations prior to boarding...'",
+            "bridge": "'prior to' đồng nghĩa với 'before'. Hành động đi liền sau là gì?"
+          },
+          {
+            "title": "Chọn từ nguyên văn",
+            "question": "Từ 1 chữ duy nhất sau 'prior to' là gì?",
+            "guide": "Đáp án là 'boarding' (việc lên xe).",
+            "bridge": "Chốt câu 20: boarding."
+          }
+        ]
+      },
+      "explanation": {
+        "steps": [
+          "<b>Vị trí ngữ pháp:</b> Cần danh từ / danh động từ sau giới từ <i>before</i>.",
+          "<b>Paragraph 6 (dòng 2-3):</b> <i>'Ticket purchase and control takes place at stations prior to boarding...'</i>",
+          "<b>Khớp từ:</b> <i>passengers pay fares</i> = <i>ticket purchase</i>; <i>before</i> = <i>prior to</i>; từ cần lấy là <i>boarding</i>.",
+          "<b>Từ cần điền:</b> <b>boarding</b>."
+        ]
+      }
+    },
+    "q21": {
+      "num": 21,
+      "finalAnswer": "wheelchairs",
+      "inputWidth": "120px",
+      "highlightId": "hl-q21",
+      "socratic": {
+        "steps": [
+          {
+            "title": "Xác định từ cần điền",
+            "question": "Câu 21 nói hành khách ngồi trên phương tiện gì ('passengers in 21 ______') có thể tiếp cận mọi phần của hệ thống?",
+            "guide": "Sau giới từ 'in' cần một danh từ chỉ thiết bị hỗ trợ di chuyển cho người khuyết tật.",
+            "bridge": "Đọc tiếp nửa sau câu thứ hai của Paragraph 6."
+          },
+          {
+            "title": "Tìm câu chứa thông tin",
+            "question": "Paragraph 6 nói việc xe buýt không có bậc bước (step-free) giúp tuyến đường tiếp cận được với những ai?",
+            "guide": "Paragraph 6 viết: '...accessible to people using wheelchairs or who are travelling with baby buggies.'",
+            "bridge": "'people using wheelchairs' tương ứng với 'passengers in wheelchairs'. Thiết bị đó là gì?"
+          },
+          {
+            "title": "Chọn từ nguyên văn",
+            "question": "Từ danh từ số nhiều chỉ xe lăn là gì?",
+            "guide": "Đáp án là 'wheelchairs' (những chiếc xe lăn).",
+            "bridge": "Chốt câu 21: wheelchairs."
+          }
+        ]
+      },
+      "explanation": {
+        "steps": [
+          "<b>Vị trí ngữ pháp:</b> Cần danh từ sau giới từ <i>in</i>.",
+          "<b>Paragraph 6 (câu cuối):</b> <i>'...accessible to people using wheelchairs or who are travelling with baby buggies.'</i>",
+          "<b>Khớp từ:</b> <i>passengers in wheelchairs</i> = <i>people using wheelchairs</i>.",
+          "<b>Từ cần điền:</b> <b>wheelchairs</b>."
+        ]
+      }
+    },
+    "q22": {
+      "num": 22,
+      "finalAnswer": "fuel",
+      "inputWidth": "90px",
+      "highlightId": "hl-q22",
+      "socratic": {
+        "steps": [
+          {
+            "title": "Xác định từ cần điền",
+            "question": "Câu 22 nói hệ thống điều hòa thỉnh thoảng không được bật để giảm việc tiêu thụ cái gì ('to reduce 22 ______ use')?",
+            "guide": "Đứng trước danh từ 'use' cần một danh từ chỉ loại nhiên liệu hoặc năng lượng xe buýt sử dụng.",
+            "bridge": "Hãy tìm lời phàn nàn của anh Paulas George ở Paragraph 7."
+          },
+          {
+            "title": "Tìm câu chứa thông tin",
+            "question": "Paragraph 7 nói tài xế thường từ chối bật điều hòa để làm gì?",
+            "guide": "Paragraph 7 viết: '...complaining that drivers often refuse to turn on the air conditioning to save fuel.' (than phiền rằng tài xế thường từ chối bật điều hòa để tiết kiệm nhiên liệu).",
+            "bridge": "'save' đồng nghĩa với 'reduce use'. Thứ được tiết kiệm là gì?"
+          },
+          {
+            "title": "Chọn từ nguyên văn",
+            "question": "Từ danh từ chỉ nhiên liệu là gì?",
+            "guide": "Đáp án là 'fuel' (nhiên liệu).",
+            "bridge": "Chốt câu 22: fuel."
+          }
+        ]
+      },
+      "explanation": {
+        "steps": [
+          "<b>Vị trí ngữ pháp:</b> Cần danh từ bổ nghĩa đứng trước <i>use</i>.",
+          "<b>Paragraph 7 (câu cuối):</b> <i>'...complaining that drivers often refuse to turn on the air conditioning to save fuel.'</i>",
+          "<b>Khớp từ:</b> <i>temperature control is not activated</i> = <i>refuse to turn on air conditioning</i>; <i>reduce ... use</i> = <i>save</i>; từ cần lấy là <i>fuel</i>.",
+          "<b>Từ cần điền:</b> <b>fuel</b>."
+        ]
+      }
+    },
+    "q23": {
+      "num": 23,
+      "finalAnswer": "flood",
+      "inputWidth": "100px",
+      "highlightId": "hl-q23",
+      "socratic": {
+        "steps": [
+          {
+            "title": "Xác định từ cần điền",
+            "question": "Câu 23 nói số lượng xe không đủ do hậu quả của một thảm họa gì nghiêm trọng ('effects of a severe 23 ______')?",
+            "guide": "Sau tính từ 'severe' cần một danh từ chỉ một hiện tượng thiên tai, ngập úng.",
+            "bridge": "Hãy đọc câu đầu tiên của Paragraph 8."
+          },
+          {
+            "title": "Tìm câu chứa thông tin",
+            "question": "Paragraph 8 nói sự thiếu hụt xe buýt xảy ra sau sự cố gì tại bãi đỗ chính?",
+            "guide": "Paragraph 8 viết: 'A shortage of buses after a serious flood at the main depot during the rainy season means the system is carrying 200,000 people a day...'",
+            "bridge": "'insufficient number of vehicles' = 'shortage of buses'; 'severe' = 'serious'. Hiện tượng thiên tai đó là gì?"
+          },
+          {
+            "title": "Chọn từ nguyên văn",
+            "question": "Từ danh từ chỉ trận lũ là gì?",
+            "guide": "Đáp án là 'flood' (trận lụt / lũ lụt).",
+            "bridge": "Chốt câu 23: flood."
+          }
+        ]
+      },
+      "explanation": {
+        "steps": [
+          "<b>Vị trí ngữ pháp:</b> Cần danh từ sau tính từ <i>severe</i>.",
+          "<b>Paragraph 8 (dòng 1-2):</b> <i>'A shortage of buses after a serious flood at the main depot during the rainy season...'</i>",
+          "<b>Khớp từ:</b> <i>insufficient number of vehicles</i> = <i>shortage of buses</i>; <i>severe</i> = <i>serious</i>; từ cần lấy là <i>flood</i>.",
+          "<b>Từ cần điền:</b> <b>flood</b>."
+        ]
+      }
+    },
+    "q24": {
+      "num": 24,
+      "finalAnswer": "smartcards",
+      "inputWidth": "120px",
+      "highlightId": "hl-q24",
+      "socratic": {
+        "steps": [
+          {
+            "title": "Xác định từ cần điền",
+            "question": "Câu 24 nói hành khách không thể sử dụng vật phẩm gì ('unable to use 24 ______') vì thiết bị bị hỏng?",
+            "guide": "Sau 'use' cần một danh từ chỉ loại thẻ thanh toán điện tử.",
+            "bridge": "Đọc tiếp câu thứ hai của Paragraph 8."
+          },
+          {
+            "title": "Tìm câu chứa thông tin",
+            "question": "Paragraph 8 nói cái gì không thể sử dụng được vì máy đọc cơ học bị hỏng?",
+            "guide": "Paragraph 8 viết: 'Smartcards can't be used as the mechanical readers aren't working either, forcing passengers to buy individual paper tickets...'",
+            "bridge": "'equipment is out of action' tương ứng với 'mechanical readers aren't working'. Thứ không thể dùng là gì?"
+          },
+          {
+            "title": "Chọn từ nguyên văn",
+            "question": "Từ danh từ số nhiều chỉ loại thẻ thông minh là gì?",
+            "guide": "Đáp án là 'smartcards' (các thẻ thông minh).",
+            "bridge": "Chốt câu 24: smartcards."
+          }
+        ]
+      },
+      "explanation": {
+        "steps": [
+          "<b>Vị trí ngữ pháp:</b> Cần danh từ làm tân ngữ sau <i>use</i>.",
+          "<b>Paragraph 8 (dòng 3-4):</b> <i>'Smartcards can't be used as the mechanical readers aren't working either...'</i>",
+          "<b>Khớp từ:</b> <i>unable to use</i> = <i>can't be used</i>; <i>equipment is out of action</i> = <i>mechanical readers aren't working</i>; từ cần lấy là <i>smartcards</i>.",
+          "<b>Từ cần điền:</b> <b>smartcards</b>."
+        ]
+      }
+    },
+    "q25": {
+      "num": 25,
+      "finalAnswer": "gates",
+      "inputWidth": "100px",
+      "highlightId": "hl-q25",
+      "socratic": {
+        "steps": [
+          {
+            "title": "Xác định từ cần điền",
+            "question": "Câu 25 nói vé phải được kiểm tra bằng tay tại vị trí nào của nhà ga ('at station 25 ______')?",
+            "guide": "Sau 'station' cần một danh từ chỉ lối đi, cửa kiểm soát vào nhà ga.",
+            "bridge": "Đọc câu áp chót của Paragraph 8."
+          },
+          {
+            "title": "Tìm câu chứa thông tin",
+            "question": "Paragraph 8 nói nhân viên đứng ở đâu để xé vé bằng tay khi hành khách bước vào?",
+            "guide": "Paragraph 8 viết: 'Staff stand by the gates and tear tickets as people enter.' (nhân viên đứng cạnh các cổng soát vé và xé vé khi mọi người đi vào).",
+            "bridge": "'checked manually' tương ứng với 'tear tickets'. Vị trí nhân viên đứng là gì?"
+          },
+          {
+            "title": "Chọn từ nguyên văn",
+            "question": "Từ danh từ số nhiều chỉ các cổng là gì?",
+            "guide": "Đáp án là 'gates' (các cổng soát vé).",
+            "bridge": "Chốt câu 25: gates."
+          }
+        ]
+      },
+      "explanation": {
+        "steps": [
+          "<b>Vị trí ngữ pháp:</b> Cần danh từ ghép sau <i>station</i>.",
+          "<b>Paragraph 8 (câu áp chót):</b> <i>'Staff stand by the gates and tear tickets as people enter.'</i>",
+          "<b>Khớp từ:</b> <i>checked manually</i> = <i>tear tickets</i>; vị trí là <i>gates</i>.",
+          "<b>Từ cần điền:</b> <b>gates</b>."
+        ]
+      }
+    },
+    "q26": {
+      "num": 26,
+      "finalAnswer": "queues",
+      "inputWidth": "100px",
+      "highlightId": "hl-q26",
+      "socratic": {
+        "steps": [
+          {
+            "title": "Xác định từ cần điền",
+            "question": "Câu 26 nói cái gì thường xuyên dài ra/ùn ứ vào giờ cao điểm ('26 ______ frequently build up during rush hours')?",
+            "guide": "Đứng làm chủ ngữ đầu câu trước động từ 'frequently build up', cần một danh từ số nhiều chỉ hàng người chờ đợi.",
+            "bridge": "Đọc câu cuối cùng của Paragraph 8."
+          },
+          {
+            "title": "Tìm câu chứa thông tin",
+            "question": "Paragraph 8 nói kết quả của việc soát vé thủ công này là gì vào giờ cao điểm?",
+            "guide": "Paragraph 8 viết: 'As a result, queues are considerable at peak times.' (kết quả là các hàng người xếp hàng dài đáng kể vào giờ cao điểm).",
+            "bridge": "'peak times' chính là 'rush hours'; 'considerable' tương ứng với 'frequently build up'. Chủ ngữ là gì?"
+          },
+          {
+            "title": "Chọn từ nguyên văn",
+            "question": "Từ danh từ số nhiều chỉ các hàng xếp hàng là gì?",
+            "guide": "Đáp án là 'queues' (những hàng người xếp hàng).",
+            "bridge": "Hoàn thành toàn bộ Passage 2! Chốt câu 26: queues."
+          }
+        ]
+      },
+      "explanation": {
+        "steps": [
+          "<b>Vị trí ngữ pháp:</b> Cần danh từ số nhiều làm chủ ngữ cho câu.",
+          "<b>Paragraph 8 (câu cuối):</b> <i>'As a result, queues are considerable at peak times.'</i>",
+          "<b>Khớp từ:</b> <i>during rush hours</i> = <i>at peak times</i>; <i>frequently build up</i> = <i>are considerable</i>; từ cần lấy là <i>queues</i>.",
+          "<b>Từ cần điền:</b> <b>queues</b>."
+        ]
+      }
+    }
+  }
+}
