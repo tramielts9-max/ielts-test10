@@ -1,8 +1,9 @@
 /**
  * diagnostic/js-diag/diag-reading.js
- * BỘ MÁY ĐIỀU KHIỂN READING KHẢO THÍ CHUẨN XÁC 100%
- * TƯƠNG THÍCH TRỰC TIẾP VỚI CẤU TRÚC JSON CAMBRIDGE (GROUPS, TEMPLATES, MATRIX, TFNG, MCQ)
- * KHÔNG CẦN CHỈNH SỬA DỮ LIỆU JSON
+ * BỘ MÁY READING ĐA NĂNG (HYBRID 2 TRONG 1):
+ * HỖ TRỢ CẢ HAI DẠNG:
+ * 1. ĐỀ CAMBRIDGE THI THẬT (GROUPS, TEMPLATES, MATRIX, TFNG, MCQ)
+ * 2. ĐỀ CHẨN ĐOÁN TEST 1 NỀN TẢNG (TWO-TIER CHỐNG ĐOÁN MÒ 2 TẦNG)
  */
 
 export class DiagReadingEngine {
@@ -11,22 +12,22 @@ export class DiagReadingEngine {
     this.onStateChange = options.onStateChange || null;
 
     this.testData = null;
+    this.formatType = "CAM_STANDARD"; // 'CAM_STANDARD' hoặc 'TWO_TIER'
     this.title = "";
     this.passageHtml = "";
+    this.passageText = "";
     this.groups = [];
     this.questions = {};
+    this.twoTierQuestions = [];
     this.expectedAnswers = {};
 
-    // Lưu câu trả lời của học sinh { q1: "mining", q8: "TRUE", ... }
     this.userAnswers = {};
-
-    // Telemetry đo phản xạ
     this.metrics = {};
     this.isReviewMode = false;
   }
 
   // =========================================================================
-  // 1. NẠP DỮ LIỆU ĐỀ THI TỪ FILE JSON NGUYÊN BẢN (KHÔNG CẦN RECODE)
+  // 1. NẠP DỮ LIỆU ĐỀ THI VÀ TỰ ĐỘNG PHÁT HIỆN ĐỊNH DẠNG
   // =========================================================================
   async loadTestFromJson(jsonUrl) {
     try {
@@ -35,469 +36,374 @@ export class DiagReadingEngine {
       const data = await res.json();
 
       this.testData = data;
-      this.title = data.title || "IELTS Reading Test";
-      this.passageHtml = data.passageHtml || "";
-      this.groups = data.groups || [];
-      this.questions = data.questions || {};
-
-      // Trích xuất toàn bộ đáp án chuẩn từ root object 'answers' hoặc 'finalAnswer' trong questions
-      this.expectedAnswers = data.answers || {};
-      if (Object.keys(this.expectedAnswers).length === 0 && this.questions) {
-        Object.entries(this.questions).forEach(([qid, q]) => {
-          if (q.finalAnswer) this.expectedAnswers[qid] = q.finalAnswer;
-        });
-      }
-
+      this.title = data.title || "IELTS Reading Diagnostic";
       this.userAnswers = {};
       this.metrics = {};
       this.isReviewMode = false;
+
+      // KIỂM TRA ĐỊNH DẠNG: TWO-TIER (TEST 1 NỀN TẢNG) HAY CAMBRIDGE THI THẬT
+      if (data.formatType === "TWO_TIER" || (Array.isArray(data.questions) && data.questions[0]?.tier1Options)) {
+        this.formatType = "TWO_TIER";
+        this.passageText = data.passageText || "";
+        this.twoTierQuestions = data.questions || [];
+      } else {
+        this.formatType = "CAM_STANDARD";
+        this.passageHtml = data.passageHtml || data.passageText || "";
+        this.groups = data.groups || [];
+        this.questions = data.questions || {};
+
+        this.expectedAnswers = data.answers || {};
+        if (Object.keys(this.expectedAnswers).length === 0 && this.questions) {
+          Object.entries(this.questions).forEach(([qid, q]) => {
+            if (q.finalAnswer) this.expectedAnswers[qid] = q.finalAnswer;
+          });
+        }
+      }
 
       return true;
     } catch (err) {
       console.error("[DiagReadingEngine] Lỗi nạp JSON:", err);
       const mount = document.getElementById(this.containerId);
       if (mount) {
-        mount.innerHTML = `
-          <div style="text-align:center; padding:30px; color:#DC2626; font-weight:800;">
-            ⚠️ Không thể nạp đề thi Reading: <code>${err.message}</code><br>
-            <span style="font-size:12px; color:#64748B;">Hãy đảm bảo file JSON đã được đặt đúng trong thư mục diagnostic/data-diag/reading/</span>
-          </div>
-        `;
+        mount.innerHTML = `<div style="text-align:center; padding:30px; color:#DC2626; font-weight:800;">⚠️ Không thể nạp đề Reading: ${err.message}</div>`;
       }
       return false;
     }
   }
 
   // =========================================================================
-  // 2. RENDER GIAO DIỆN CHUẨN THI MÁY (BÀI ĐỌC TRÁI - CÂU HỎI PHẢI)
+  // 2. RENDER GIAO DIỆN CHÍNH
   // =========================================================================
   render() {
     const mount = document.getElementById(this.containerId);
     if (!mount || !this.testData) return;
 
-    const now = Date.now();
-    let questionsHtml = '';
-
-    // Render từng nhóm câu hỏi
-    this.groups.forEach((group, gIdx) => {
-      questionsHtml += this.renderGroup(group, gIdx, now);
-    });
-
-    // Bố cục Split-Screen 2 cột có thanh cuộn riêng
-    mount.innerHTML = `
-      <style>
-        .diag-reading-split {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 20px;
-          height: calc(100vh - 220px);
-          min-height: 580px;
-        }
-        @media (max-width: 900px) {
-          .diag-reading-split { grid-template-columns: 1fr; height: auto; }
-        }
-        .diag-passage-panel {
-          background: #FFFFFF;
-          border: 2px solid #E8E2D8;
-          border-left: 6px solid #8B1518;
-          border-radius: 18px;
-          padding: 22px 24px;
-          overflow-y: auto;
-          line-height: 1.75;
-          font-size: 14.5px;
-          color: #1E293B;
-          box-shadow: 0 4px 14px rgba(0,0,0,0.02);
-        }
-        .diag-passage-panel h2, .diag-passage-panel h3 {
-          color: #8B1518;
-          margin-top: 0;
-        }
-        .diag-questions-panel {
-          background: #FFFFFF;
-          border: 2px solid #E8E2D8;
-          border-radius: 18px;
-          padding: 20px 22px;
-          overflow-y: auto;
-          box-shadow: 0 4px 14px rgba(0,0,0,0.02);
-        }
-        .diag-group-card {
-          background: #FAF7F2;
-          border: 1.5px solid #E8E2D8;
-          border-radius: 16px;
-          padding: 16px 18px;
-          margin-bottom: 20px;
-        }
-        .diag-group-title {
-          font-size: 15px;
-          font-weight: 900;
-          color: #8B1518;
-          margin-bottom: 6px;
-          display: flex;
-          align-items: center;
-          gap: 6px;
-        }
-        .diag-group-instr {
-          font-size: 13px;
-          color: #64748B;
-          margin-bottom: 14px;
-          line-height: 1.5;
-        }
-        .diag-fill-input {
-          font-family: inherit;
-          font-size: 14px;
-          font-weight: 800;
-          color: #8B1518;
-          background: #FFFFFF;
-          border: 2px solid #CBD5E1;
-          border-bottom: 3.5px solid #94A3B8;
-          border-radius: 8px;
-          padding: 4px 10px;
-          text-align: center;
-          outline: none;
-          margin: 0 4px;
-          display: inline-block;
-          vertical-align: middle;
-          transition: border-color 0.15s ease;
-        }
-        .diag-fill-input:focus {
-          border-color: #8B1518;
-          background: #FFFDF5;
-        }
-        .diag-matrix-wrap {
-          overflow-x: auto;
-          border: 1.5px solid #E8E2D8;
-          border-radius: 12px;
-          background: #FFFFFF;
-          margin: 12px 0;
-        }
-        .diag-matrix-tbl {
-          width: 100%;
-          border-collapse: collapse;
-          font-size: 13px;
-        }
-        .diag-matrix-tbl th {
-          background: #FAF7F2;
-          padding: 8px 10px;
-          font-weight: 900;
-          border-bottom: 1.5px solid #E8E2D8;
-          border-right: 1px solid #E8E2D8;
-          text-align: center;
-        }
-        .diag-matrix-tbl td {
-          padding: 8px 10px;
-          border-bottom: 1px solid #E8E2D8;
-          border-right: 1px solid #E8E2D8;
-        }
-        .diag-matrix-tbl tr:hover { background: #FDFBF7; }
-        .diag-matrix-tbl input[type="radio"] {
-          accent-color: #8B1518;
-          cursor: pointer;
-          transform: scale(1.15);
-        }
-        .diag-pill-label {
-          display: inline-flex;
-          align-items: center;
-          gap: 6px;
-          padding: 6px 14px;
-          background: #FFFFFF;
-          border: 1.5px solid #CBD5E1;
-          border-bottom: 3px solid #94A3B8;
-          border-radius: 10px;
-          cursor: pointer;
-          font-weight: 800;
-          font-size: 13px;
-          user-select: none;
-          transition: all 0.1s ease;
-        }
-        .diag-pill-label:hover { border-color: #8B1518; background: #FFF5F5; }
-        .diag-pill-label.active {
-          background: #8B1518;
-          color: #FFFFFF;
-          border-color: #5E0C0E;
-        }
-        .diag-choice-box {
-          display: flex;
-          align-items: flex-start;
-          gap: 10px;
-          padding: 10px 12px;
-          background: #FFFFFF;
-          border: 1.5px solid #CBD5E1;
-          border-radius: 10px;
-          cursor: pointer;
-          font-weight: 700;
-          font-size: 13.5px;
-          margin-bottom: 6px;
-          transition: all 0.1s ease;
-        }
-        .diag-choice-box:hover { border-color: #0284C7; background: #F0F9FF; }
-        .diag-q-item {
-          background: #FFFFFF;
-          border: 1.5px solid #E8E2D8;
-          border-radius: 12px;
-          padding: 12px 14px;
-          margin-bottom: 10px;
-        }
-      </style>
-
-      <div class="diag-reading-split">
-        <!-- CỘT BÀI ĐỌC (BÊN TRÁI) -->
-        <div class="diag-passage-panel" id="diagReadingPassageView">
-          ${this.passageHtml || '<div style="color:#64748B;">Không tìm thấy nội dung bài đọc.</div>'}
-        </div>
-
-        <!-- CỘT CÂU HỎI (BÊN PHẢI) -->
-        <div class="diag-questions-panel" id="diagReadingQuestionsView">
-          ${questionsHtml}
-        </div>
-      </div>
-    `;
-
+    if (this.formatType === "TWO_TIER") {
+      this.renderTwoTierUI(mount);
+    } else {
+      this.renderCambridgeUI(mount);
+    }
     this.restoreUserInputsUI();
   }
 
   // =========================================================================
-  // 3. XỬ LÝ RENDER ĐA DẠNG CÁC NHÓM CÂU HỎI CAMBRIDGE
+  // 3. GIAO DIỆN CHO TEST 1 NỀN TẢNG (TWO-TIER CHỐNG ĐOÁN MÒ BUNG TO TRÀN VIỀN)
   // =========================================================================
-  renderGroup(group, gIdx, now) {
-    const gType = (group.type || '').toLowerCase();
-    const gMeta = ((group.title || '') + ' ' + (group.instructions || '')).toLowerCase();
+  renderTwoTierUI(mount) {
+    const now = Date.now();
+    let qHtml = '';
 
-    const isTFNG = gType.includes('tfng') || gMeta.includes('true/false/not given');
-    const isYNNG = gType.includes('ynng') || gMeta.includes('yes/no/not given');
-    const isMatchingInfo = gType.includes('matching_info') || gMeta.includes('which section') || gMeta.includes('contains the following');
+    this.twoTierQuestions.forEach((q, idx) => {
+      this.initQuestionMetric(q.id, now);
+      const snippet = q.passageSnippet ? `
+        <div style="background:#FFFDF7; border:1px solid #CBD5E1; border-left:4px solid #8B1518; padding:10px 14px; border-radius:10px; font-size:13.5px; line-height:1.6; color:#334155; margin-bottom:10px; font-style:italic;">
+          "${q.passageSnippet}"
+        </div>
+      ` : '';
 
-    let bodyHtml = '';
+      qHtml += `
+        <div class="q-item-box" id="box_${q.id}" style="background:#FFFFFF; border:2px solid #E8E2D8; border-radius:16px; padding:18px; margin-bottom:16px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <span style="font-size:12px; font-weight:900; color:#8B1518; text-transform:uppercase;">
+              CÂU ${idx + 1} (${q.level || 'A2'}) — ${q.type || 'Xác thực thông tin'}
+            </span>
+            <span id="badge_status_${q.id}" style="display:none; font-size:11.5px; font-weight:800; padding:2px 8px; border-radius:6px;"></span>
+          </div>
 
-    // 1. DẠNG ĐIỀN TỪ (TEMPLATE CÓ CHỨA {{q1}}, {{q2}}...)
-    if (group.template) {
-      let content = group.template;
-      (group.questionIds || []).forEach(qId => {
-        this.initQuestionMetric(qId, now);
-        const q = this.questions[qId] || {};
-        const width = q.inputWidth || "120px";
-        const num = q.num || qId.replace('q', '');
+          ${snippet}
 
-        const inputHtml = `
-          <input type="text"
-            class="diag-fill-input"
-            id="diag_input_${qId}"
-            data-qid="${qId}"
-            style="width:${width};"
-            placeholder="[${num}]"
-            autocomplete="off"
-            oninput="window.diagReadingEngine.onInputAnswer('${qId}', this.value)"
-          />
-          <span id="diag_badge_${qId}" style="display:none; font-size:12px; margin-left:2px;"></span>
-        `;
-        content = content.replace(new RegExp(`{{${qId}}}`, 'g'), inputHtml);
-      });
+          <b style="font-size:14.5px; color:#1E293B; display:block; margin-bottom:10px; line-height:1.5;">
+            ${q.statement || q.questionText}
+          </b>
 
-      bodyHtml = `
-        <div style="background:#FFFFFF; border:1px solid #CBD5E1; border-radius:12px; padding:16px 18px; line-height:1.8; font-size:14px;">
-          ${(group.noteTitle || group.summaryTitle) ? `<b style="font-size:15px; color:#1E293B; display:block; margin-bottom:10px;">${group.noteTitle || group.summaryTitle}</b>` : ''}
-          ${content}
+          <!-- TẦNG 1 -->
+          <div style="font-size:12px; font-weight:900; color:#0284C7; margin-bottom:4px; text-transform:uppercase;">
+            Tầng 1: Lựa chọn của em
+          </div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            ${(q.tier1Options || []).map(opt => {
+              const optLetter = opt.charAt(0);
+              return `
+                <label class="option-label" style="flex:1; min-width:140px; margin-top:0;" onclick="window.diagReadingEngine.onSelectTier1('${q.id}', '${optLetter}')">
+                  <input type="radio" name="t1_${q.id}" value="${optLetter}">
+                  <span>${opt}</span>
+                </label>
+              `;
+            }).join('')}
+          </div>
+
+          <!-- TẦNG 2 -->
+          <div id="tier2_box_${q.id}" style="display:none; margin-top:12px; padding:14px; background:#FFFBEB; border:2px dashed #F59E0B; border-radius:12px;">
+            <div style="font-size:12px; font-weight:900; color:#92400E; margin-bottom:8px; text-transform:uppercase;">
+              🔍 Tầng 2: Chọn câu trích dẫn làm căn cứ cho lựa chọn của em:
+            </div>
+            <div id="tier2_options_${q.id}" style="display:flex; flex-direction:column; gap:6px;"></div>
+          </div>
+
+          <div id="review_feedback_${q.id}" style="display:none; margin-top:10px; padding:10px 14px; border-radius:10px; font-size:13px; line-height:1.5;"></div>
         </div>
       `;
+    });
 
-    // 2. DẠNG BẢNG MA TRẬN NỐI ĐOẠN MATCHING INFORMATION (A - G)
-    } else if (isMatchingInfo) {
-      let paras = ['A', 'B', 'C', 'D', 'E', 'F', 'G'];
-      // Lấy danh sách đoạn văn từ câu hỏi đầu tiên nếu có
-      if (group.questionIds && group.questionIds.length > 0) {
-        const firstQ = this.questions[group.questionIds[0]];
-        if (firstQ && Array.isArray(firstQ.options) && firstQ.options.length > 0) {
-          paras = firstQ.options.map(o => String(o).charAt(0).toUpperCase());
-        }
-      }
-
-      bodyHtml = `
-        <div class="diag-matrix-wrap">
-          <table class="diag-matrix-tbl">
-            <thead>
-              <tr>
-                <th style="text-align:left; min-width:180px;">Câu hỏi</th>
-                ${paras.map(p => `<th>${p}</th>`).join('')}
-              </tr>
-            </thead>
-            <tbody>
-              ${(group.questionIds || []).map(qId => {
-                this.initQuestionMetric(qId, now);
-                const q = this.questions[qId] || {};
-                const num = q.num || qId.replace('q', '');
-                return `
-                  <tr id="diag_row_${qId}">
-                    <td>
-                      <b>Câu ${num}.</b> ${q.text || ''}
-                      <span id="diag_badge_${qId}" style="display:none; font-size:11px; margin-left:4px; font-weight:800;"></span>
-                    </td>
-                    ${paras.map(p => `
-                      <td style="text-align:center;">
-                        <input type="radio" name="diag_rad_${qId}" value="${p}" onchange="window.diagReadingEngine.onInputAnswer('${qId}', '${p}')">
-                      </td>
-                    `).join('')}
-                  </tr>
-                `;
-              }).join('')}
-            </tbody>
-          </table>
+    mount.innerHTML = `
+      <div style="display:grid; grid-template-columns: 42% 58%; gap:20px; height:calc(100vh - 215px);">
+        <!-- CỘT TRÁI: BÀI ĐỌC TỔNG THỂ -->
+        <div style="background:#FFFFFF; border:2px solid #E8E2D8; border-left:6px solid #8B1518; border-radius:18px; padding:22px 24px; overflow-y:auto; line-height:1.8; font-size:15px; color:#1E293B;">
+          <h3 style="margin:0 0 12px 0; color:#8B1518; font-size:18px;">📖 ${this.testData.passageTitle || 'READING PASSAGE'}</h3>
+          <div style="white-space:pre-wrap;">${this.passageText || 'Xem các trích đoạn trực tiếp ở từng câu hỏi bên phải.'}</div>
         </div>
-      `;
+        <!-- CỘT PHẢI: CÂU HỎI 2 TẦNG CHỐNG ĐOÁN MÒ -->
+        <div style="overflow-y:auto; padding-right:6px;">
+          ${qHtml}
+        </div>
+      </div>
+    `;
+  }
 
-    // 3. DẠNG TRẮC NGHIỆM / TFNG / YNNG / NỐI TÊN
-    } else {
-      bodyHtml = (group.questionIds || []).map(qId => {
-        this.initQuestionMetric(qId, now);
-        const q = this.questions[qId] || {};
-        const num = q.num || qId.replace('q', '');
+  // =========================================================================
+  // 4. GIAO DIỆN CHO ĐỀ CAMBRIDGE THI THẬT
+  // =========================================================================
+  renderCambridgeUI(mount) {
+    const now = Date.now();
+    let qContentHtml = '';
 
-        let optionsArea = '';
+    this.groups.forEach((g, gIdx) => {
+      const gType = (g.type || '').toLowerCase();
+      const gMeta = ((g.title || '') + ' ' + (g.instructions || '')).toLowerCase();
+      const isTFNG = gType.includes('tfng') || gMeta.includes('true/false/not given');
+      const isYNNG = gType.includes('ynng') || gMeta.includes('yes/no/not given');
+      const isMatchingInfo = gType.includes('matching_info') || gMeta.includes('which section') || gMeta.includes('contains the following');
 
-        if (isTFNG) {
-          optionsArea = this.renderPills(qId, ['TRUE', 'FALSE', 'NOT GIVEN']);
-        } else if (isYNNG) {
-          optionsArea = this.renderPills(qId, ['YES', 'NO', 'NOT GIVEN']);
-        } else if (q.options && Array.isArray(q.options)) {
-          optionsArea = `
-            <div style="display:flex; flex-direction:column; gap:6px; margin-top:8px;">
-              ${q.options.map(opt => {
-                const optLetter = opt.charAt(0);
-                return `
-                  <label class="diag-choice-box" onclick="window.diagReadingEngine.onInputAnswer('${qId}', '${optLetter}')">
-                    <input type="radio" name="diag_rad_${qId}" value="${optLetter}" style="margin-top:2px; accent-color:#8B1518;">
-                    <span style="font-weight:900; color:#8B1518; background:#FDEDEE; padding:1px 6px; border-radius:5px;">${optLetter}</span>
-                    <span style="flex:1;">${opt.substring(opt.indexOf('.') + 1).trim() || opt}</span>
-                  </label>
-                `;
-              }).join('')}
-            </div>
+      let inner = '';
+
+      if (g.template) {
+        let tmpl = g.template;
+        (g.questionIds || []).forEach(qId => {
+          this.initQuestionMetric(qId, now);
+          const q = (this.questions || {})[qId] || {};
+          const num = q.num || qId.replace('q', '');
+          const width = q.inputWidth || "120px";
+          const inputEl = `
+            <input type="text" class="diag-input" id="inp_diag_read_${qId}" style="width:${width}; display:inline-block; vertical-align:middle; padding:5px 8px; text-align:center; font-weight:800; color:#8B1518; margin:0 4px;" placeholder="[${num}]" oninput="window.diagReadingEngine.onInputAnswer('${qId}', this.value)">
           `;
-        } else {
-          optionsArea = `
-            <input type="text"
-              class="diag-fill-input"
-              id="diag_input_${qId}"
-              data-qid="${qId}"
-              style="width:200px; text-align:left; padding:8px 12px; margin-top:6px;"
-              placeholder="Điền đáp án..."
-              autocomplete="off"
-              oninput="window.diagReadingEngine.onInputAnswer('${qId}', this.value)"
-            />
-          `;
-        }
-
-        return `
-          <div class="diag-q-item" id="diag_qbox_${qId}">
-            <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
-              <b style="font-size:14px; color:#1E293B; line-height:1.5;">
-                Câu ${num}. ${q.text || ''}
-              </b>
-              <span id="diag_badge_${qId}" style="display:none; font-size:11px; padding:2px 6px; border-radius:4px; font-weight:800;"></span>
-            </div>
-            ${optionsArea}
-            <div id="diag_exp_${qId}" style="display:none; margin-top:8px; padding:8px 10px; background:#FFFDF0; border-left:3px solid #EAB308; border-radius:6px; font-size:12.5px; line-height:1.5;"></div>
+          tmpl = tmpl.replace(new RegExp(`{{${qId}}}`, 'g'), inputEl);
+        });
+        inner = `
+          <div style="background:#FFFFFF; border:1.5px solid #CBD5E1; border-radius:12px; padding:18px; font-size:14.5px; line-height:1.85;">
+            ${(g.noteTitle || g.summaryTitle) ? `<b style="font-size:15px; color:#8B1518; display:block; margin-bottom:8px;">${g.noteTitle || g.summaryTitle}</b>` : ''}
+            ${tmpl}
           </div>
         `;
-      }).join('');
-    }
+      } else if (isMatchingInfo) {
+        let paras = ['A', 'B', 'C', 'D', 'E', 'F', 'G'];
+        if (g.questionIds && g.questionIds.length > 0) {
+          const firstQ = (this.questions || {})[g.questionIds[0]];
+          if (firstQ && Array.isArray(firstQ.options) && firstQ.options.length > 0) {
+            paras = firstQ.options.map(o => String(o).charAt(0).toUpperCase());
+          }
+        }
+        inner = `
+          <div style="overflow-x:auto; background:#FFFFFF; border:1.5px solid #E8E2D8; border-radius:12px; margin:10px 0;">
+            <table style="width:100%; border-collapse:collapse; font-size:13.5px;">
+              <thead>
+                <tr style="background:#FAF7F2;">
+                  <th style="padding:10px 12px; text-align:left;">Câu hỏi</th>
+                  ${paras.map(p => `<th style="padding:10px 6px; text-align:center;">${p}</th>`).join('')}
+                </tr>
+              </thead>
+              <tbody>
+                ${(g.questionIds || []).map(qId => {
+                  this.initQuestionMetric(qId, now);
+                  const q = (this.questions || {})[qId] || {};
+                  return `
+                    <tr style="border-top:1px solid #E8E2D8;">
+                      <td style="padding:10px 12px; font-weight:700;">Câu ${q.num || qId}. ${q.text || ''}</td>
+                      ${paras.map(p => `
+                        <td style="text-align:center; padding:6px;">
+                          <input type="radio" name="rad_diag_read_${qId}" value="${p}" onchange="window.diagReadingEngine.onInputAnswer('${qId}', '${p}')">
+                        </td>
+                      `).join('')}
+                    </tr>
+                  `;
+                }).join('')}
+              </tbody>
+            </table>
+          </div>
+        `;
+      } else {
+        inner = (g.questionIds || []).map(qId => {
+          this.initQuestionMetric(qId, now);
+          const q = (this.questions || {})[qId] || {};
+          const num = q.num || qId.replace('q', '');
+          let opts = '';
 
-    return `
-      <div class="diag-group-card">
-        <div class="diag-group-title">
-          <i class="fa-solid fa-layer-group"></i> ${group.title || `Nhóm ${gIdx + 1}`}
+          if (isTFNG) {
+            opts = ['TRUE', 'FALSE', 'NOT GIVEN'].map(ch => `
+              <label class="option-label" style="display:inline-flex; width:auto; padding:7px 16px; margin-right:6px;" onclick="window.diagReadingEngine.onInputAnswer('${qId}', '${ch}')">
+                <input type="radio" name="rad_diag_read_${qId}" value="${ch}">
+                <span>${ch}</span>
+              </label>
+            `).join('');
+          } else if (isYNNG) {
+            opts = ['YES', 'NO', 'NOT GIVEN'].map(ch => `
+              <label class="option-label" style="display:inline-flex; width:auto; padding:7px 16px; margin-right:6px;" onclick="window.diagReadingEngine.onInputAnswer('${qId}', '${ch}')">
+                <input type="radio" name="rad_diag_read_${qId}" value="${ch}">
+                <span>${ch}</span>
+              </label>
+            `).join('');
+          } else if (q.options && Array.isArray(q.options)) {
+            opts = q.options.map(opt => `
+              <label class="option-label" onclick="window.diagReadingEngine.onInputAnswer('${qId}', '${opt.charAt(0)}')">
+                <input type="radio" name="rad_diag_read_${qId}" value="${opt.charAt(0)}">
+                <span>${opt}</span>
+              </label>
+            `).join('');
+          } else {
+            opts = `<input type="text" class="diag-input" id="inp_diag_read_${qId}" placeholder="Điền đáp án..." oninput="window.diagReadingEngine.onInputAnswer('${qId}', this.value)">`;
+          }
+
+          return `
+            <div class="q-item-box" style="margin-bottom:12px; background:#FFFFFF;">
+              <b style="font-size:14px; color:#1E293B; display:block; margin-bottom:6px;">
+                Câu ${num}. ${q.text || ''}
+              </b>
+              <div style="display:flex; flex-wrap:wrap; gap:6px;">${opts}</div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      qContentHtml += `
+        <div style="background:#FAF7F2; border:1.5px solid #E8E2D8; border-radius:14px; padding:16px; margin-bottom:16px;">
+          <b style="font-size:15.5px; color:#8B1518; display:block; margin-bottom:4px;">${g.title}</b>
+          ${g.instructions ? `<div style="font-size:13px; color:#64748B; margin-bottom:12px;">${g.instructions}</div>` : ''}
+          ${inner}
         </div>
-        ${group.instructions ? `<div class="diag-group-instr">${group.instructions}</div>` : ''}
-        ${bodyHtml}
-      </div>
-    `;
-  }
+      `;
+    });
 
-  renderPills(qId, choices) {
-    return `
-      <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;">
-        ${choices.map(c => `
-          <label class="diag-pill-label" onclick="window.diagReadingEngine.onInputAnswer('${qId}', '${c}')">
-            <input type="radio" name="diag_rad_${qId}" value="${c}" style="display:none;">
-            <span>${c}</span>
-          </label>
-        `).join('')}
+    mount.innerHTML = `
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; height:calc(100vh - 215px);">
+        <!-- CỘT TRÁI: BÀI ĐỌC -->
+        <div style="background:#FFFFFF; border:2px solid #E8E2D8; border-left:6px solid #8B1518; border-radius:18px; padding:24px 26px; overflow-y:auto; line-height:1.8; font-size:15px; color:#1E293B;">
+          <h3 style="margin:0 0 12px 0; color:#8B1518; font-size:18px;">${this.title || 'READING PASSAGE'}</h3>
+          <div>${this.passageHtml}</div>
+        </div>
+        <!-- CỘT PHẢI: CÂU HỎI -->
+        <div style="overflow-y:auto; padding-right:6px;">
+          ${qContentHtml}
+        </div>
       </div>
     `;
   }
 
   // =========================================================================
-  // 4. LƯU TRỮ TRẠNG THÁI & ĐO TELEMETRY
+  // 5. TƯƠNG TÁC NGƯỜI DÙNG & LƯU ĐÁP ÁN
   // =========================================================================
-  initQuestionMetric(qId, timestamp) {
-    if (!this.metrics[qId]) {
-      this.metrics[qId] = {
-        renderTime: timestamp,
-        firstInteractionTime: null,
-        ttfiMs: null,
-        hesitationCount: 0,
-        interactionHistory: []
-      };
-    }
+  onSelectTier1(qId, selectedLetter) {
+    if (!this.userAnswers[qId]) this.userAnswers[qId] = {};
+    this.userAnswers[qId].t1Val = selectedLetter;
+
+    const q = this.twoTierQuestions.find(item => item.id === qId);
+    if (!q || !q.tier2Options) return;
+
+    const tier2Container = document.getElementById(`tier2_box_${qId}`);
+    const tier2Mount = document.getElementById(`tier2_options_${qId}`);
+    if (!tier2Container || !tier2Mount) return;
+
+    const options = q.tier2Options[selectedLetter] || [];
+    tier2Mount.innerHTML = options.map(opt => `
+      <label class="option-label" style="background:#FFFFFF; border:1.5px solid #FCD34D; border-radius:8px; padding:8px 12px; margin-top:4px;" onclick="window.diagReadingEngine.onSelectTier2('${qId}', '${opt.code}')">
+        <input type="radio" name="t2_${qId}" value="${opt.code}">
+        <span style="font-size:13px; color:#1E293B;">${opt.text}</span>
+      </label>
+    `).join('');
+
+    tier2Container.style.display = 'block';
+  }
+
+  onSelectTier2(qId, selectedCode) {
+    if (!this.userAnswers[qId]) this.userAnswers[qId] = {};
+    this.userAnswers[qId].t2Val = selectedCode;
   }
 
   onInputAnswer(qId, val) {
-    if (this.isReviewMode) return;
-    const cleanVal = String(val).trim();
-    this.userAnswers[qId] = cleanVal;
+    this.userAnswers[qId] = String(val).trim();
+  }
 
-    // Cập nhật giao diện radio pills active
-    const radios = document.querySelectorAll(`input[name="diag_rad_${qId}"]`);
-    radios.forEach(r => {
-      const isMatch = r.value.toUpperCase() === cleanVal.toUpperCase();
-      r.checked = isMatch;
-      const parentLabel = r.closest('.diag-pill-label');
-      if (parentLabel) parentLabel.classList.toggle('active', isMatch);
-    });
-
-    // Đo tốc độ phản xạ
-    const now = Date.now();
-    const m = this.metrics[qId];
-    if (m) {
-      if (!m.firstInteractionTime) {
-        m.firstInteractionTime = now;
-        m.ttfiMs = now - m.renderTime;
-      }
-      m.interactionHistory.push({ value: cleanVal, time: now });
-    }
-
-    if (typeof this.onStateChange === 'function') {
-      this.onStateChange(this.getSnapshot());
+  initQuestionMetric(qId, timestamp) {
+    if (!this.metrics[qId]) {
+      this.metrics[qId] = { renderTime: timestamp };
     }
   }
 
   // =========================================================================
-  // 5. BỘ CHẤM ĐIỂM CHUẨN XÁC TUYỆT ĐỐI (EVALUATOR)
+  // 6. CHẤM ĐIỂM TOÀN DIỆN
   // =========================================================================
   evaluate() {
     let score = 0;
-    const qKeys = Object.keys(this.expectedAnswers);
-    const total = qKeys.length;
     const details = [];
     const wrongList = [];
 
+    // CHẤM TWO-TIER (TEST 1)
+    if (this.formatType === "TWO_TIER") {
+      const total = this.twoTierQuestions.length;
+      this.twoTierQuestions.forEach((q, idx) => {
+        const u = this.userAnswers[q.id] || {};
+        const t1 = (u.t1Val || "").toUpperCase().trim();
+        const t2 = (u.t2Val || "").toUpperCase().trim();
+
+        const isT1 = t1 === (q.correctTier1 || "").toUpperCase().trim();
+        const isT2 = t2 === (q.correctTier2 || "").toUpperCase().trim();
+        const isCorrect = isT1 && isT2;
+
+        if (isCorrect) score++;
+
+        const d = {
+          questionNum: idx + 1,
+          questionId: q.id,
+          userTier1: t1 || "Trống",
+          userTier2: t2 || "Trống",
+          expectedTier1: q.correctTier1,
+          expectedTier2: q.correctTier2,
+          isCorrect: isCorrect,
+          behaviorTag: isCorrect ? "Hiểu bản chất" : (isT1 ? "Đoán mò / Sai căn cứ" : "Sai đáp án")
+        };
+
+        details.push(d);
+        if (!isCorrect) wrongList.push(d);
+      });
+
+      return {
+        title: this.title,
+        score: score,
+        total: total,
+        scorePercent: Math.round((score / (total || 1)) * 100),
+        details: details,
+        wrongList: wrongList,
+        answersSnapshot: this.userAnswers
+      };
+    }
+
+    // CHẤM CAMBRIDGE (TEST 2, TEST 3)
+    const qKeys = Object.keys(this.expectedAnswers);
+    const total = qKeys.length;
+
     qKeys.forEach((qId, idx) => {
       const q = this.questions[qId] || {};
-      const num = q.num || idx + 1;
       const expected = this.expectedAnswers[qId];
       const userVal = (this.userAnswers[qId] || '').trim();
 
-      // Chuẩn hóa so sánh
-      const isCorrect = this.checkIsMatch(userVal, expected);
+      const isCorrect = this.checkMatch(userVal, expected);
       if (isCorrect) score++;
 
       const expStr = Array.isArray(expected) ? expected.join(' / ') : String(expected);
-
       const d = {
-        questionNum: num,
+        questionNum: q.num || idx + 1,
         questionId: qId,
         userAnswer: userVal || "(Bỏ trống)",
         expectedAnswer: expStr,
-        isCorrect: isCorrect,
-        explanation: (q.explanation && q.explanation.steps) ? q.explanation.steps.join(' ') : ''
+        isCorrect: isCorrect
       };
 
       details.push(d);
@@ -515,110 +421,67 @@ export class DiagReadingEngine {
     };
   }
 
-  checkIsMatch(userVal, expected) {
-    if (!userVal) return false;
-    const u = userVal.toLowerCase().replace(/\s+/g, ' ').trim();
+  checkMatch(u, exp) {
+    if (!u) return false;
+    let s = u.toLowerCase().trim();
+    if (s === 't') s = 'true';
+    if (s === 'f') s = 'false';
+    if (s === 'ng') s = 'not given';
+    if (s === 'y') s = 'yes';
+    if (s === 'n') s = 'no';
 
-    // Chuẩn hóa viết tắt T / F / NG
-    let normUser = u;
-    if (u === 't') normUser = 'true';
-    if (u === 'f') normUser = 'false';
-    if (u === 'ng') normUser = 'not given';
-    if (u === 'y') normUser = 'yes';
-    if (u === 'n') normUser = 'no';
-
-    if (Array.isArray(expected)) {
-      return expected.some(exp => {
-        const e = String(exp).toLowerCase().replace(/\s+/g, ' ').trim();
-        return normUser === e || u === e;
-      });
-    } else {
-      const e = String(expected).toLowerCase().replace(/\s+/g, ' ').trim();
-      return normUser === e || u === e;
+    if (Array.isArray(exp)) {
+      return exp.some(e => String(e).toLowerCase().trim() === s || String(e).toLowerCase().trim() === u.toLowerCase().trim());
     }
+    const e = String(exp).toLowerCase().trim();
+    return s === e || u.toLowerCase().trim() === e;
   }
 
   // =========================================================================
-  // 6. CHẾ ĐỘ XEM LẠI REVIEW MODE (TÔ MÀU ĐÚNG / SAI & HIỆN LỜI GIẢI)
+  // 7. REVIEW MODE & KHÔI PHỤC DỮ LIỆU
   // =========================================================================
   renderReviewMode(evalResult) {
     this.isReviewMode = true;
-    const details = evalResult?.details || [];
+    (evalResult.details || []).forEach(d => {
+      const badge = document.getElementById(`badge_status_${d.questionId}`);
+      const fb = document.getElementById(`review_feedback_${d.questionId}`);
+      const box = document.getElementById(`box_${d.questionId}`);
 
-    details.forEach(d => {
-      const qId = d.questionId;
-      const inp = document.getElementById(`diag_input_${qId}`);
-      const badge = document.getElementById(`diag_badge_${qId}`);
-      const row = document.getElementById(`diag_row_${qId}`);
-      const qbox = document.getElementById(`diag_qbox_${qId}`);
-      const expBox = document.getElementById(`diag_exp_${qId}`);
-
-      if (inp) {
-        inp.disabled = true;
-        inp.style.background = d.isCorrect ? '#DCFCE7' : '#FEE2E2';
-        inp.style.borderColor = d.isCorrect ? '#16A34A' : '#DC2626';
-        inp.style.color = d.isCorrect ? '#166534' : '#991B1B';
-      }
-
+      if (box) box.style.borderColor = d.isCorrect ? '#22C55E' : '#EF4444';
       if (badge) {
         badge.style.display = 'inline-block';
         badge.style.background = d.isCorrect ? '#DCFCE7' : '#FEE2E2';
         badge.style.color = d.isCorrect ? '#166534' : '#991B1B';
-        badge.innerText = d.isCorrect ? '✓ Đúng' : `✗ Sai (Đ/A: ${d.expectedAnswer})`;
+        badge.innerText = d.isCorrect ? '✓ ĐÚNG' : '✗ SAI';
       }
-
-      if (row) {
-        row.style.background = d.isCorrect ? '#F0FDF4' : '#FEF2F2';
+      if (fb) {
+        fb.style.display = 'block';
+        fb.style.background = d.isCorrect ? '#F0FDF4' : '#FEF2F2';
+        fb.innerHTML = `Đ/A chuẩn: <b>${d.expectedTier1 || d.expectedAnswer}</b> (${d.behaviorTag || ''})`;
       }
-
-      if (qbox) {
-        qbox.style.border = `1.5px solid ${d.isCorrect ? '#86EFAC' : '#FCA5A5'}`;
-        qbox.style.background = d.isCorrect ? '#F0FDF4' : '#FFF5F5';
-      }
-
-      if (expBox && d.explanation) {
-        expBox.style.display = 'block';
-        expBox.innerHTML = `<b>💡 Lời giải chi tiết:</b> ${d.explanation}`;
-      }
-
-      // Vô hiệu hóa radios
-      const radios = document.querySelectorAll(`input[name="diag_rad_${qId}"]`);
-      radios.forEach(r => r.disabled = true);
     });
   }
 
   restoreUserInputsUI() {
-    Object.entries(this.userAnswers).forEach(([qId, val]) => {
-      const inp = document.getElementById(`diag_input_${qId}`);
-      if (inp) inp.value = val;
-
-      const radios = document.querySelectorAll(`input[name="diag_rad_${qId}"]`);
-      radios.forEach(r => {
-        if (r.value.toUpperCase() === String(val).toUpperCase()) {
-          r.checked = true;
-          const label = r.closest('.diag-pill-label');
-          if (label) label.classList.add('active');
+    Object.entries(this.userAnswers).forEach(([qid, val]) => {
+      if (typeof val === 'object') {
+        if (val.t1Val) {
+          const r = document.querySelector(`input[name="t1_${qid}"][value="${val.t1Val}"]`);
+          if (r) { r.checked = true; this.onSelectTier1(qid, val.t1Val); }
         }
-      });
+        if (val.t2Val) {
+          const r2 = document.querySelector(`input[name="t2_${qid}"][value="${val.t2Val}"]`);
+          if (r2) r2.checked = true;
+        }
+      } else {
+        const inp = document.getElementById(`inp_diag_read_${qid}`);
+        if (inp) inp.value = val;
+        const rad = document.querySelector(`input[name="rad_diag_read_${qid}"][value="${val}"]`);
+        if (rad) rad.checked = true;
+      }
     });
-  }
-
-  getSnapshot() {
-    return {
-      title: this.title,
-      userAnswers: this.userAnswers,
-      metrics: this.metrics
-    };
-  }
-
-  restoreSnapshot(snapshot) {
-    if (!snapshot) return;
-    this.userAnswers = snapshot.userAnswers || {};
-    this.metrics = snapshot.metrics || {};
-    this.restoreUserInputsUI();
   }
 }
 
-// Khởi tạo instance và xuất toàn cục
 export const diagReadingEngine = new DiagReadingEngine();
 window.diagReadingEngine = diagReadingEngine;
