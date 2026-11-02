@@ -1,18 +1,13 @@
 /**
  * diagnostic/js-diag/diag-reading.js
- * BỘ MÁY READING ĐA NĂNG (HYBRID 2 TRONG 1):
- * HỖ TRỢ CẢ HAI DẠNG:
- * 1. ĐỀ CAMBRIDGE THI THẬT (GROUPS, TEMPLATES, MATRIX, TFNG, MCQ)
- * 2. ĐỀ CHẨN ĐOÁN TEST 1 NỀN TẢNG (TWO-TIER CHỐNG ĐOÁN MÒ 2 TẦNG)
+ * BỘ MÁY READING HYBRID + THANH KÉO RESIZER 3D DUOLINGO CO GIÃN ĐỘC LẬP
  */
 
 export class DiagReadingEngine {
   constructor(options = {}) {
     this.containerId = options.containerId || 'readingQuestionsMount';
-    this.onStateChange = options.onStateChange || null;
-
     this.testData = null;
-    this.formatType = "CAM_STANDARD"; // 'CAM_STANDARD' hoặc 'TWO_TIER'
+    this.formatType = "CAM_STANDARD";
     this.title = "";
     this.passageHtml = "";
     this.passageText = "";
@@ -20,15 +15,11 @@ export class DiagReadingEngine {
     this.questions = {};
     this.twoTierQuestions = [];
     this.expectedAnswers = {};
-
     this.userAnswers = {};
     this.metrics = {};
     this.isReviewMode = false;
   }
 
-  // =========================================================================
-  // 1. NẠP DỮ LIỆU ĐỀ THI VÀ TỰ ĐỘNG PHÁT HIỆN ĐỊNH DẠNG
-  // =========================================================================
   async loadTestFromJson(jsonUrl) {
     try {
       const res = await fetch(`${jsonUrl}?t=${Date.now()}`);
@@ -41,7 +32,6 @@ export class DiagReadingEngine {
       this.metrics = {};
       this.isReviewMode = false;
 
-      // KIỂM TRA ĐỊNH DẠNG: TWO-TIER (TEST 1 NỀN TẢNG) HAY CAMBRIDGE THI THẬT
       if (data.formatType === "TWO_TIER" || (Array.isArray(data.questions) && data.questions[0]?.tier1Options)) {
         this.formatType = "TWO_TIER";
         this.passageText = data.passageText || "";
@@ -51,7 +41,6 @@ export class DiagReadingEngine {
         this.passageHtml = data.passageHtml || data.passageText || "";
         this.groups = data.groups || [];
         this.questions = data.questions || {};
-
         this.expectedAnswers = data.answers || {};
         if (Object.keys(this.expectedAnswers).length === 0 && this.questions) {
           Object.entries(this.questions).forEach(([qid, q]) => {
@@ -59,21 +48,17 @@ export class DiagReadingEngine {
           });
         }
       }
-
       return true;
     } catch (err) {
-      console.error("[DiagReadingEngine] Lỗi nạp JSON:", err);
+      console.error("[DiagReadingEngine] Lỗi:", err);
       const mount = document.getElementById(this.containerId);
       if (mount) {
-        mount.innerHTML = `<div style="text-align:center; padding:30px; color:#DC2626; font-weight:800;">⚠️ Không thể nạp đề Reading: ${err.message}</div>`;
+        mount.innerHTML = `<div style="text-align:center; padding:30px; color:#DC2626; font-weight:800;">⚠️ Lỗi nạp Reading: ${err.message}</div>`;
       }
       return false;
     }
   }
 
-  // =========================================================================
-  // 2. RENDER GIAO DIỆN CHÍNH
-  // =========================================================================
   render() {
     const mount = document.getElementById(this.containerId);
     if (!mount || !this.testData) return;
@@ -83,18 +68,15 @@ export class DiagReadingEngine {
     } else {
       this.renderCambridgeUI(mount);
     }
+
     this.restoreUserInputsUI();
+    this.initDraggableResizer('diagSplitWrap', 'diagLeftPane', 'diagResizerBar', 'diagRightPane');
   }
 
-  // =========================================================================
-  // 3. GIAO DIỆN CHO TEST 1 NỀN TẢNG (TWO-TIER CHỐNG ĐOÁN MÒ BUNG TO TRÀN VIỀN)
-  // =========================================================================
+  // GIAO DIỆN TWO-TIER (TEST 1 NỀN TẢNG)
   renderTwoTierUI(mount) {
-    const now = Date.now();
     let qHtml = '';
-
     this.twoTierQuestions.forEach((q, idx) => {
-      this.initQuestionMetric(q.id, now);
       const snippet = q.passageSnippet ? `
         <div style="background:#FFFDF7; border:1px solid #CBD5E1; border-left:4px solid #8B1518; padding:10px 14px; border-radius:10px; font-size:13.5px; line-height:1.6; color:#334155; margin-bottom:10px; font-style:italic;">
           "${q.passageSnippet}"
@@ -116,7 +98,6 @@ export class DiagReadingEngine {
             ${q.statement || q.questionText}
           </b>
 
-          <!-- TẦNG 1 -->
           <div style="font-size:12px; font-weight:900; color:#0284C7; margin-bottom:4px; text-transform:uppercase;">
             Tầng 1: Lựa chọn của em
           </div>
@@ -132,10 +113,9 @@ export class DiagReadingEngine {
             }).join('')}
           </div>
 
-          <!-- TẦNG 2 -->
           <div id="tier2_box_${q.id}" style="display:none; margin-top:12px; padding:14px; background:#FFFBEB; border:2px dashed #F59E0B; border-radius:12px;">
             <div style="font-size:12px; font-weight:900; color:#92400E; margin-bottom:8px; text-transform:uppercase;">
-              🔍 Tầng 2: Chọn câu trích dẫn làm căn cứ cho lựa chọn của em:
+              🔍 Tầng 2: Chọn câu trích dẫn chứng minh:
             </div>
             <div id="tier2_options_${q.id}" style="display:flex; flex-direction:column; gap:6px;"></div>
           </div>
@@ -146,25 +126,28 @@ export class DiagReadingEngine {
     });
 
     mount.innerHTML = `
-      <div style="display:grid; grid-template-columns: 42% 58%; gap:20px; height:calc(100vh - 215px);">
-        <!-- CỘT TRÁI: BÀI ĐỌC TỔNG THỂ -->
-        <div style="background:#FFFFFF; border:2px solid #E8E2D8; border-left:6px solid #8B1518; border-radius:18px; padding:22px 24px; overflow-y:auto; line-height:1.8; font-size:15px; color:#1E293B;">
+      <div id="diagSplitWrap" style="display:flex; height:calc(100vh - 215px); position:relative; user-select:none;">
+        <div id="diagLeftPane" style="width:45%; height:100%; overflow-y:auto; background:#FFFFFF; border:2px solid #E8E2D8; border-left:6px solid #8B1518; border-radius:18px; padding:22px 24px; box-sizing:border-box; line-height:1.8; font-size:15px; color:#1E293B;">
           <h3 style="margin:0 0 12px 0; color:#8B1518; font-size:18px;">📖 ${this.testData.passageTitle || 'READING PASSAGE'}</h3>
           <div style="white-space:pre-wrap;">${this.passageText || 'Xem các trích đoạn trực tiếp ở từng câu hỏi bên phải.'}</div>
         </div>
-        <!-- CỘT PHẢI: CÂU HỎI 2 TẦNG CHỐNG ĐOÁN MÒ -->
-        <div style="overflow-y:auto; padding-right:6px;">
+
+        <!-- THANH KÉO 3D DUOLINGO -->
+        <div id="diagResizerBar" style="width:20px; cursor:col-resize; display:flex; align-items:center; justify-content:center; z-index:10; flex-shrink:0;">
+          <div style="width:34px; height:60px; background:#FFFFFF; border:2.5px solid #E8E2D8; border-bottom:5px solid #D3CBC0; border-radius:18px; display:flex; align-items:center; justify-content:center; color:#8B1518; font-size:14px; box-shadow:0 4px 12px rgba(0,0,0,0.08); transition:transform 0.1s ease;">
+            <i class="fa-solid fa-arrows-left-right"></i>
+          </div>
+        </div>
+
+        <div id="diagRightPane" style="flex:1; height:100%; overflow-y:auto; padding-right:4px; box-sizing:border-box;">
           ${qHtml}
         </div>
       </div>
     `;
   }
 
-  // =========================================================================
-  // 4. GIAO DIỆN CHO ĐỀ CAMBRIDGE THI THẬT
-  // =========================================================================
+  // GIAO DIỆN CAMBRIDGE
   renderCambridgeUI(mount) {
-    const now = Date.now();
     let qContentHtml = '';
 
     this.groups.forEach((g, gIdx) => {
@@ -179,7 +162,6 @@ export class DiagReadingEngine {
       if (g.template) {
         let tmpl = g.template;
         (g.questionIds || []).forEach(qId => {
-          this.initQuestionMetric(qId, now);
           const q = (this.questions || {})[qId] || {};
           const num = q.num || qId.replace('q', '');
           const width = q.inputWidth || "120px";
@@ -213,7 +195,6 @@ export class DiagReadingEngine {
               </thead>
               <tbody>
                 ${(g.questionIds || []).map(qId => {
-                  this.initQuestionMetric(qId, now);
                   const q = (this.questions || {})[qId] || {};
                   return `
                     <tr style="border-top:1px solid #E8E2D8;">
@@ -232,7 +213,6 @@ export class DiagReadingEngine {
         `;
       } else {
         inner = (g.questionIds || []).map(qId => {
-          this.initQuestionMetric(qId, now);
           const q = (this.questions || {})[qId] || {};
           const num = q.num || qId.replace('q', '');
           let opts = '';
@@ -283,23 +263,82 @@ export class DiagReadingEngine {
     });
 
     mount.innerHTML = `
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; height:calc(100vh - 215px);">
-        <!-- CỘT TRÁI: BÀI ĐỌC -->
-        <div style="background:#FFFFFF; border:2px solid #E8E2D8; border-left:6px solid #8B1518; border-radius:18px; padding:24px 26px; overflow-y:auto; line-height:1.8; font-size:15px; color:#1E293B;">
+      <div id="diagSplitWrap" style="display:flex; height:calc(100vh - 215px); position:relative; user-select:none;">
+        <div id="diagLeftPane" style="width:50%; height:100%; overflow-y:auto; background:#FFFFFF; border:2px solid #E8E2D8; border-left:6px solid #8B1518; border-radius:18px; padding:24px 26px; box-sizing:border-box; line-height:1.8; font-size:15px; color:#1E293B;">
           <h3 style="margin:0 0 12px 0; color:#8B1518; font-size:18px;">${this.title || 'READING PASSAGE'}</h3>
           <div>${this.passageHtml}</div>
         </div>
-        <!-- CỘT PHẢI: CÂU HỎI -->
-        <div style="overflow-y:auto; padding-right:6px;">
+
+        <!-- THANH KÉO 3D DUOLINGO -->
+        <div id="diagResizerBar" style="width:20px; cursor:col-resize; display:flex; align-items:center; justify-content:center; z-index:10; flex-shrink:0;">
+          <div style="width:34px; height:60px; background:#FFFFFF; border:2.5px solid #E8E2D8; border-bottom:5px solid #D3CBC0; border-radius:18px; display:flex; align-items:center; justify-content:center; color:#8B1518; font-size:14px; box-shadow:0 4px 12px rgba(0,0,0,0.08); transition:transform 0.1s ease;">
+            <i class="fa-solid fa-arrows-left-right"></i>
+          </div>
+        </div>
+
+        <div id="diagRightPane" style="flex:1; height:100%; overflow-y:auto; padding-right:4px; box-sizing:border-box;">
           ${qContentHtml}
         </div>
       </div>
     `;
   }
 
-  // =========================================================================
-  // 5. TƯƠNG TÁC NGƯỜI DÙNG & LƯU ĐÁP ÁN
-  // =========================================================================
+  // CƠ CHẾ KÉO THẢ RESIZER 3D DUOLINGO
+  initDraggableResizer(wrapId, leftId, resizerId, rightId) {
+    const wrap = document.getElementById(wrapId);
+    const left = document.getElementById(leftId);
+    const resizer = document.getElementById(resizerId);
+    if (!wrap || !left || !resizer) return;
+
+    let isDragging = false;
+    const handle = resizer.querySelector('div');
+
+    const onMouseDown = (e) => {
+      isDragging = true;
+      document.body.style.cursor = 'col-resize';
+      document.body.style.userSelect = 'none';
+      if (handle) {
+        handle.style.transform = 'scale(0.92)';
+        handle.style.borderBottomWidth = '2px';
+        handle.style.background = '#FFF5F5';
+      }
+    };
+
+    const onMouseMove = (e) => {
+      if (!isDragging) return;
+      const wrapRect = wrap.getBoundingClientRect();
+      const pointerX = e.clientX || (e.touches && e.touches[0].clientX);
+      if (!pointerX) return;
+
+      const offset = pointerX - wrapRect.left;
+      let pct = (offset / wrapRect.width) * 100;
+      if (pct < 25) pct = 25;
+      if (pct > 75) pct = 75;
+
+      left.style.width = `${pct}%`;
+    };
+
+    const onMouseUp = () => {
+      if (!isDragging) return;
+      isDragging = false;
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+      if (handle) {
+        handle.style.transform = 'scale(1)';
+        handle.style.borderBottomWidth = '5px';
+        handle.style.background = '#FFFFFF';
+      }
+    };
+
+    resizer.addEventListener('mousedown', onMouseDown);
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
+
+    resizer.addEventListener('touchstart', onMouseDown);
+    window.addEventListener('touchmove', onMouseMove);
+    window.addEventListener('touchend', onMouseUp);
+  }
+
   onSelectTier1(qId, selectedLetter) {
     if (!this.userAnswers[qId]) this.userAnswers[qId] = {};
     this.userAnswers[qId].t1Val = selectedLetter;
@@ -318,7 +357,6 @@ export class DiagReadingEngine {
         <span style="font-size:13px; color:#1E293B;">${opt.text}</span>
       </label>
     `).join('');
-
     tier2Container.style.display = 'block';
   }
 
@@ -332,31 +370,23 @@ export class DiagReadingEngine {
   }
 
   initQuestionMetric(qId, timestamp) {
-    if (!this.metrics[qId]) {
-      this.metrics[qId] = { renderTime: timestamp };
-    }
+    if (!this.metrics[qId]) this.metrics[qId] = { renderTime: timestamp };
   }
 
-  // =========================================================================
-  // 6. CHẤM ĐIỂM TOÀN DIỆN
-  // =========================================================================
   evaluate() {
     let score = 0;
     const details = [];
     const wrongList = [];
 
-    // CHẤM TWO-TIER (TEST 1)
     if (this.formatType === "TWO_TIER") {
       const total = this.twoTierQuestions.length;
       this.twoTierQuestions.forEach((q, idx) => {
         const u = this.userAnswers[q.id] || {};
         const t1 = (u.t1Val || "").toUpperCase().trim();
         const t2 = (u.t2Val || "").toUpperCase().trim();
-
         const isT1 = t1 === (q.correctTier1 || "").toUpperCase().trim();
         const isT2 = t2 === (q.correctTier2 || "").toUpperCase().trim();
         const isCorrect = isT1 && isT2;
-
         if (isCorrect) score++;
 
         const d = {
@@ -369,7 +399,6 @@ export class DiagReadingEngine {
           isCorrect: isCorrect,
           behaviorTag: isCorrect ? "Hiểu bản chất" : (isT1 ? "Đoán mò / Sai căn cứ" : "Sai đáp án")
         };
-
         details.push(d);
         if (!isCorrect) wrongList.push(d);
       });
@@ -385,15 +414,12 @@ export class DiagReadingEngine {
       };
     }
 
-    // CHẤM CAMBRIDGE (TEST 2, TEST 3)
     const qKeys = Object.keys(this.expectedAnswers);
     const total = qKeys.length;
-
     qKeys.forEach((qId, idx) => {
       const q = this.questions[qId] || {};
       const expected = this.expectedAnswers[qId];
       const userVal = (this.userAnswers[qId] || '').trim();
-
       const isCorrect = this.checkMatch(userVal, expected);
       if (isCorrect) score++;
 
@@ -405,7 +431,6 @@ export class DiagReadingEngine {
         expectedAnswer: expStr,
         isCorrect: isCorrect
       };
-
       details.push(d);
       if (!isCorrect) wrongList.push(d);
     });
@@ -437,9 +462,6 @@ export class DiagReadingEngine {
     return s === e || u.toLowerCase().trim() === e;
   }
 
-  // =========================================================================
-  // 7. REVIEW MODE & KHÔI PHỤC DỮ LIỆU
-  // =========================================================================
   renderReviewMode(evalResult) {
     this.isReviewMode = true;
     (evalResult.details || []).forEach(d => {
