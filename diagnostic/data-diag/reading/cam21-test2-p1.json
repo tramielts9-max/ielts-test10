@@ -1,0 +1,584 @@
+{
+  "title": "IELTS Academic 21 - Test 2 - Passage 1: Do animals dream?",
+  "answers": {
+    "q1": "rats",
+    "q2": "visual",
+    "q3": "half",
+    "q4": "temperature",
+    "q5": "vivid",
+    "q6": "TRUE",
+    "q7": "FALSE",
+    "q8": "NOT GIVEN",
+    "q9": "FALSE",
+    "q10": "TRUE",
+    "q11": "FALSE",
+    "q12": "NOT GIVEN",
+    "q13": "NOT GIVEN"
+  },
+  "passageHtml": "<h2>READING PASSAGE 1</h2><h3>Do animals dream?</h3><p>Studies using electrodes attached to the heads of sleepers have shown that when we sleep, we do so in two ways that alternate throughout the night. The first is rapid eye movement (REM) or active sleep. During this stage our eyes move, even though our eyelids are closed. Our muscles also twitch slightly, though they are largely paralysed so we don't hurt ourselves. In contrast, we also engage in non-REM sleep, during which we barely move at all. Most dream states, and certainly those with the most vivid dreams, happen during REM sleep.</p><p>There's some evidence that other mammals may also dream. <span class=\"hl\" id=\"hl-q1\" data-q=\"[Q1]\">For example, researchers compared the brain patterns of <span class=\"kw\">rats</span> running through a maze when awake with their brain patterns during REM sleep</span>. They found the patterns were very similar and concluded that the sleeping rats were dreaming about going through the maze.</p><p>But finding evidence of dreaming in non-mammals has proved more difficult. Their brains are very different from those of humans, and it can often be difficult to record their activity while they are sleeping. Recently, however, researchers succeeded in recording brain activity in sleeping pigeons. As in mammals, the recordings revealed both REM and non-REM sleep. <span class=\"hl\" id=\"hl-q2\" data-q=\"[Q2]\">Intriguingly, REM sleep activity was high in brain regions involved in processing <span class=\"kw\">visual</span> information</span>, especially images related to physical activities such as flying, which suggests that this may possibly be what the pigeons were dreaming about.</p><p>That said, dreaming and REM sleep are unlikely to be universal in the animal kingdom. For example, sponges don't have brains, so they lack the machinery for dreaming. There are also some animals with unusual sleep patterns. These include whales and dolphins, which do not shut down their entire brain when they sleep, but <span class=\"hl\" id=\"hl-q3\" data-q=\"[Q3]\">only <span class=\"kw\">half</span> of it, keeping the rest awake</span>. <span class=\"hl\" id=\"hl-q5\" data-q=\"[Q5]\">They also show no sign of REM sleep, suggesting that they may only experience non-REM dreams, which are less <span class=\"kw\">vivid</span></span>. This is surprising because we tend to think of whales and dolphins as having complex inner lives. <span class=\"hl\" id=\"hl-q4\" data-q=\"[Q4]\">It's thought that they don't experience REM sleep because during REM sleep animals are more vulnerable to extremes of <span class=\"kw\">temperature</span></span>.</p><p><span class=\"hl\" id=\"hl-q6\" data-q=\"[Q6]\">Nevertheless, in many cases REM sleep does seem to have benefits. Growing evidence from birds and mammals suggests that REM sleep and dreaming are important for forming memories and learning. It is believed that when events are replayed in dreams, this helps to integrate memories into longer-term storage</span>. As soon as animals evolved moderately complex lifestyles, they would have needed to dream in order to manage these lifestyles.</p><p><span class=\"hl\" id=\"hl-q7\" data-q=\"[Q7]\">However, we still don't understand how this outward behaviour relates to internal experience. It seems impossible to know what it is like to be a rat or a pigeon, let alone imagine their dreamscapes. We are quick to interpret the twitching limbs and quiet barks of sleeping dogs, but the truth is that we don't know if there is an internal experience of chasing rabbits that comes along with that</span>.</p><p><span class=\"hl\" id=\"hl-q8\" data-q=\"[Q8]\">Another non-human dreamer offers insight here. In 2019, while making a documentary, David Scheel of Alaska Pacific University in the USA housed an octopus named Heidi in a tank in his living room</span>. At one point, in the middle of the night, Heidi seemed to dream: her limbs and head moved, and her skin rapidly changed colour, as though she was pursuing a crab.</p><p><span class=\"hl\" id=\"hl-q9\" data-q=\"[Q9]\">Similarly, a report recently emerged of a sleeping octopus apparently having a nightmare. Costello, as the octopus was called, thrashed around, extended his mantle as if trying to make himself look bigger, and squirted ink as though he were being attacked by a predator</span>. The nightmare study is intriguing, says Scheel, but is only based on one animal. <span class=\"hl\" id=\"hl-q10\" data-q=\"[Q10]\">He argues that as well as outward behaviour, brain imaging is needed to show that the octopuses are replaying sequences of activities from their waking lives in dreams</span>.</p><p><span class=\"hl\" id=\"hl-q11\" data-q=\"[Q11]\">The trouble is that we will never be able to experience any animal's dreams. That goes for other humans' dreams too</span>. But we can try to imagine what these dreamscapes are like by meeting animals on their own terms. <span class=\"hl\" id=\"hl-q12\" data-q=\"[Q12]\">For example, vision is the dominant sense for many humans, and so our dreams are heavily visual too. Dogs primarily navigate the world using smell while spiders rely much more on vibrations</span>.</p><p><span class=\"hl\" id=\"hl-q13\" data-q=\"[Q13]\">It is likely that dreaming has served multiple purposes since the first complex animals evolved. And if this is the case, it is possible that better understanding of these purposes might shed light on the true purpose of our own dreams</span>.</p>",
+  "groups": [
+    {
+      "id": "g1",
+      "type": "table",
+      "title": "Questions 1-5",
+      "instructions": "<i>Complete the table below.<br>Choose <b>ONE WORD ONLY</b> from the passage for each answer.<br>Write your answers in boxes 1-5 on your answer sheet.</i>",
+      "questionIds": ["q1", "q2", "q3", "q4", "q5"],
+      "template": "<table class=\"table-question\" style=\"width:100%; border-collapse: collapse; margin-bottom: 25px;\"><thead><tr style=\"background: var(--bg-subcard); border-bottom: 2px solid var(--border-color);\"><th style=\"width: 25%; padding: 10px; text-align: left;\">Subjects</th><th style=\"width: 50%; padding: 10px; text-align: left;\">Research findings</th><th style=\"width: 25%; padding: 10px; text-align: left;\">Comment</th></tr></thead><tbody><tr style=\"border-bottom: 1px solid var(--border-color);\"><td style=\"padding: 10px; vertical-align: top;\"><b>Humans</b></td><td style=\"padding: 10px; vertical-align: top;\">• humans experience REM sleep and non-REM sleep<br>• in REM sleep, the eyes and muscles move</td><td style=\"padding: 10px; vertical-align: top;\"></td></tr><tr style=\"border-bottom: 1px solid var(--border-color);\"><td style=\"padding: 10px; vertical-align: top;\"><b>1.</b> {{q1}}</td><td style=\"padding: 10px; vertical-align: top;\">• similar brain patterns were observed when active and sleeping</td><td style=\"padding: 10px; vertical-align: top;\">indicative of dreaming</td></tr><tr style=\"border-bottom: 1px solid var(--border-color);\"><td style=\"padding: 10px; vertical-align: top;\"><b>Pigeons</b></td><td style=\"padding: 10px; vertical-align: top;\">• when sleeping, pigeons displayed activity in parts of the brain that deal with <b>2.</b> {{q2}} input</td><td style=\"padding: 10px; vertical-align: top;\">may have been dreaming of flying</td></tr><tr style=\"border-bottom: 1px solid var(--border-color);\"><td style=\"padding: 10px; vertical-align: top;\" rowspan=\"2\"><b>Whales and dolphins</b></td><td style=\"padding: 10px; vertical-align: top;\">• still have <b>3.</b> {{q3}} their brain awake when they sleep<br><br>• don't experience REM sleep, as this could affect their sensitivity to <b>4.</b> {{q4}}</td><td style=\"padding: 10px; vertical-align: top;\">their dreams are probably not very <b>5.</b> {{q5}}</td></tr></tbody></table>"
+    },
+    {
+      "id": "g2",
+      "type": "tfng",
+      "title": "Questions 6-13",
+      "instructions": "<i>Do the following statements agree with the information given in Reading Passage 1?<br>In boxes 6-13 on your answer sheet, write:<br><b>TRUE</b> if the statement agrees with the information<br><b>FALSE</b> if the statement contradicts the information<br><b>NOT GIVEN</b> if there is no information on this</i>",
+      "questionIds": ["q6", "q7", "q8", "q9", "q10", "q11", "q12", "q13"]
+    }
+  ],
+  "questions": {
+    "q1": {
+      "num": 1,
+      "finalAnswer": "rats",
+      "inputWidth": "110px",
+      "highlightId": "hl-q1",
+      "socratic": {
+        "steps": [
+          {
+            "title": "Rào Ngữ Pháp & Đoán Nhãn",
+            "question": "Nhìn vào cột 1 của bảng: dòng trên là 'Humans', dòng dưới là 'Pigeons'. Ô trống số 1 này bắt buộc phải là loại từ gì?",
+            "guide": "Cột ngoài cùng bên trái liệt kê các đối tượng tham gia nghiên cứu. Do đó, ô trống số 1 đứng đầu dòng làm chủ ngữ bắt buộc phải là danh từ chỉ loài động vật (dạng số nhiều).",
+            "bridge": "Cần tìm danh từ số nhiều chỉ loài vật được so sánh sóng não lúc thức và ngủ."
+          },
+          {
+            "title": "Chọn Mỏ Neo Định Vị",
+            "question": "Cụm thuật ngữ khoa học bất biến nào trong câu đề giúp định vị câu chứa thông tin ở Đoạn 2?",
+            "guide": "Thuật ngữ 'brain patterns' (sóng não) kết hợp với trạng thái 'active and sleeping' dẫn mắt ta dừng lại ngay tại câu đầu tiên của Đoạn 2.",
+            "bridge": "Đọc câu đầu Đoạn 2 để bóc trần loài động vật này."
+          },
+          {
+            "title": "Triệt Tiêu Đối Xứng",
+            "question": "Sau khi gạch bỏ các cụm từ trùng nghĩa với đề bài, danh từ chỉ loài vật nào xuất hiện ngay sau cụm 'brain patterns of'?",
+            "guide": "Bài đọc viết: 'researchers compared the brain patterns of rats running through a maze when awake with their brain patterns during REM sleep.'",
+            "bridge": "Danh từ loài vật duy nhất là 'rats'."
+          },
+          {
+            "title": "Kiểm Tra Luật Chơi & Chốt Đáp Án",
+            "question": "Từ 'rats' có đuôi -s hay không và theo luật ONE WORD ONLY em phải chép thế nào?",
+            "guide": "Chép nguyên văn 'rats' ở dạng số nhiều có đuôi -s.",
+            "bridge": "Chốt câu 1: rats."
+          }
+        ]
+      },
+      "explanation": {
+        "steps": [
+          "<b>Vị trí ngữ pháp:</b> Cần danh từ số nhiều chỉ loài động vật làm đối tượng nghiên cứu.",
+          "<b>Đoạn 2 (dòng 1-2):</b> <i>'researchers compared the brain patterns of rats running through a maze when awake with their brain patterns during REM sleep. They found the patterns were very similar...'</i>",
+          "<b>Khớp từ:</b> <i>similar brain patterns</i> = <i>patterns were very similar</i>; <i>when active and sleeping</i> = <i>when awake / during REM sleep</i>; đối tượng là <i>rats</i>.",
+          "<b>Từ cần điền:</b> <b>rats</b>."
+        ]
+      }
+    },
+    "q2": {
+      "num": 2,
+      "finalAnswer": "visual",
+      "inputWidth": "100px",
+      "highlightId": "hl-q2",
+      "socratic": {
+        "steps": [
+          {
+            "title": "Rào Ngữ Pháp",
+            "question": "Chỗ trống đứng sau 'deal with' và đứng trước danh từ 'input'. Cần loại từ gì?",
+            "guide": "'Input' là danh từ. Đứng giữa 'deal with' và 'input' cần một tính từ bổ nghĩa cho loại thông tin giác quan đầu vào.",
+            "bridge": "Cần tìm một tính từ mô tả dạng thông tin đầu vào của chim bồ câu."
+          },
+          {
+            "title": "Khóa Vùng Bằng Mỏ Neo Cứng",
+            "question": "Tên loài chim nào giúp em nhảy dù thẳng tới câu chứa thông tin ở Đoạn 3?",
+            "guide": "Tên riêng 'pigeons' (chim bồ câu) xuất hiện ở dòng 3 của Đoạn 3.",
+            "bridge": "Quét tiếp câu chứa hoạt động não bộ của bồ câu."
+          },
+          {
+            "title": "Lột Vỏ Paraphrase",
+            "question": "Trong bài đọc, cụm từ nào đồng nghĩa với 'parts of the brain that deal with ______ input'?",
+            "guide": "Bài viết: 'activity was high in brain regions involved in processing visual information'. Trong đó: 'brain regions' = 'parts of the brain'; 'involved in processing' = 'deal with'; 'information' = 'input'.",
+            "bridge": "Từ đứng trước 'information' chính là từ cần tìm."
+          },
+          {
+            "title": "Chốt Đáp Án",
+            "question": "Tính từ duy nhất bổ nghĩa cho 'information' là gì?",
+            "guide": "Đó là tính từ 'visual'.",
+            "bridge": "Chốt câu 2: visual."
+          }
+        ]
+      },
+      "explanation": {
+        "steps": [
+          "<b>Vị trí ngữ pháp:</b> Cần tính từ đứng trước danh từ <i>input</i>.",
+          "<b>Đoạn 3 (dòng 4-5):</b> <i>'...REM sleep activity was high in brain regions involved in processing visual information...'</i>",
+          "<b>Khớp từ:</b> <i>parts of the brain</i> = <i>brain regions</i>; <i>deal with</i> = <i>involved in processing</i>; <i>input</i> = <i>information</i>; từ bổ nghĩa là <i>visual</i>.",
+          "<b>Từ cần điền:</b> <b>visual</b>."
+        ]
+      }
+    },
+    "q3": {
+      "num": 3,
+      "finalAnswer": "half",
+      "inputWidth": "90px",
+      "highlightId": "hl-q3",
+      "socratic": {
+        "steps": [
+          {
+            "title": "Đoán Ý Nghĩa Ngữ Cảnh",
+            "question": "Cấu trúc đề: 'still have [ 3 ______ ] their brain awake'. Cần loại từ gì để chỉ tỷ lệ bộ não?",
+            "guide": "Cần một từ định lượng hoặc phân số để chỉ tỷ lệ phần não còn thức khi cá voi ngủ.",
+            "bridge": "Tìm câu nói về giấc ngủ của cá voi và cá heo ở Đoạn 4."
+          },
+          {
+            "title": "Bắt Mỏ Neo Định Vị",
+            "question": "Tên hai loài sinh vật biển nào ở dòng 3 Đoạn 4 giúp xác định câu văn?",
+            "guide": "Mỏ neo 'whales and dolphins' xuất hiện tại dòng 3 của Đoạn 4.",
+            "bridge": "Đọc kỹ phần mô tả tỷ lệ não bộ ngừng hoạt động."
+          },
+          {
+            "title": "Triệt Tiêu Đối Xứng",
+            "question": "Bài đọc ghi: 'do not shut down their entire brain when they sleep, but only ______ of it, keeping the rest awake'. Từ còn thiếu là gì?",
+            "guide": "Từ đứng sau 'only' là 'half' (một nửa).",
+            "bridge": "Có một nửa não còn thức."
+          },
+          {
+            "title": "Chốt Đáp Án",
+            "question": "Từ duy nhất cần điền là gì?",
+            "guide": "Đáp án là 'half'.",
+            "bridge": "Chốt câu 3: half."
+          }
+        ]
+      },
+      "explanation": {
+        "steps": [
+          "<b>Vị trí ngữ pháp:</b> Cần lượng từ chỉ tỷ lệ bộ não đứng trước <i>their brain</i>.",
+          "<b>Đoạn 4 (dòng 3-4):</b> <i>'These include whales and dolphins, which do not shut down their entire brain when they sleep, but only half of it, keeping the rest awake.'</i>",
+          "<b>Khớp từ:</b> <i>keeping the rest awake</i> = <i>still have... their brain awake</i>; tỷ lệ là <i>half</i>.",
+          "<b>Từ cần điền:</b> <b>half</b>."
+        ]
+      }
+    },
+    "q4": {
+      "num": 4,
+      "finalAnswer": "temperature",
+      "inputWidth": "120px",
+      "highlightId": "hl-q4",
+      "socratic": {
+        "steps": [
+          {
+            "title": "Rào Ngữ Pháp",
+            "question": "Cấu trúc đề: 'affect their sensitivity to [ 4 ______ ]'. Cần loại từ gì?",
+            "guide": "Sau giới từ 'to' trong 'sensitivity to' cần một danh từ chỉ tác nhân hoặc yếu tố môi trường.",
+            "bridge": "Tìm nguyên nhân cá voi không trải qua giấc ngủ REM ở câu cuối Đoạn 4."
+          },
+          {
+            "title": "Dòng Chảy Tịnh Tiến",
+            "question": "Câu cuối Đoạn 4 giải thích lý do cá voi không có REM sleep bắt đầu bằng từ nào?",
+            "guide": "Câu cuối Đoạn 4: 'It's thought that they don't experience REM sleep because during REM sleep animals are more vulnerable to extremes of temperature.'",
+            "bridge": "Tìm từ đồng nghĩa với 'sensitivity to'."
+          },
+          {
+            "title": "Lột Vỏ Từ Đồng Nghĩa",
+            "question": "Cụm 'more vulnerable to' trong bài tương đương với cụm nào trong đề?",
+            "guide": "'more vulnerable to' tương đương với 'affect their sensitivity to' (dễ bị tổn thương / nhạy cảm hơn).",
+            "bridge": "Yếu tố đứng sau 'extremes of' là gì?"
+          },
+          {
+            "title": "Chốt Đáp Án",
+            "question": "Bốc 1 từ duy nhất chỉ yếu tố môi trường này:",
+            "guide": "Đó là 'temperature'.",
+            "bridge": "Chốt câu 4: temperature."
+          }
+        ]
+      },
+      "explanation": {
+        "steps": [
+          "<b>Vị trí ngữ pháp:</b> Cần danh từ sau cụm <i>sensitivity to</i>.",
+          "<b>Đoạn 4 (câu cuối):</b> <i>'It's thought that they don't experience REM sleep because during REM sleep animals are more vulnerable to extremes of temperature.'</i>",
+          "<b>Khớp từ:</b> <i>as this could</i> = <i>because</i>; <i>affect their sensitivity to</i> = <i>are more vulnerable to</i>; yếu tố môi trường là <i>temperature</i>.",
+          "<b>Từ cần điền:</b> <b>temperature</b>."
+        ]
+      }
+    },
+    "q5": {
+      "num": 5,
+      "finalAnswer": "vivid",
+      "inputWidth": "100px",
+      "highlightId": "hl-q5",
+      "socratic": {
+        "steps": [
+          {
+            "title": "Rào Ngữ Pháp",
+            "question": "Cấu trúc đề: 'their dreams are probably not very [ 5 ______ ]'. Cần loại từ gì?",
+            "guide": "Sau 'not very' cần một tính từ miêu tả tính chất giấc mơ của cá voi.",
+            "bridge": "Tìm câu nói về đặc điểm giấc mơ non-REM của cá voi ở Đoạn 4."
+          },
+          {
+            "title": "Định Vị Tọa Độ Từ Khóa",
+            "question": "Câu văn nào ở dòng 5 Đoạn 4 nói về giấc mơ non-REM?",
+            "guide": "Bài viết: 'They also show no sign of REM sleep, suggesting that they may only experience non-REM dreams, which are less vivid.'",
+            "bridge": "So sánh cấu trúc phủ định trong đề với so sánh hơn trong bài."
+          },
+          {
+            "title": "Bẫy So Sánh Đối Xứng",
+            "question": "Cụm 'probably not very' trong đề bài viết lại từ cụm nào trong bài đọc?",
+            "guide": "'not very' tương đương với 'less' (kém / không mấy).",
+            "bridge": "Tính từ đứng sau 'less' là gì?"
+          },
+          {
+            "title": "Chốt Đáp Án",
+            "question": "Tính từ duy nhất cần điền là gì?",
+            "guide": "Đáp án là 'vivid' (sống động, rõ nét).",
+            "bridge": "Chốt câu 5: vivid."
+          }
+        ]
+      },
+      "explanation": {
+        "steps": [
+          "<b>Vị trí ngữ pháp:</b> Cần tính từ đứng sau phó từ <i>not very</i>.",
+          "<b>Đoạn 4 (dòng 5-6):</b> <i>'...suggesting that they may only experience non-REM dreams, which are less vivid.'</i>",
+          "<b>Khớp từ:</b> <i>probably not very</i> = <i>less</i>; tính từ là <i>vivid</i>.",
+          "<b>Từ cần điền:</b> <b>vivid</b>."
+        ]
+      }
+    },
+    "q6": {
+      "num": 6,
+      "text": "Dreaming about past experiences helps us to create lasting memories of them.",
+      "finalAnswer": "TRUE",
+      "highlightId": "hl-q6",
+      "socratic": {
+        "steps": [
+          {
+            "title": "Xé Câu 3 Mảnh S - V - O",
+            "question": "Câu khẳng định điều gì? Việc mơ về trải nghiệm quá khứ giúp con người tạo ra ký ức lâu dài.",
+            "guide": "Chia làm 3 phần: [Mơ về quá khứ] / [giúp tạo ra] / [ký ức lâu dài].",
+            "bridge": "Tìm câu nói về lợi ích của giấc mơ đối với trí nhớ ở Đoạn 5."
+          },
+          {
+            "title": "Định Vị Tịnh Tiến",
+            "question": "Ở Đoạn 5, câu nào nói về việc giấc mơ tái hiện sự kiện để lưu trữ ký ức?",
+            "guide": "Đoạn 5 viết: 'It is believed that when events are replayed in dreams, this helps to integrate memories into longer-term storage.'",
+            "bridge": "Đối chiếu từng thành phần ý nghĩa."
+          },
+          {
+            "title": "So Khớp 3 Điểm Song Hành",
+            "question": "Các cụm từ 'events replayed in dreams' và 'longer-term storage' có khớp với câu nhận định không?",
+            "guide": "'events are replayed in dreams' = mơ về trải nghiệm quá khứ; 'helps to integrate memories into longer-term storage' = giúp tạo ra ký ức lâu dài.",
+            "bridge": "Cả 3 phần đều trùng khớp 100%."
+          },
+          {
+            "title": "Chốt Đáp Án",
+            "question": "Đáp án là TRUE, FALSE hay NOT GIVEN?",
+            "guide": "Thông tin hoàn toàn trùng khớp -> TRUE.",
+            "bridge": "Chốt câu 6: TRUE."
+          }
+        ]
+      },
+      "explanation": {
+        "steps": [
+          "<b>Ý nhận định:</b> Mơ về những trải nghiệm trong quá khứ giúp chúng ta tạo ra những ký ức lâu dài về chúng.",
+          "<b>Đoạn 5 (dòng 2-4):</b> <i>'Growing evidence from birds and mammals suggests that REM sleep and dreaming are important for forming memories and learning. It is believed that when events are replayed in dreams, this helps to integrate memories into longer-term storage.'</i>",
+          "<b>Khớp từ:</b> <i>events are replayed in dreams</i> = <i>Dreaming about past experiences</i>; <i>longer-term storage</i> = <i>lasting memories</i>.",
+          "<b>Kết luận:</b> Chọn <b>TRUE</b>."
+        ]
+      }
+    },
+    "q7": {
+      "num": 7,
+      "text": "It is now possible to tell what type of dream a dog is having.",
+      "finalAnswer": "FALSE",
+      "highlightId": "hl-q7",
+      "socratic": {
+        "steps": [
+          {
+            "title": "Đóng Khung Từ Quyết Định",
+            "question": "Câu khẳng định điều gì? Khoa học ngày nay CÓ THỂ BIẾT ĐƯỢC ('is now possible to tell') một chú chó đang có giấc mơ gì.",
+            "guide": "Từ khóa mấu chốt là 'possible to tell' (có thể xác định được).",
+            "bridge": "Tìm vị trí nhắc đến giấc mơ của loài chó (dog/dogs) ở Đoạn 6."
+          },
+          {
+            "title": "Khóa Hiện Trường Bằng Mỏ Neo",
+            "question": "Đoạn 6 viết gì về việc con người phỏng đoán giấc mơ của chó?",
+            "guide": "Đoạn 6 dòng 3-5: 'We are quick to interpret the twitching limbs and quiet barks of sleeping dogs, but the truth is that we don't know if there is an internal experience of chasing rabbits that comes along with that.'",
+            "bridge": "Tác giả nói con người 'biết' hay 'không biết'?"
+          },
+          {
+            "title": "Bắt Chữ Lật Kèo",
+            "question": "Cụm 'the truth is that we don't know' mâu thuẫn thế nào với 'is now possible to tell'?",
+            "guide": "Một bên bảo 'có thể biết', một bên nói sự thật là 'chúng ta không biết'. Hai ý mâu thuẫn trực tiếp.",
+            "bridge": "Mâu thuẫn hoàn toàn thì chọn đáp án nào?"
+          },
+          {
+            "title": "Chốt Đáp Án",
+            "question": "Đáp án là gì?",
+            "guide": "Chọn FALSE.",
+            "bridge": "Chốt câu 7: FALSE."
+          }
+        ]
+      },
+      "explanation": {
+        "steps": [
+          "<b>Ý nhận định:</b> Hiện nay chúng ta đã có thể biết được chú chó đang mơ loại giấc mơ nào.",
+          "<b>Đoạn 6 (dòng 3-5):</b> <i>'We are quick to interpret the twitching limbs and quiet barks of sleeping dogs, but the truth is that we don't know if there is an internal experience of chasing rabbits that comes along with that.'</i>",
+          "<b>Đối chiếu:</b> Nhận định cho rằng có thể biết (<i>possible to tell</i>), nhưng bài đọc khẳng định sự thật là chúng ta không hề biết (<i>we don't know</i>). Hai ý trái ngược nhau 100%.",
+          "<b>Kết luận:</b> Chọn <b>FALSE</b>."
+        ]
+      }
+    },
+    "q8": {
+      "num": 8,
+      "text": "David Scheel's documentary was influential on other research into the sleeping patterns of octopuses.",
+      "finalAnswer": "NOT GIVEN",
+      "highlightId": "hl-q8",
+      "socratic": {
+        "steps": [
+          {
+            "title": "Xé Câu & Bắt Vế Quan Hệ",
+            "question": "Câu nhận định có vế phán xét nào? Bộ phim tài liệu của David Scheel có sức ảnh hưởng lên các nghiên cứu khác ('was influential on other research').",
+            "guide": "Cần tìm xem bài đọc có nói bộ phim này ảnh hưởng tới nhà nghiên cứu khác hay không.",
+            "bridge": "Tìm tên riêng 'David Scheel' ở Đoạn 7."
+          },
+          {
+            "title": "Định Vị Tên Riêng",
+            "question": "Đoạn 7 nói gì về David Scheel và bộ phim tài liệu?",
+            "guide": "Đoạn 7 viết: 'In 2019, while making a documentary, David Scheel of Alaska Pacific University in the USA housed an octopus named Heidi in a tank in his living room.'",
+            "bridge": "Bài có nhắc tới việc bộ phim gây ảnh hưởng đến ai không?"
+          },
+          {
+            "title": "Bộ Lọc Không Tự Suy Diễn",
+            "question": "Có câu nào trong đoạn nói bộ phim có ảnh hưởng ('influential') tới nghiên cứu của người khác không?",
+            "guide": "Hoàn toàn không nhắc tới tác động hay ảnh hưởng của bộ phim lên các nghiên cứu khác.",
+            "bridge": "Thiếu dữ kiện so sánh/tác động."
+          },
+          {
+            "title": "Chốt Đáp Án",
+            "question": "Đáp án là gì?",
+            "guide": "Chọn NOT GIVEN.",
+            "bridge": "Chốt câu 8: NOT GIVEN."
+          }
+        ]
+      },
+      "explanation": {
+        "steps": [
+          "<b>Ý nhận định:</b> Phim tài liệu của David Scheel đã có sức ảnh hưởng tới các nghiên cứu khác về mô hình giấc ngủ của bạch tuộc.",
+          "<b>Đoạn 7 (dòng 1-2):</b> <i>'In 2019, while making a documentary, David Scheel of Alaska Pacific University in the USA housed an octopus named Heidi in a tank in his living room.'</i>",
+          "<b>Đối chiếu:</b> Bài đọc chỉ nhắc đến việc Scheel làm phim tài liệu và quay được con bạch tuộc Heidi đổi màu khi ngủ, hoàn toàn không có thông tin về việc bộ phim có gây ảnh hưởng tới các nghiên cứu khác hay không (<i>influential on other research</i>).",
+          "<b>Kết luận:</b> Chọn <b>NOT GIVEN</b>."
+        ]
+      }
+    },
+    "q9": {
+      "num": 9,
+      "text": "While it was asleep, the octopus called Costello reacted as if it was hunting.",
+      "finalAnswer": "FALSE",
+      "highlightId": "hl-q9",
+      "socratic": {
+        "steps": [
+          {
+            "title": "Xé Câu Bắt Hành Động",
+            "question": "Câu nhận định bảo con bạch tuộc tên Costello phản ứng như thể nó đang đi săn ('as if it was hunting').",
+            "guide": "Cần kiểm tra xem lúc ngủ, Costello hành động như kẻ đi săn hay con mồi bị tấn công.",
+            "bridge": "Tìm tên riêng 'Costello' ở Đoạn 8."
+          },
+          {
+            "title": "Định Vị Bằng Tên Riêng",
+            "question": "Đoạn 8 miêu tả hành vi lúc ngủ của Costello ra sao?",
+            "guide": "Đoạn 8 dòng 2-4: 'Costello, as the octopus was called, thrashed around, extended his mantle as if trying to make himself look bigger, and squirted ink as though he were being attacked by a predator.'",
+            "bridge": "Costello phun mực và phòng vệ như thể nó bị cái gì?"
+          },
+          {
+            "title": "So Khớp Hành Động Thực Tế",
+            "question": "Hành động 'squirted ink as though he were being attacked by a predator' (bị thú dữ tấn công) có giống 'hunting' (đi săn) không?",
+            "guide": "Ngược chiều hoàn toàn: Costello phản ứng như thể đang bị kẻ săn mồi tấn công (bị hại), chứ không phải đang đi săn (kẻ tấn công).",
+            "bridge": "Ý trái ngược 100%."
+          },
+          {
+            "title": "Chốt Đáp Án",
+            "question": "Đáp án là gì?",
+            "guide": "Chọn FALSE.",
+            "bridge": "Chốt câu 9: FALSE."
+          }
+        ]
+      },
+      "explanation": {
+        "steps": [
+          "<b>Ý nhận định:</b> Khi đang ngủ, con bạch tuộc tên Costello đã phản ứng như thể nó đang đi săn.",
+          "<b>Đoạn 8 (dòng 2-4):</b> <i>'Costello, as the octopus was called, thrashed around, extended his mantle as if trying to make himself look bigger, and squirted ink as though he were being attacked by a predator.'</i>",
+          "<b>Đối chiếu:</b> Bài đọc cho biết Costello giãy giụa và phun mực như thể đang bị kẻ săn mồi tấn công (<i>being attacked by a predator</i>), trái ngược hoàn toàn với việc đang chủ động đi săn (<i>hunting</i>).",
+          "<b>Kết luận:</b> Chọn <b>FALSE</b>."
+        ]
+      }
+    },
+    "q10": {
+      "num": 10,
+      "text": "Scheel believes more research into octopuses' dreams should be carried out.",
+      "finalAnswer": "TRUE",
+      "highlightId": "hl-q10",
+      "socratic": {
+        "steps": [
+          {
+            "title": "Xé Câu Tìm Quan Điểm",
+            "question": "Câu khẳng định Scheel tin rằng cần tiến hành thêm nghiên cứu ('more research should be carried out') về giấc mơ bạch tuộc.",
+            "guide": "Tìm xem Scheel có cho rằng cần thêm bằng chứng/nghiên cứu không.",
+            "bridge": "Đọc câu cuối cùng của Đoạn 8."
+          },
+          {
+            "title": "Quét Tọa Độ Chuyên Gia",
+            "question": "Scheel phát biểu điều gì sau thí nghiệm của Costello?",
+            "guide": "Đoạn 8 viết: 'The nightmare study is intriguing, says Scheel, but is only based on one animal. He argues that as well as outward behaviour, brain imaging is needed to show that the octopuses are replaying sequences...'",
+            "bridge": "Lập luận 'mới chỉ trên 1 con vật' và 'cần chụp ảnh não' có nghĩa là gì?"
+          },
+          {
+            "title": "Lột Vỏ Lập Luận",
+            "question": "Việc yêu cầu phải chụp ảnh não ('brain imaging is needed') vì nghiên cứu mới chỉ trên một cá thể có đồng nghĩa với việc cần làm thêm nghiên cứu không?",
+            "guide": "Đồng nghĩa hoàn toàn. Ông khẳng định phải làm thêm các bước kỹ thuật sâu hơn (chụp ảnh não) thì mới kết luận được.",
+            "bridge": "Ý trùng khớp với nhận định."
+          },
+          {
+            "title": "Chốt Đáp Án",
+            "question": "Đáp án là gì?",
+            "guide": "Chọn TRUE.",
+            "bridge": "Chốt câu 10: TRUE."
+          }
+        ]
+      },
+      "explanation": {
+        "steps": [
+          "<b>Ý nhận định:</b> Scheel tin rằng cần thực hiện thêm nhiều nghiên cứu hơn nữa về giấc mơ của bạch tuộc.",
+          "<b>Đoạn 8 (dòng 4-7):</b> <i>'The nightmare study is intriguing, says Scheel, but is only based on one animal. He argues that as well as outward behaviour, brain imaging is needed to show that the octopuses are replaying sequences of activities from their waking lives in dreams.'</i>",
+          "<b>Khớp ý:</b> Nhận xét nghiên cứu chỉ mới dựa trên một con vật và yêu cầu cần có chụp ảnh não bộ (<i>brain imaging is needed</i>) chính là khẳng định cần làm thêm nghiên cứu (<i>more research should be carried out</i>).",
+          "<b>Kết luận:</b> Chọn <b>TRUE</b>."
+        ]
+      }
+    },
+    "q11": {
+      "num": 11,
+      "text": "We may soon be able to share the dreams of other human beings.",
+      "finalAnswer": "FALSE",
+      "highlightId": "hl-q11",
+      "socratic": {
+        "steps": [
+          {
+            "title": "Đóng Khung Từ Hạn Định",
+            "question": "Câu nhận định dự đoán con người sắp có thể chia sẻ giấc mơ của người khác ('may soon be able to share').",
+            "guide": "Từ mấu chốt là 'soon' (sớm/sắp).",
+            "bridge": "Đọc câu đầu tiên của Đoạn 9."
+          },
+          {
+            "title": "Bắt Hiện Trường Đoạn 9",
+            "question": "Tác giả khẳng định điều gì ở hai câu đầu Đoạn 9?",
+            "guide": "Đoạn 9 viết: 'The trouble is that we will never be able to experience any animal's dreams. That goes for other humans' dreams too.'",
+            "bridge": "Tác giả dùng từ gì trước 'be able to experience'?"
+          },
+          {
+            "title": "Bắt Cặp Từ Đối Nghịch",
+            "question": "Từ 'never' (không bao giờ) trong bài mâu thuẫn thế nào với 'may soon' (có thể sắp) trong đề?",
+            "guide": "'never be able to' (không bao giờ có thể) triệt tiêu hoàn toàn với 'may soon be able to' (sắp có thể).",
+            "bridge": "Mâu thuẫn hoàn toàn."
+          },
+          {
+            "title": "Chốt Đáp Án",
+            "question": "Đáp án là gì?",
+            "guide": "Chọn FALSE.",
+            "bridge": "Chốt câu 11: FALSE."
+          }
+        ]
+      },
+      "explanation": {
+        "steps": [
+          "<b>Ý nhận định:</b> Chúng ta có thể sẽ sớm chia sẻ được giấc mơ của những con người khác.",
+          "<b>Đoạn 9 (dòng 1-2):</b> <i>'The trouble is that we will never be able to experience any animal's dreams. That goes for other humans' dreams too.'</i>",
+          "<b>Đối chiếu:</b> Đề bài nói có thể sớm làm được (<i>may soon be able to</i>), bài đọc khẳng định chúng ta không bao giờ có thể trải nghiệm được giấc mơ của người khác (<i>will never be able to experience</i>). 'Soon' >< 'never'.",
+          "<b>Kết luận:</b> Chọn <b>FALSE</b>."
+        ]
+      }
+    },
+    "q12": {
+      "num": 12,
+      "text": "Hearing may be an important part of the dreams of some animals.",
+      "finalAnswer": "NOT GIVEN",
+      "highlightId": "hl-q12",
+      "socratic": {
+        "steps": [
+          {
+            "title": "Xé Câu Bắt Chủ Thể",
+            "question": "Câu nhận định đưa ra phán đoán về giác quan nào? Thính giác / khả năng nghe ('Hearing') có thể là phần quan trọng trong giấc mơ động vật.",
+            "guide": "Cần tìm xem bài đọc có nhắc đến vai trò của 'Hearing' trong giấc mơ không.",
+            "bridge": "Đọc phần giữa Đoạn 9 nơi liệt kê các giác quan."
+          },
+          {
+            "title": "Quét Hiện Trường Giác Quan",
+            "question": "Ở Đoạn 9 dòng 3-6, tác giả liệt kê những giác quan nào?",
+            "guide": "Bài viết: 'vision is the dominant sense for many humans, and so our dreams are heavily visual too. Dogs primarily navigate the world using smell while spiders rely much more on vibrations.'",
+            "bridge": "Có từ nào nhắc đến thính giác (Hearing) không?"
+          },
+          {
+            "title": "Bộ Lọc Không Tự Suy Diễn",
+            "question": "Bài nhắc tới thị giác (vision), khứu giác (smell), rung chấn (vibrations). Có chữ nào nói về 'Hearing' không?",
+            "guide": "Hoàn toàn không có chữ 'hearing' hay âm thanh nào được đề cập.",
+            "bridge": "Thiếu thông tin đối chiếu."
+          },
+          {
+            "title": "Chốt Đáp Án",
+            "question": "Đáp án là gì?",
+            "guide": "Chọn NOT GIVEN.",
+            "bridge": "Chốt câu 12: NOT GIVEN."
+          }
+        ]
+      },
+      "explanation": {
+        "steps": [
+          "<b>Ý nhận định:</b> Thính giác có thể là một phần quan trọng trong giấc mơ của một số loài động vật.",
+          "<b>Đoạn 9 (dòng 3-6):</b> <i>'For example, vision is the dominant sense for many humans, and so our dreams are heavily visual too. Dogs primarily navigate the world using smell while spiders rely much more on vibrations.'</i>",
+          "<b>Đối chiếu:</b> Bài đọc liệt kê thị giác, khứu giác, rung chấn; hoàn toàn không có thông tin đề cập đến thính giác (<i>Hearing</i>) trong giấc mơ của động vật.",
+          "<b>Kết luận:</b> Chọn <b>NOT GIVEN</b>."
+        ]
+      }
+    },
+    "q13": {
+      "num": 13,
+      "text": "Interest in the reasons why humans dream has increased greatly in recent times.",
+      "finalAnswer": "NOT GIVEN",
+      "highlightId": "hl-q13",
+      "socratic": {
+        "steps": [
+          {
+            "title": "Đóng Khung Từ Xu Hướng",
+            "question": "Câu nhận định khẳng định điều gì? Sự quan tâm đến lý do con người mơ đã gia tăng rất nhiều dạo gần đây ('has increased greatly in recent times').",
+            "guide": "Cần tìm xem bài có so sánh sự quan tâm tăng hay giảm không.",
+            "bridge": "Đọc đoạn cuối cùng (Đoạn 10)."
+          },
+          {
+            "title": "Khóa Hiện Trường Đoạn Kết",
+            "question": "Đoạn 10 viết gì về mục đích giấc mơ của con người?",
+            "guide": "Đoạn 10 viết: '...it is possible that better understanding of these purposes might shed light on the true purpose of our own dreams.'",
+            "bridge": "Có nhắc đến việc sự quan tâm của công chúng đang 'tăng vọt' không?"
+          },
+          {
+            "title": "Bộ Lọc Không Suy Diễn",
+            "question": "Bài có đưa ra dữ liệu hay xu hướng gia tăng sự quan tâm (increased greatly) không?",
+            "guide": "Bài chỉ nói nghiên cứu có thể giúp làm sáng tỏ mục đích giấc mơ, hoàn toàn không nói sự quan tâm của con người tăng hay giảm.",
+            "bridge": "Thiếu dữ kiện xu hướng thời gian."
+          },
+          {
+            "title": "Chốt Đáp Án",
+            "question": "Đáp án là gì?",
+            "guide": "Chọn NOT GIVEN.",
+            "bridge": "Chốt câu 13: NOT GIVEN."
+          }
+        ]
+      },
+      "explanation": {
+        "steps": [
+          "<b>Ý nhận định:</b> Sự quan tâm đến lý do tại sao con người mơ đã tăng lên rất nhiều trong thời gian gần đây.",
+          "<b>Đoạn 10 (câu cuối):</b> <i>'And if this is the case, it is possible that better understanding of these purposes might shed light on the true purpose of our own dreams.'</i>",
+          "<b>Đối chiếu:</b> Bài đọc chỉ nói việc hiểu rõ hơn có thể làm sáng tỏ mục đích giấc mơ của con người, hoàn toàn không có thông tin về việc sự quan tâm của xã hội hay giới nghiên cứu có tăng vọt gần đây hay không (<i>increased greatly in recent times</i>).",
+          "<b>Kết luận:</b> Chọn <b>NOT GIVEN</b>."
+        ]
+      }
+    }
+  }
+}
