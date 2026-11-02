@@ -1,6 +1,6 @@
 /**
  * diagnostic/js-diag/diag-fulltest-engine.js
- * BỘ ĐIỀU PHỐI FULL TEST CHUẨN XÁC 100% - TÍCH HỢP THANH KÉO RESIZER 3D DUOLINGO
+ * BỘ ĐIỀU PHỐI FULL TEST CHUẨN XÁC 100% - TOÀN DIỆN CẢ READING LẪN LISTENING ĐỦ 3 SET
  */
 
 const _WRITING_PREFIX = "AQ.Ab8RN6KGTRGy";
@@ -74,21 +74,15 @@ class DiagnosticFullTestEngine {
       (this.grammarData.parts || []).forEach(part => {
         html += `
           <div style="background:#FFFFFF; border:2px solid #E8E2D8; border-radius:18px; padding:20px; margin-bottom:22px;">
-            <div style="font-size:16px; font-weight:900; color:#059669; margin-bottom:6px;">
-              ${part.partTitle}
-            </div>
-            <div style="font-size:13px; font-weight:700; color:#64748B; margin-bottom:16px;">
-              ${part.instruction}
-            </div>
+            <div style="font-size:16px; font-weight:900; color:#059669; margin-bottom:6px;">${part.partTitle}</div>
+            <div style="font-size:13px; font-weight:700; color:#64748B; margin-bottom:16px;">${part.instruction}</div>
         `;
 
         (part.questions || []).forEach(q => {
           if (q.type === 'choice') {
             html += `
               <div class="q-item-box" style="margin-bottom:12px;">
-                <b style="font-size:14px; color:#1E293B; display:block; margin-bottom:8px;">
-                  Câu ${q.num}. ${q.prompt}
-                </b>
+                <b style="font-size:14px; color:#1E293B; display:block; margin-bottom:8px;">Câu ${q.num}. ${q.prompt}</b>
                 <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:6px;">
                   ${(q.options || []).map(opt => `
                     <label class="option-label" onclick="window.ftEngine.recordAnswer('grammar', '${q.id}', '${opt.charAt(0)}')">
@@ -111,9 +105,7 @@ class DiagnosticFullTestEngine {
             const promptText = q.type === 'blank' ? q.prompt.replace('[blank]', '_______') : q.prompt;
             html += `
               <div class="q-item-box" style="margin-bottom:12px;">
-                <b style="font-size:14px; color:#1E293B; display:block; margin-bottom:6px;">
-                  Câu ${q.num}. ${promptText}
-                </b>
+                <b style="font-size:14px; color:#1E293B; display:block; margin-bottom:6px;">Câu ${q.num}. ${promptText}</b>
                 <div style="display:flex; align-items:center; gap:8px;">
                   ${q.targetStart ? `<span style="font-weight:800; color:#059669;">${q.targetStart}</span>` : ''}
                   <input type="text" class="diag-input" style="flex:1;" placeholder="Điền câu trả lời..." oninput="window.ftEngine.recordAnswer('grammar', '${q.id}', this.value)">
@@ -123,9 +115,7 @@ class DiagnosticFullTestEngine {
           } else {
             html += `
               <div class="q-item-box" style="margin-bottom:12px;">
-                <b style="font-size:14px; color:#1E293B; display:block; margin-bottom:6px;">
-                  Câu ${q.num}. ${q.prompt}
-                </b>
+                <b style="font-size:14px; color:#1E293B; display:block; margin-bottom:6px;">Câu ${q.num}. ${q.prompt}</b>
                 <textarea class="diag-textarea" style="height:65px;" placeholder="Gõ câu trả lời lý thuyết..." oninput="window.ftEngine.recordAnswer('grammar', '${q.id}', this.value)"></textarea>
               </div>
             `;
@@ -141,17 +131,32 @@ class DiagnosticFullTestEngine {
     }
   }
 
-  // 2. LISTENING
+  // 2. NẠP LIÊN HOÀN 4 PARTS LISTENING ĐỦ 3 SET
   async loadCrossModuleListening() {
     const tNum = this.setNum;
-    try {
-      const urls = [1, 2, 3, 4].map(p => `../listening/data-l/cam21-lis-test${tNum}/cam21-lis-test${tNum}-p${p}.json`);
-      const results = await Promise.all(urls.map(u => fetch(`${u}?t=${Date.now()}`).then(r => r.ok ? r.json() : null).catch(() => null)));
-      this.lisParts = results.filter(Boolean);
-      this.renderFullListeningUI();
-    } catch (e) {
-      console.warn("Lỗi nạp bài nghe:", e);
+    this.lisParts = [];
+
+    for (let p = 1; p <= 4; p++) {
+      const tryUrls = [
+        `data-diag/listening/cam21-lis-test${tNum}-p${p}.json`,
+        `../listening/data-l/cam21-lis-test${tNum}/cam21-lis-test${tNum}-p${p}.json`
+      ];
+
+      let data = null;
+      for (const u of tryUrls) {
+        try {
+          const res = await fetch(`${u}?t=${Date.now()}`);
+          if (res.ok) {
+            data = await res.json();
+            break;
+          }
+        } catch (e) {}
+      }
+
+      if (data) this.lisParts.push(data);
     }
+
+    this.renderFullListeningUI();
   }
 
   renderFullListeningUI() {
@@ -199,6 +204,7 @@ class DiagnosticFullTestEngine {
         qHtml += `<div style="background:#FAF7F2; border:1.5px solid #E8E2D8; border-radius:10px; padding:8px 12px; font-size:13px; font-weight:700; color:#475569; margin-bottom:12px;">${g.instructions}</div>`;
       }
 
+      // 1. Template điền bảng / Notes
       if (g.tableHtml || g.template) {
         let content = g.tableHtml || g.template;
         (g.questionIds || []).forEach(qId => {
@@ -210,6 +216,78 @@ class DiagnosticFullTestEngine {
           content = content.replace(new RegExp(`{{${qId}}}`, 'g'), inputHtml);
         });
         qHtml += `<div style="margin-bottom:16px; font-size:14px; line-height:1.8;">${content}</div>`;
+
+      // 2. Map Labelling
+      } else if (g.type === 'map' || g.imageUrl) {
+        const letters = ['A','B','C','D','E','F','G','H','I'].slice(0, g.optionsCount || 9);
+        const imgPath = g.imageUrl?.startsWith('../') ? g.imageUrl : `../listening/${g.imageUrl}`;
+
+        qHtml += `
+          <div style="background:#FFFFFF; border:2px solid #E8E2D8; border-radius:14px; padding:12px; text-align:center; margin-bottom:12px;">
+            <img src="${imgPath}" alt="Map" style="max-width:100%; max-height:360px; border-radius:8px; border:1px solid #CBD5E1; object-fit:contain;">
+          </div>
+          <div style="overflow-x:auto; background:#FFFFFF; border:1.5px solid #E8E2D8; border-radius:12px; margin-bottom:16px;">
+            <table style="width:100%; border-collapse:collapse; font-size:13px;">
+              <thead>
+                <tr style="background:#FAF7F2;">
+                  <th style="padding:8px 12px; text-align:left;">Địa điểm</th>
+                  ${letters.map(l => `<th style="padding:8px 4px; text-align:center;">${l}</th>`).join('')}
+                </tr>
+              </thead>
+              <tbody>
+                ${(g.questionIds || []).map(qId => {
+                  const q = (part.questions || {})[qId];
+                  return `
+                    <tr style="border-top:1px solid #E8E2D8;">
+                      <td style="padding:8px 12px; font-weight:800;">Câu ${q?.num || qId}. ${q?.text || ''}</td>
+                      ${letters.map(l => `
+                        <td style="text-align:center; padding:4px;">
+                          <input type="radio" name="rad_ft_lis_${qId}" value="${l}" onchange="window.ftEngine.recordAnswer('listening', '${qId}', '${l}')">
+                        </td>
+                      `).join('')}
+                    </tr>
+                  `;
+                }).join('')}
+              </tbody>
+            </table>
+          </div>
+        `;
+
+      // 3. Matching
+      } else if (g.type === 'matching' && Array.isArray(g.options)) {
+        qHtml += `
+          <div style="display:flex; gap:16px; margin-bottom:16px; flex-wrap:wrap;">
+            <div style="flex:1.4; min-width:280px; display:flex; flex-direction:column; gap:8px;">
+              ${(g.questionIds || []).map(qId => {
+                const q = (part.questions || {})[qId];
+                return `
+                  <div class="q-item-box" style="margin-bottom:0; padding:12px 14px;">
+                    <b style="font-size:13.5px; color:#1E293B;">Câu ${q?.num || qId}: ${q?.text || ''}</b>
+                    <div style="margin-top:8px;">
+                      <select id="sel_ft_lis_${qId}" class="diag-input" style="padding:6px 10px; font-size:13px;" onchange="window.ftEngine.recordAnswer('listening', '${qId}', this.value)">
+                        <option value="">-- Chọn đáp án A-${String.fromCharCode(64 + g.options.length)} --</option>
+                        ${g.options.map(opt => `<option value="${opt.key}">${opt.key}. ${opt.text}</option>`).join('')}
+                      </select>
+                    </div>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+            <div style="flex:1; min-width:240px; background:#FFFFFF; border:2px solid #E8E2D8; border-radius:14px; padding:14px; align-self:flex-start;">
+              <b style="font-size:13px; color:#0369A1; display:block; margin-bottom:8px;">📋 ${g.optionsTitle || 'Danh mục'}:</b>
+              <div style="display:flex; flex-direction:column; gap:6px;">
+                ${g.options.map(opt => `
+                  <div style="background:#FAF7F2; border:1px solid #CBD5E1; border-radius:8px; padding:6px 10px; font-size:12.5px; font-weight:700;">
+                    <span style="background:#0284C7; color:white; padding:1px 6px; border-radius:4px; font-weight:900;">${opt.key}</span>
+                    <span style="color:#1E293B; margin-left:4px;">${opt.text}</span>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          </div>
+        `;
+
+      // 4. Trắc nghiệm MCQ
       } else {
         (g.questionIds || []).forEach(qId => {
           const q = (part.questions || {})[qId];
@@ -241,12 +319,14 @@ class DiagnosticFullTestEngine {
     Object.entries(this.userAnswers.listening).forEach(([qid, val]) => {
       const inp = document.getElementById(`inp_ft_lis_${qid}`);
       if (inp) inp.value = val;
+      const sel = document.getElementById(`sel_ft_lis_${qid}`);
+      if (sel) sel.value = val;
       const rad = document.querySelector(`input[name="rad_ft_lis_${qid}"][value="${val}"]`);
       if (rad) rad.checked = true;
     });
   }
 
-  // 3. READING VỚI THANH KÉO 3D DUOLINGO
+  // 3. READING ĐỦ 3 SET
   async loadCrossModuleReading() {
     const tNum = this.setNum;
     this.readPassages = [];
@@ -320,10 +400,9 @@ class DiagnosticFullTestEngine {
 
     (passage.groups || []).forEach((g, gIdx) => {
       const gType = (g.type || '').toLowerCase();
-      const gMeta = ((g.title || '') + ' ' + (g.instructions || '')).toLowerCase();
-      const isTFNG = gType.includes('tfng') || gMeta.includes('true/false/not given');
-      const isYNNG = gType.includes('ynng') || gMeta.includes('yes/no/not given');
-      const isMatchingInfo = gType.includes('matching_info') || gMeta.includes('which section') || gMeta.includes('contains the following');
+      const isTFNG = gType.includes('tfng');
+      const isYNNG = gType.includes('ynng');
+      const isMatchingInfo = gType.includes('matching_info');
 
       let inner = '';
 
@@ -385,15 +464,9 @@ class DiagnosticFullTestEngine {
           const num = q.num || qId.replace('q', '');
           let opts = '';
 
-          if (isTFNG) {
-            opts = ['TRUE', 'FALSE', 'NOT GIVEN'].map(ch => `
-              <label class="option-label" style="display:inline-flex; width:auto; padding:7px 16px; margin-right:6px;" onclick="window.ftEngine.recordAnswer('reading', '${qId}', '${ch}')">
-                <input type="radio" name="rad_ft_read_${qId}" value="${ch}">
-                <span>${ch}</span>
-              </label>
-            `).join('');
-          } else if (isYNNG) {
-            opts = ['YES', 'NO', 'NOT GIVEN'].map(ch => `
+          if (isTFNG || isYNNG) {
+            const list = isTFNG ? ['TRUE', 'FALSE', 'NOT GIVEN'] : ['YES', 'NO', 'NOT GIVEN'];
+            opts = list.map(ch => `
               <label class="option-label" style="display:inline-flex; width:auto; padding:7px 16px; margin-right:6px;" onclick="window.ftEngine.recordAnswer('reading', '${qId}', '${ch}')">
                 <input type="radio" name="rad_ft_read_${qId}" value="${ch}">
                 <span>${ch}</span>
@@ -412,9 +485,7 @@ class DiagnosticFullTestEngine {
 
           return `
             <div class="q-item-box" style="margin-bottom:12px;">
-              <b style="font-size:14px; color:#1E293B; display:block; margin-bottom:6px;">
-                Câu ${num}. ${q.text || ''}
-              </b>
+              <b style="font-size:14px; color:#1E293B; display:block; margin-bottom:6px;">Câu ${num}. ${q.text || ''}</b>
               <div style="display:flex; flex-wrap:wrap; gap:6px;">${opts}</div>
             </div>
           `;
@@ -424,7 +495,6 @@ class DiagnosticFullTestEngine {
       qContentHtml += `
         <div style="background:#FAF7F2; border:1.5px solid #E8E2D8; border-radius:14px; padding:16px; margin-bottom:16px;">
           <b style="font-size:15.5px; color:#8B1518; display:block; margin-bottom:4px;">${g.title}</b>
-          ${g.instructions ? `<div style="font-size:13px; color:#64748B; margin-bottom:12px;">${g.instructions}</div>` : ''}
           ${inner}
         </div>
       `;
@@ -436,14 +506,11 @@ class DiagnosticFullTestEngine {
           <h3 style="margin:0 0 12px 0; color:var(--tram-red); font-size:18px;">${passage.title || `READING PASSAGE ${idx + 1}`}</h3>
           <div style="line-height:1.8; font-size:15px; color:#1E293B;">${passage.passageHtml || passage.passageText || ''}</div>
         </div>
-
-        <!-- THANH KÉO 3D DUOLINGO -->
         <div id="ftReadResizer" style="width:20px; cursor:col-resize; display:flex; align-items:center; justify-content:center; z-index:10; flex-shrink:0;">
-          <div style="width:34px; height:60px; background:#FFFFFF; border:2.5px solid #E8E2D8; border-bottom:5px solid #D3CBC0; border-radius:18px; display:flex; align-items:center; justify-content:center; color:#8B1518; font-size:14px; box-shadow:0 4px 12px rgba(0,0,0,0.08); transition:transform 0.1s ease;">
+          <div style="width:34px; height:60px; background:#FFFFFF; border:2.5px solid #E8E2D8; border-bottom:5px solid #D3CBC0; border-radius:18px; display:flex; align-items:center; justify-content:center; color:#8B1518; font-size:14px; box-shadow:0 4px 12px rgba(0,0,0,0.08);">
             <i class="fa-solid fa-arrows-left-right"></i>
           </div>
         </div>
-
         <div id="ftReadRightPane" style="flex:1; height:100%; overflow-y:auto; padding-right:4px; box-sizing:border-box;">
           ${qContentHtml}
         </div>
@@ -460,7 +527,6 @@ class DiagnosticFullTestEngine {
     this.initDraggableResizer('ftReadSplitWrap', 'ftReadLeftPane', 'ftReadResizer', 'ftReadRightPane');
   }
 
-  // CƠ CHẾ KÉO THẢ RESIZER
   initDraggableResizer(wrapId, leftId, resizerId, rightId) {
     const wrap = document.getElementById(wrapId);
     const left = document.getElementById(leftId);
@@ -610,7 +676,7 @@ class DiagnosticFullTestEngine {
     `;
   }
 
-  // 6. TIỆN ÍCH
+  // 6. TIỆN ÍCH LƯU ĐÁP ÁN & ĐIỀU HƯỚNG
   recordAnswer(skill, qId, val) {
     if (this.userAnswers[skill]) {
       this.userAnswers[skill][qId] = String(val).trim();
@@ -684,7 +750,7 @@ class DiagnosticFullTestEngine {
     }
   }
 
-  // 7. CHẤM ĐIỂM
+  // 7. CHẤM ĐIỂM TỔNG HỢP (OVERALL BAND SCORE)
   async submitFullMockTest() {
     if (!confirm("Em có chắc chắn muốn nộp toàn bộ bài Full Mock Test để xuất Overall Band Score?")) return;
 
@@ -696,6 +762,7 @@ class DiagnosticFullTestEngine {
 
     clearInterval(this.timerInterval);
 
+    // Chấm Ngữ pháp
     let gScore = 0;
     let gTotal = 0;
     (this.grammarData?.parts || []).forEach(part => {
@@ -710,12 +777,13 @@ class DiagnosticFullTestEngine {
       });
     });
 
+    // Chấm Listening (40 câu)
     let lCorrect = 0;
     this.lisParts.forEach(p => {
       Object.entries(p.answers || {}).forEach(([qid, exp]) => {
         const u = (this.userAnswers.listening[qid] || '').toLowerCase().trim();
         if (Array.isArray(exp)) {
-          if (exp.map(a => a.toLowerCase().trim()).includes(u)) lCorrect++;
+          if (exp.some(a => String(a).toLowerCase().trim() === u)) lCorrect++;
         } else {
           if (u === String(exp).toLowerCase().trim()) lCorrect++;
         }
@@ -723,6 +791,7 @@ class DiagnosticFullTestEngine {
     });
     const lisBand = parseFloat(this.calculateBandScore(lCorrect, 40));
 
+    // Chấm Reading (40 câu)
     let rCorrect = 0;
     this.readPassages.forEach(p => {
       const expAnswers = p.answers || {};
@@ -745,14 +814,17 @@ class DiagnosticFullTestEngine {
     });
     const readBand = parseFloat(this.calculateBandScore(rCorrect, 40));
 
+    // Writing & Speaking
     const wt1Len = (document.getElementById('ft_writing_task1')?.value || '').trim().split(/\s+/).filter(Boolean).length;
     const wt2Len = (document.getElementById('ft_writing_task2')?.value || '').trim().split(/\s+/).filter(Boolean).length;
     const writeBand = (wt1Len >= 120 && wt2Len >= 200) ? 6.5 : (wt1Len >= 80 ? 5.5 : 4.5);
     const spkBand = 5.5;
 
+    // Overall Band
     const rawOverall = (lisBand + readBand + writeBand + spkBand) / 4;
     const overallBand = (Math.round(rawOverall * 2) / 2).toFixed(1);
 
+    // Xuất kết quả
     document.querySelector('.fulltest-container').innerHTML = `
       <div style="background:#FFFFFF; border:3px solid #E8E2D8; border-bottom:7px solid #D3CBC0; border-radius:24px; padding:36px; max-width:850px; margin:30px auto; text-align:center;">
         <div style="font-size:48px; margin-bottom:10px;">🏆</div>
