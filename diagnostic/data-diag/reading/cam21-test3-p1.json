@@ -1,0 +1,507 @@
+{
+  "title": "IELTS Academic 21 - Test 3 - Passage 1: Saving the saiga",
+  "answers": {
+    "q1": "dust",
+    "q2": "blood",
+    "q3": "coat",
+    "q4": "horns",
+    "q5": "habitat",
+    "q6": "routes",
+    "q7": "streams",
+    "q8": "FALSE",
+    "q9": "FALSE",
+    "q10": "TRUE",
+    "q11": "NOT GIVEN",
+    "q12": "TRUE",
+    "q13": "NOT GIVEN"
+  },
+  "passageHtml": "<h2>READING PASSAGE 1</h2><h3>Saving the saiga</h3><p>The saiga, a species of antelope native to Central Asia, once roamed the vast grasslands of this region in enormous herds, many millions strong. Regrettably, such spectacular sights are a thing of the past. Today, <span class=\"hl\" id=\"hl-q8\" data-q=\"[Q8]\">the saiga is largely confined to a single country: Kazakhstan. This country is estimated to be home to well over 90% of the global saiga population, with Russia, Mongolia and Uzbekistan accounting for the rest</span>.</p><p>The saiga is perfectly adapted to the tough conditions of the remote wilderness of the steppes of Central Asia. One such adaptation is its bizarre bulbous nose, which enables the animal to survive the extreme seasonal temperature swings of the region. The swollen nostrils of the nose serve several purposes: they filter out <span class=\"hl\" id=\"hl-q1\" data-q=\"[Q1]\"><span class=\"kw\">dust</span></span> and cool the <span class=\"hl\" id=\"hl-q2\" data-q=\"[Q2]\"><span class=\"kw\">blood</span></span> during hot, dry summers, and they warm the cold air before it enters the saiga's lungs in winter. Other seasonal adaptations include a heavy winter <span class=\"hl\" id=\"hl-q3\" data-q=\"[Q3]\"><span class=\"kw\">coat</span></span> that the saiga sheds when the weather warms up.</p><p>Despite these superb adaptations to harsh conditions, the saiga has no defence against the threats posed by humans. It was almost driven to extinction by hunters in the 19th century. Legal protection ensured its survival for a while, and <span class=\"hl\" id=\"hl-q9\" data-q=\"[Q9]\">numbers steadily recovered throughout most of the 20th century</span>. But the respite was only temporary. In the ten years following the break-up of the former Soviet Union in 1991, over 95% of the global population was lost - one of the fastest examples of species loss ever recorded for a mammal.</p><p>The dramatic decline during this decade was due to illegal poaching on an industrial scale. Male saiga are a particular target, because their <span class=\"hl\" id=\"hl-q4\" data-q=\"[Q4]\"><span class=\"kw\">horns</span></span> are highly prized by traditional medicine practitioners. <span class=\"hl\" id=\"hl-q10\" data-q=\"[Q10]\">Poaching reached epidemic levels after misguided conservationists tried to relieve the pressure on threatened African rhinos by actively encouraging the use of saiga horns in traditional medicine as an alternative to those of rhinos</span>. Male saiga were almost wiped out, leading to a population crash from which the species has been struggling to recover ever since.</p><p>Another threat to the survival of the saiga is loss of <span class=\"hl\" id=\"hl-q5\" data-q=\"[Q5]\"><span class=\"kw\">habitat</span></span>, as a result of agricultural expansion and human settlement. Physical barriers such as railways, pipelines and fences can block the seasonal migration <span class=\"hl\" id=\"hl-q6\" data-q=\"[Q6]\"><span class=\"kw\">routes</span></span> of this transboundary species. In the worst cases, herds may starve to death after being trapped.</p><p>Then there is the risk of disease. In 2015, an outbreak of haemorrhagic septicaemia, caused by the normally harmless bacterium Pasteurella multocida, killed over 75% of the global adult saiga population in just three weeks. In 2017, 60% of the Mongolian saiga population - a subspecies found nowhere else in the world - was killed by a virus that spilled over from livestock. These so-called mass mortality events represent an unpredictable and serious threat to the species.</p><p><span class=\"hl\" id=\"hl-q11\" data-q=\"[Q11]\">Climate change poses a further threat. Although well adapted to cold winters and hot summers, saiga struggle to cope with temperature extremes and unpredictable fluctuations in climate</span>. Experts believe that unusually warm weather may have triggered the 2015 mass mortality event. The steppe region has also become increasingly arid in recent years, and many of the smaller <span class=\"hl\" id=\"hl-q7\" data-q=\"[Q7]\"><span class=\"kw\">streams</span></span> that the species normally depended on have dried up and vanished.</p><p>Recent efforts to save the saiga have been spearheaded by the Altyn Dala Conservation Initiative, a project led by the Association for the Conservation of Biodiversity of Kazakhstan, working in partnership with the Kazakh government's Committee for Forestry and Wildlife, Frankfurt Zoological Society and Fauna and Flora, an international conservation charity. <span class=\"hl\" id=\"hl-q12\" data-q=\"[Q12]\">Its purpose is to protect and restore Kazakhstan's steppe, semi-desert and desert ecosystems and the many species they support</span>, including the critically endangered saiga. <span class=\"hl\" id=\"hl-q13\" data-q=\"[Q13]\">In 2022 the United Nations recognised the initiative as a World Restoration Flagship project</span>, an accolade reserved for the ten best examples of large-scale ecosystem restoration around the globe.</p><p>So, how many saiga are there now? By 2000, the global saiga population had hit an all-time low of just 21,000 individuals. There was some recovery in the first decade of the new millennium but this was then crushed by devastating mass mortality events that saw the loss of hundreds of thousands of the species. But thanks to the intervention of the Altyn Dala Conservation Initiative, the most recent episodes in the ongoing story of the saiga have been relatively uplifting. Three years ago, the Ustyurt Plateau population in Kazakhstan experienced its largest mass birth of saiga calves in many years. An aerial census two years ago recorded an estimated 842,000 saiga across Kazakhstan as a whole, and according to an aerial survey earlier this year, the saiga population in Kazakhstan now exceeds 1.9 million. The world's strangest-looking antelope remains critically endangered, but the direction of travel is positive.</p>",
+  "groups": [
+    {
+      "id": "g1",
+      "type": "notes",
+      "title": "Questions 1-7",
+      "instructions": "<i>Complete the notes below.<br>Choose <b>ONE WORD ONLY</b> from the passage for each answer.<br>Write your answers in boxes 1-7 on your answer sheet.</i>",
+      "noteTitle": "The saiga",
+      "questionIds": ["q1", "q2", "q3", "q4", "q5", "q6", "q7"],
+      "template": "<p><b>Adaptations</b></p><ul><li style=\"margin-bottom: 12px;\">has a large bulbous nose with swollen nostrils that<ul><li style=\"margin-bottom: 8px;\">keep <b>1.</b> {{q1}} out.</li><li style=\"margin-bottom: 8px;\">lower the temperature of its <b>2.</b> {{q2}} in summer.</li><li style=\"margin-bottom: 8px;\">warm the air entering its lungs in winter</li></ul></li><li style=\"margin-bottom: 12px;\">grows a thick <b>3.</b> {{q3}} in winter, which it loses in spring.</li></ul><p><b>Reasons for population decline</b></p><ul><li style=\"margin-bottom: 12px;\">poaching, especially for the <b>4.</b> {{q4}} of male saiga.</li><li style=\"margin-bottom: 12px;\">expansion of farms and settlements, causing<ul><li style=\"margin-bottom: 8px;\">reduction in the size of the saiga's <b>5.</b> {{q5}}.</li><li style=\"margin-bottom: 8px;\">loss of access to the <b>6.</b> {{q6}} which they use for migration.</li></ul></li><li style=\"margin-bottom: 12px;\">various forms of disease, leading to mass mortality events</li><li style=\"margin-bottom: 12px;\">climate change, causing the disappearance of <b>7.</b> {{q7}} which the saiga relied on.</li></ul>"
+    },
+    {
+      "id": "g2",
+      "type": "tfng",
+      "title": "Questions 8-13",
+      "instructions": "<i>Do the following statements agree with the information given in Reading Passage 1?<br>In boxes 8-13 on your answer sheet, write:<br><b>TRUE</b> if the statement agrees with the information<br><b>FALSE</b> if the statement contradicts the information<br><b>NOT GIVEN</b> if there is no information on this</i>",
+      "questionIds": ["q8", "q9", "q10", "q11", "q12", "q13"]
+    }
+  ],
+  "questions": {
+    "q1": {
+      "num": 1,
+      "finalAnswer": "dust",
+      "inputWidth": "100px",
+      "highlightId": "hl-q1",
+      "socratic": {
+        "steps": [
+          {
+            "title": "Xác định từ cần điền",
+            "question": "Câu 1 nói phần mũi phồng giúp ngăn cái gì ra ngoài ('keep 1 ______ out')?",
+            "guide": "Sau 'keep' và trước 'out' cần một danh từ chỉ dị vật hoặc hạt bụi trong không khí bị cản lại.",
+            "bridge": "Hãy tìm câu nói về chức năng của lỗ mũi phồng (swollen nostrils) ở Paragraph 2."
+          },
+          {
+            "title": "Tìm câu chứa thông tin",
+            "question": "Paragraph 2 nói lỗ mũi có tác dụng lọc cái gì đầu tiên?",
+            "guide": "Paragraph 2 viết: 'The swollen nostrils of the nose serve several purposes: they filter out dust and cool the blood...' (lọc sạch bụi và làm mát máu).",
+            "bridge": "'filter out' đồng nghĩa hoàn toàn với 'keep out'. Vật bị lọc ra là gì?"
+          },
+          {
+            "title": "Chọn từ nguyên văn",
+            "question": "Từ 1 chữ duy nhất sau 'filter out' là gì?",
+            "guide": "Đáp án là 'dust' (bụi bẩn).",
+            "bridge": "Chốt câu 1: dust."
+          }
+        ]
+      },
+      "explanation": {
+        "steps": [
+          "<b>Vị trí ngữ pháp:</b> Cần danh từ sau <i>keep</i> trong cụm <i>keep ... out</i>.",
+          "<b>Paragraph 2 (dòng 3-4):</b> <i>'...they filter out dust and cool the blood during hot, dry summers...'</i>",
+          "<b>Khớp từ:</b> <i>keep out</i> = <i>filter out</i>; từ cần lấy là <i>dust</i>.",
+          "<b>Từ cần điền:</b> <b>dust</b>."
+        ]
+      }
+    },
+    "q2": {
+      "num": 2,
+      "finalAnswer": "blood",
+      "inputWidth": "100px",
+      "highlightId": "hl-q2",
+      "socratic": {
+        "steps": [
+          {
+            "title": "Xác định từ cần điền",
+            "question": "Câu 2 nói vào mùa hè lỗ mũi giúp hạ nhiệt độ của cái gì ('lower the temperature of its 2 ______ in summer')?",
+            "guide": "Sau tính từ sở hữu 'its' cần một danh từ chỉ chất lỏng hoặc cơ quan bên trong cơ thể linh dương.",
+            "bridge": "Đọc tiếp ngay sau chữ 'dust' ở Paragraph 2 nhé."
+          },
+          {
+            "title": "Tìm câu chứa thông tin",
+            "question": "Paragraph 2 nói lỗ mũi làm mát cái gì trong mùa hè khô nóng?",
+            "guide": "Paragraph 2 viết: '...and cool the blood during hot, dry summers...'",
+            "bridge": "'cool' đồng nghĩa với 'lower the temperature'. Thứ được làm mát là gì?"
+          },
+          {
+            "title": "Chọn từ nguyên văn",
+            "question": "Từ 1 chữ duy nhất chỉ bộ phận được làm mát là gì?",
+            "guide": "Đáp án là 'blood' (máu).",
+            "bridge": "Chốt câu 2: blood."
+          }
+        ]
+      },
+      "explanation": {
+        "steps": [
+          "<b>Vị trí ngữ pháp:</b> Cần danh từ sau <i>its</i>.",
+          "<b>Paragraph 2 (dòng 4):</b> <i>'...and cool the blood during hot, dry summers...'</i>",
+          "<b>Khớp từ:</b> <i>lower the temperature</i> = <i>cool</i>; từ cần lấy là <i>blood</i>.",
+          "<b>Từ cần điền:</b> <b>blood</b>."
+        ]
+      }
+    },
+    "q3": {
+      "num": 3,
+      "finalAnswer": "coat",
+      "inputWidth": "100px",
+      "highlightId": "hl-q3",
+      "socratic": {
+        "steps": [
+          {
+            "title": "Xác định từ cần điền",
+            "question": "Câu 3 nói loài saiga mọc một cái gì đó dày vào mùa đông ('grows a thick 3 ______ in winter') và rụng vào mùa xuân?",
+            "guide": "Sau tính từ 'thick' cần một danh từ chỉ lớp lông bao phủ cơ thể động vật.",
+            "bridge": "Hãy đọc câu cuối cùng của Paragraph 2."
+          },
+          {
+            "title": "Tìm câu chứa thông tin",
+            "question": "Paragraph 2 nói loài saiga có sự thích nghi theo mùa nào bằng lớp bao phủ cơ thể?",
+            "guide": "Paragraph 2 viết: 'Other seasonal adaptations include a heavy winter coat that the saiga sheds when the weather warms up.' (lớp lông dày mùa đông rụng đi khi thời tiết ấm lên).",
+            "bridge": "'thick' đồng nghĩa với 'heavy'; 'loses in spring' tương ứng với 'sheds when weather warms up'. Lớp bao phủ đó gọi là gì?"
+          },
+          {
+            "title": "Chọn từ nguyên văn",
+            "question": "Từ danh từ chỉ lớp áo lông là gì?",
+            "guide": "Đáp án là 'coat' (lớp lông ngoài).",
+            "bridge": "Chốt câu 3: coat."
+          }
+        ]
+      },
+      "explanation": {
+        "steps": [
+          "<b>Vị trí ngữ pháp:</b> Cần danh từ sau tính từ <i>thick</i>.",
+          "<b>Paragraph 2 (câu cuối):</b> <i>'Other seasonal adaptations include a heavy winter coat that the saiga sheds when the weather warms up.'</i>",
+          "<b>Khớp từ:</b> <i>thick</i> = <i>heavy</i>; <i>loses</i> = <i>sheds</i>; từ cần lấy là <i>coat</i>.",
+          "<b>Từ cần điền:</b> <b>coat</b>."
+        ]
+      }
+    },
+    "q4": {
+      "num": 4,
+      "finalAnswer": "horns",
+      "inputWidth": "100px",
+      "highlightId": "hl-q4",
+      "socratic": {
+        "steps": [
+          {
+            "title": "Xác định từ cần điền",
+            "question": "Câu 4 nói nạn săn trộm nhắm đặc biệt vào bộ phận nào của con saiga đực ('especially for the 4 ______ of male saiga')?",
+            "guide": "Sau 'for the' cần một danh từ chỉ bộ phận có giá trị cao trên cơ thể con đực.",
+            "bridge": "Hãy tìm cụm 'Male saiga' ở Paragraph 4."
+          },
+          {
+            "title": "Tìm câu chứa thông tin",
+            "question": "Paragraph 4 nói bộ phận nào của con đực bị săn lùng để làm thuốc đông y?",
+            "guide": "Paragraph 4 viết: 'Male saiga are a particular target, because their horns are highly prized by traditional medicine practitioners.' (Con đực là mục tiêu cụ thể vì sừng của chúng rất có giá trị đối với các thầy thuốc truyền thống).",
+            "bridge": "'particular target' chính là 'especially'. Bộ phận đó là gì?"
+          },
+          {
+            "title": "Chọn từ nguyên văn",
+            "question": "Từ danh từ số nhiều chỉ bộ phận sừng là gì?",
+            "guide": "Đáp án là 'horns' (những chiếc sừng).",
+            "bridge": "Chốt câu 4: horns."
+          }
+        ]
+      },
+      "explanation": {
+        "steps": [
+          "<b>Vị trí ngữ pháp:</b> Cần danh từ sau <i>the</i>.",
+          "<b>Paragraph 4 (dòng 2-3):</b> <i>'Male saiga are a particular target, because their horns are highly prized by traditional medicine practitioners.'</i>",
+          "<b>Khớp từ:</b> <i>especially for</i> = <i>a particular target, because</i>; từ cần lấy là <i>horns</i>.",
+          "<b>Từ cần điền:</b> <b>horns</b>."
+        ]
+      }
+    },
+    "q5": {
+      "num": 5,
+      "finalAnswer": "habitat",
+      "inputWidth": "110px",
+      "highlightId": "hl-q5",
+      "socratic": {
+        "steps": [
+          {
+            "title": "Xác định từ cần điền",
+            "question": "Câu 5 nói sự mở rộng nông nghiệp dẫn tới sự sụt giảm kích thước của cái gì của saiga ('reduction in the size of the saiga's 5 ______')?",
+            "guide": "Sau sở hữu cách 'saiga's' cần một danh từ chỉ vùng sinh sống, môi trường tự nhiên.",
+            "bridge": "Hãy tìm cụm 'agricultural expansion' ở đầu Paragraph 5."
+          },
+          {
+            "title": "Tìm câu chứa thông tin",
+            "question": "Paragraph 5 nói mối đe dọa khác đối với sự sống còn của saiga là mất đi cái gì?",
+            "guide": "Paragraph 5 viết: 'Another threat to the survival of the saiga is loss of habitat, as a result of agricultural expansion and human settlement.'",
+            "bridge": "'reduction in the size' tương đương với 'loss of'. Yếu tố bị mất đi là gì?"
+          },
+          {
+            "title": "Chọn từ nguyên văn",
+            "question": "Từ danh từ chỉ môi trường sống là gì?",
+            "guide": "Đáp án là 'habitat' (môi trường sống).",
+            "bridge": "Chốt câu 5: habitat."
+          }
+        ]
+      },
+      "explanation": {
+        "steps": [
+          "<b>Vị trí ngữ pháp:</b> Cần danh từ sau <i>saiga's</i>.",
+          "<b>Paragraph 5 (dòng 1-2):</b> <i>'Another threat to the survival of the saiga is loss of habitat, as a result of agricultural expansion and human settlement.'</i>",
+          "<b>Khớp từ:</b> <i>reduction in the size / loss</i>; từ cần lấy là <i>habitat</i>.",
+          "<b>Từ cần điền:</b> <b>habitat</b>."
+        ]
+      }
+    },
+    "q6": {
+      "num": 6,
+      "finalAnswer": "routes",
+      "inputWidth": "100px",
+      "highlightId": "hl-q6",
+      "socratic": {
+        "steps": [
+          {
+            "title": "Xác định từ cần điền",
+            "question": "Câu 6 nói saiga bị mất lối đi vào những cái gì dùng để di cư ('loss of access to the 6 ______ which they use for migration')?",
+            "guide": "Sau mạo từ 'the' cần một danh từ chỉ tuyến đường, hành lang di cư của loài vật.",
+            "bridge": "Đọc tiếp câu thứ hai của Paragraph 5."
+          },
+          {
+            "title": "Tìm câu chứa thông tin",
+            "question": "Paragraph 5 nói các rào cản nhân tạo như đường ray, đường ống, hàng rào đã chặn cái gì?",
+            "guide": "Paragraph 5 viết: 'Physical barriers such as railways, pipelines and fences can block the seasonal migration routes of this transboundary species.'",
+            "bridge": "'block' chính là 'loss of access to'; 'migration' đi với danh từ nào?"
+          },
+          {
+            "title": "Chọn từ nguyên văn",
+            "question": "Từ danh từ số nhiều chỉ các tuyến đường là gì?",
+            "guide": "Đáp án là 'routes' (các lộ trình/tuyến đường).",
+            "bridge": "Chốt câu 6: routes."
+          }
+        ]
+      },
+      "explanation": {
+        "steps": [
+          "<b>Vị trí ngữ pháp:</b> Cần danh từ sau <i>the</i> đi trước mệnh đề quan hệ <i>which they use for migration</i>.",
+          "<b>Paragraph 5 (dòng 2-4):</b> <i>'Physical barriers such as railways, pipelines and fences can block the seasonal migration routes...'</i>",
+          "<b>Khớp từ:</b> <i>loss of access</i> = <i>block</i>; từ cần lấy là <i>routes</i>.",
+          "<b>Từ cần điền:</b> <b>routes</b>."
+        ]
+      }
+    },
+    "q7": {
+      "num": 7,
+      "finalAnswer": "streams",
+      "inputWidth": "110px",
+      "highlightId": "hl-q7",
+      "socratic": {
+        "steps": [
+          {
+            "title": "Xác định từ cần điền",
+            "question": "Câu 7 nói biến đổi khí hậu làm biến mất những cái gì mà saiga dựa vào để sống ('disappearance of 7 ______ which the saiga relied on')?",
+            "guide": "Sau 'disappearance of' cần một danh từ chỉ nguồn nước tự nhiên bị cạn kiệt.",
+            "bridge": "Hãy tìm đoạn nói về khí hậu (climate change) ở Paragraph 7."
+          },
+          {
+            "title": "Tìm câu chứa thông tin",
+            "question": "Paragraph 7 nói vùng thảo nguyên trở nên khô hạn và cái gì mà chúng phụ thuộc đã khô cạn biến mất?",
+            "guide": "Paragraph 7 viết: '...and many of the smaller streams that the species normally depended on have dried up and vanished.'",
+            "bridge": "'vanished' đồng nghĩa với 'disappearance'; 'depended on' chính là 'relied on'. Danh từ chỉ nguồn nước là gì?"
+          },
+          {
+            "title": "Chọn từ nguyên văn",
+            "question": "Từ danh từ số nhiều chỉ các dòng suối nhỏ là gì?",
+            "guide": "Đáp án là 'streams' (các con suối).",
+            "bridge": "Chốt câu 7: streams."
+          }
+        ]
+      },
+      "explanation": {
+        "steps": [
+          "<b>Vị trí ngữ pháp:</b> Cần danh từ sau <i>disappearance of</i>.",
+          "<b>Paragraph 7 (câu cuối):</b> <i>'...many of the smaller streams that the species normally depended on have dried up and vanished.'</i>",
+          "<b>Khớp từ:</b> <i>disappearance</i> = <i>vanished</i>; <i>relied on</i> = <i>depended on</i>; từ cần lấy là <i>streams</i>.",
+          "<b>Từ cần điền:</b> <b>streams</b>."
+        ]
+      }
+    },
+    "q8": {
+      "num": 8,
+      "text": "Today, numbers of saiga are distributed evenly across four nations in Central Asia: Kazakhstan, Russia, Mongolia and Uzbekistan.",
+      "finalAnswer": "FALSE",
+      "highlightId": "hl-q8",
+      "socratic": {
+        "steps": [
+          {
+            "title": "Hiểu nội dung nhận định",
+            "question": "Câu 8 khẳng định số lượng saiga ngày nay được phân bố đồng đều ('distributed evenly') khắp 4 quốc gia ở Trung Á. Đúng hay sai?",
+            "guide": "Hãy tìm tỷ lệ phần trăm phân bố giữa các nước ở cuối Paragraph 1.",
+            "bridge": "Cùng đọc câu cuối Paragraph 1 nhé."
+          },
+          {
+            "title": "Đối chiếu với bài đọc",
+            "question": "Paragraph 1 nói Kazakhstan chiếm bao nhiêu phần trăm tổng số saiga?",
+            "guide": "Paragraph 1 viết: 'This country is estimated to be home to well over 90% of the global saiga population, with Russia, Mongolia and Uzbekistan accounting for the rest.' (Kazakhstan chiếm hơn 90%, ba nước còn lại chỉ chiếm chưa đầy 10% gom lại).",
+            "bridge": "Một nước chiếm hơn 90% thì có thể gọi là 'phân bố đồng đều' (distributed evenly) không?"
+          },
+          {
+            "title": "Đưa ra kết luận",
+            "question": "Một bên bảo phân bố đều, một bên thực tế 1 nước chiếm >90%. Hai thông tin này đối nghịch nhau, vậy ta chọn gì?",
+            "guide": "Thông tin trái ngược 100%, chọn FALSE.",
+            "bridge": "Chốt câu 8: FALSE."
+          }
+        ]
+      },
+      "explanation": {
+        "steps": [
+          "<b>Ý nhận định:</b> Saiga được phân bố đồng đều khắp 4 quốc gia Trung Á.",
+          "<b>Paragraph 1 (câu cuối):</b> <i>'This country [Kazakhstan] is estimated to be home to well over 90% of the global saiga population, with Russia, Mongolia and Uzbekistan accounting for the rest.'</i>",
+          "<b>Đối chiếu:</b> Kazakhstan chiếm hơn 90% dân số saiga toàn cầu, trái ngược hoàn toàn với việc phân bố đồng đều (<i>distributed evenly</i>).",
+          "<b>Kết luận:</b> Chọn <b>FALSE</b>."
+        ]
+      }
+    },
+    "q9": {
+      "num": 9,
+      "text": "For most of the 20th century, the population of saiga were falling.",
+      "finalAnswer": "FALSE",
+      "highlightId": "hl-q9",
+      "socratic": {
+        "steps": [
+          {
+            "title": "Hiểu nội dung nhận định",
+            "question": "Câu 9 nói trong hầu hết thế kỷ 20 ('most of the 20th century'), số lượng saiga liên tục bị sụt giảm ('were falling').",
+            "guide": "Em hãy tìm mốc thời gian thế kỷ 20 ở Paragraph 3 để xem số lượng tăng hay giảm.",
+            "bridge": "Cùng đọc câu thứ ba của Paragraph 3."
+          },
+          {
+            "title": "Đối chiếu với bài đọc",
+            "question": "Paragraph 3 miêu tả số lượng saiga trong phần lớn thế kỷ 20 ra sao?",
+            "guide": "Paragraph 3 viết: 'Legal protection ensured its survival for a while, and numbers steadily recovered throughout most of the 20th century.' (nhờ được pháp luật bảo vệ, số lượng đã phục hồi ổn định trong phần lớn thế kỷ 20).",
+            "bridge": "'steadily recovered' (phục hồi ổn định) đối lập hoàn toàn với 'were falling' (bị sụt giảm)."
+          },
+          {
+            "title": "Đưa ra kết luận",
+            "question": "Bài nói số lượng phục hồi, câu hỏi lại bảo sụt giảm. Vậy đáp án là gì?",
+            "guide": "Thông tin trái ngược, chọn FALSE.",
+            "bridge": "Chốt câu 9: FALSE."
+          }
+        ]
+      },
+      "explanation": {
+        "steps": [
+          "<b>Ý nhận định:</b> Trong phần lớn thế kỷ 20, số lượng saiga bị sụt giảm liên tục.",
+          "<b>Paragraph 3 (dòng 2-3):</b> <i>'...numbers steadily recovered throughout most of the 20th century.'</i>",
+          "<b>Đối chiếu:</b> Bài đọc nói số lượng phục hồi ổn định (<i>steadily recovered</i>), trái ngược với từ <i>falling</i> trong câu hỏi.",
+          "<b>Kết luận:</b> Chọn <b>FALSE</b>."
+        ]
+      }
+    },
+    "q10": {
+      "num": 10,
+      "text": "Efforts to protect rhinos in Africa had a significant effect on saiga populations.",
+      "finalAnswer": "TRUE",
+      "highlightId": "hl-q10",
+      "socratic": {
+        "steps": [
+          {
+            "title": "Hiểu nội dung nhận định",
+            "question": "Câu 10 nói nỗ lực bảo vệ tê giác ở châu Phi ('protect rhinos in Africa') đã gây ra tác động đáng kể ('significant effect') lên số lượng saiga.",
+            "guide": "Hãy tìm đoạn nhắc đến tê giác châu Phi (African rhinos) ở Paragraph 4.",
+            "bridge": "Cùng đọc câu thứ ba của Paragraph 4."
+          },
+          {
+            "title": "Đối chiếu với bài đọc",
+            "question": "Paragraph 4 giải thích việc bảo vệ tê giác đã ảnh hưởng đến saiga như thế nào?",
+            "guide": "Paragraph 4 viết: các nhà bảo tồn khuyến khích dùng sừng saiga thay cho sừng tê giác, khiến nạn săn trộm saiga bùng phát dữ dội ('reached epidemic levels') và con đực suýt bị quét sạch, dẫn tới sự sụp đổ số lượng ('population crash').",
+            "bridge": "Gây ra nạn săn trộm quy mô khủng khiếp và làm số lượng sụp đổ chính là có tác động cực kỳ nghiêm trọng (significant effect)."
+          },
+          {
+            "title": "Đưa ra kết luận",
+            "question": "Nhận định này có trùng khớp với nội dung bài đọc không?",
+            "guide": "Thông tin hoàn toàn chính xác, chọn TRUE.",
+            "bridge": "Chốt câu 10: TRUE."
+          }
+        ]
+      },
+      "explanation": {
+        "steps": [
+          "<b>Ý nhận định:</b> Nỗ lực bảo vệ tê giác châu Phi đã gây ảnh hưởng lớn đến số lượng loài saiga.",
+          "<b>Paragraph 4 (dòng 3-6):</b> <i>'Poaching reached epidemic levels after misguided conservationists tried to relieve the pressure on threatened African rhinos by actively encouraging the use of saiga horns... leading to a population crash...'</i>",
+          "<b>Khớp ý:</b> Việc khuyến khích dùng sừng saiga thay sừng tê giác đã dẫn đến nạn săn trộm bùng nổ và sụp đổ số lượng = có tác động to lớn (<i>significant effect</i>).",
+          "<b>Kết luận:</b> Chọn <b>TRUE</b>."
+        ]
+      }
+    },
+    "q11": {
+      "num": 11,
+      "text": "Unpredictable fluctuations in climate are threatening the wildlife of Central Asia more than in other parts of the world.",
+      "finalAnswer": "NOT GIVEN",
+      "highlightId": "hl-q11",
+      "socratic": {
+        "steps": [
+          {
+            "title": "Phân tích từ khóa nhận định",
+            "question": "Câu 11 nói gì? Sự biến động khó lường của khí hậu đang đe dọa động vật hoang dã ở Trung Á NHIỀU HƠN ở những nơi khác trên thế giới ('more than in other parts of the world').",
+            "guide": "Hãy tìm câu nói về biến đổi khí hậu ở đầu Paragraph 7 xem có so sánh Trung Á với các khu vực khác không.",
+            "bridge": "Cùng đọc câu đầu Paragraph 7."
+          },
+          {
+            "title": "Đối chiếu với bài đọc",
+            "question": "Paragraph 7 nói gì về tác động của biến đổi khí hậu lên linh dương saiga?",
+            "guide": "Paragraph 7 viết: 'Climate change poses a further threat. Although well adapted to cold winters and hot summers, saiga struggle to cope with temperature extremes and unpredictable fluctuations in climate.'",
+            "bridge": "Bài chỉ nói khí hậu đe dọa saiga ở Trung Á, có câu chữ nào so sánh mức độ đe dọa này 'nhiều hơn các nơi khác trên thế giới' không?"
+          },
+          {
+            "title": "Đưa ra kết luận",
+            "question": "Bài hoàn toàn không so sánh giữa Trung Á và các khu vực khác. Vậy đáp án là gì?",
+            "guide": "Thiếu dữ kiện so sánh nên chọn NOT GIVEN.",
+            "bridge": "Chốt câu 11: NOT GIVEN."
+          }
+        ]
+      },
+      "explanation": {
+        "steps": [
+          "<b>Ý nhận định:</b> Biến động khí hậu đe dọa động vật Trung Á nhiều hơn các nơi khác trên thế giới.",
+          "<b>Paragraph 7 (dòng 1-3):</b> Bài đề cập biến đổi khí hậu là mối đe dọa và saiga chật vật chống chọi với các biến động khó lường.",
+          "<b>Đối chiếu:</b> Không có bất kỳ chi tiết nào so sánh mức độ ảnh hưởng ở Trung Á với các nơi khác trên thế giới (<i>more than in other parts of the world</i>).",
+          "<b>Kết luận:</b> Chọn <b>NOT GIVEN</b>."
+        ]
+      }
+    },
+    "q12": {
+      "num": 12,
+      "text": "The Altyn Dala Conservation Initiative was formed for the benefit of a number of different animals.",
+      "finalAnswer": "TRUE",
+      "highlightId": "hl-q12",
+      "socratic": {
+        "steps": [
+          {
+            "title": "Hiểu nội dung nhận định",
+            "question": "Câu 12 nói sáng kiến bảo tồn Altyn Dala được thành lập nhằm mang lại lợi ích cho NHIỀU LOÀI ĐỘNG VẬT KHÁC NHAU ('a number of different animals').",
+            "guide": "Em hãy tìm tên sáng kiến 'Altyn Dala Conservation Initiative' ở Paragraph 8.",
+            "bridge": "Cùng đọc câu thứ hai của Paragraph 8 nhé."
+          },
+          {
+            "title": "Đối chiếu với bài đọc",
+            "question": "Paragraph 8 nói mục đích của dự án này là gì?",
+            "guide": "Paragraph 8 viết: 'Its purpose is to protect and restore Kazakhstan's steppe, semi-desert and desert ecosystems and the many species they support, including the critically endangered saiga.' (bảo vệ và phục hồi các hệ sinh thái và NHIỀU LOÀI mà chúng nuôi dưỡng, bao gồm cả saiga).",
+            "bridge": "'the many species they support' chính là mang lại lợi ích cho nhiều loài động vật khác nhau (a number of different animals)."
+          },
+          {
+            "title": "Đưa ra kết luận",
+            "question": "Nội dung nhận định có khớp hoàn toàn với bài đọc không?",
+            "guide": "Thông tin hoàn toàn chính xác, chọn TRUE.",
+            "bridge": "Chốt câu 12: TRUE."
+          }
+        ]
+      },
+      "explanation": {
+        "steps": [
+          "<b>Ý nhận định:</b> Sáng kiến bảo tồn Altyn Dala được lập ra vì lợi ích của nhiều loài động vật khác nhau.",
+          "<b>Paragraph 8 (dòng 5-7):</b> <i>'Its purpose is to protect and restore Kazakhstan's steppe, semi-desert and desert ecosystems and the many species they support, including the critically endangered saiga.'</i>",
+          "<b>Khớp ý:</b> <i>the many species they support</i> = <i>for the benefit of a number of different animals</i>.",
+          "<b>Kết luận:</b> Chọn <b>TRUE</b>."
+        ]
+      }
+    },
+    "q13": {
+      "num": 13,
+      "text": "The Altyn Dala Conservation Initiative's recognition as a World Restoration Flagship project attracted additional international funding for the scheme.",
+      "finalAnswer": "NOT GIVEN",
+      "highlightId": "hl-q13",
+      "socratic": {
+        "steps": [
+          {
+            "title": "Phân tích từ khóa nhận định",
+            "question": "Câu 13 nói việc được Liên Hợp Quốc công nhận là dự án 'World Restoration Flagship' đã giúp dự án thu hút thêm nguồn tài trợ quốc tế ('attracted additional international funding').",
+            "guide": "Hãy đọc câu nói về danh hiệu này ở cuối Paragraph 8.",
+            "bridge": "Cùng đọc câu cuối Paragraph 8."
+          },
+          {
+            "title": "Đối chiếu với bài đọc",
+            "question": "Paragraph 8 nói gì về sự kiện Liên Hợp Quốc vinh danh dự án?",
+            "guide": "Paragraph 8 viết: 'In 2022 the United Nations recognised the initiative as a World Restoration Flagship project, an accolade reserved for the ten best examples of large-scale ecosystem restoration around the globe.' (đây là danh hiệu dành cho 10 ví dụ điển hình nhất thế giới).",
+            "bridge": "Bài có nói danh hiệu này có mang lại thêm tiền tài trợ quốc tế (additional international funding) hay không?"
+          },
+          {
+            "title": "Đưa ra kết luận",
+            "question": "Bài đọc chỉ nói đây là danh hiệu cao quý, hoàn toàn không nói đến việc có nhận thêm tiền tài trợ hay không. Vậy chọn đáp án gì?",
+            "guide": "Thiếu dữ kiện nên chọn NOT GIVEN.",
+            "bridge": "Hoàn thành Passage 1! Chốt câu 13: NOT GIVEN."
+          }
+        ]
+      },
+      "explanation": {
+        "steps": [
+          "<b>Ý nhận định:</b> Việc được công nhận là dự án Flagship giúp thu hút thêm tiền tài trợ quốc tế.",
+          "<b>Paragraph 8 (câu cuối):</b> Bài nói dự án được Liên Hợp Quốc công nhận là <i>World Restoration Flagship</i>, một danh hiệu (<i>accolade</i>) dành cho 10 dự án phục hồi hệ sinh thái quy mô lớn tốt nhất.",
+          "<b>Đối chiếu:</b> Không có bất kỳ thông tin nào cho biết sự công nhận này có giúp dự án thu hút thêm quỹ tài trợ quốc tế (<i>additional international funding</i>) hay không.",
+          "<b>Kết luận:</b> Chọn <b>NOT GIVEN</b>."
+        ]
+      }
+    }
+  }
+}
