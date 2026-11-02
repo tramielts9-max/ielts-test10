@@ -1,6 +1,6 @@
 /**
  * diagnostic/js-diag/diag-fulltest-engine.js
- * BỘ ĐIỀU PHỐI FULL TEST CHUẨN XÁC 100% - TOÀN BỘ GIAO DIỆN BUNG TRÀN VIỀN
+ * BỘ ĐIỀU PHỐI FULL TEST CHUẨN XÁC 100% - TÍCH HỢP THANH KÉO RESIZER 3D DUOLINGO
  */
 
 const _WRITING_PREFIX = "AQ.Ab8RN6KGTRGy";
@@ -50,29 +50,17 @@ class DiagnosticFullTestEngine {
       titleEl.innerText = `IELTS FULL MOCK TEST • CAMBRIDGE 21 (SET ${this.setNum})`;
     }
 
-    // 1. Nạp 100 câu ngữ pháp
     await this.loadGrammar100();
-
-    // 2. Nạp liên hoàn 4 Parts Listening
     await this.loadCrossModuleListening();
-
-    // 3. Nạp liên hoàn 3 Passages Reading Cam 21
     await this.loadCrossModuleReading();
-
-    // 4. Render Writing Task 1 & 2
     this.renderFullWriting();
-
-    // 5. Render Speaking 3 Parts
     this.renderFullSpeaking();
 
-    // 6. Kích hoạt Mic & Đồng hồ
     this.initSpeechRecognition();
     this.startTimer();
   }
 
-  // =========================================================================
-  // 1. NẠP 100 CÂU NGỮ PHÁP
-  // =========================================================================
+  // 1. NGỮ PHÁP 100 CÂU
   async loadGrammar100() {
     const mount = document.getElementById('ftGrammarMount');
     if (!mount) return;
@@ -153,9 +141,7 @@ class DiagnosticFullTestEngine {
     }
   }
 
-  // =========================================================================
-  // 2. NẠP LISTENING
-  // =========================================================================
+  // 2. LISTENING
   async loadCrossModuleListening() {
     const tNum = this.setNum;
     try {
@@ -260,9 +246,7 @@ class DiagnosticFullTestEngine {
     });
   }
 
-  // =========================================================================
-  // 3. NẠP READING LIÊN HOÀN 3 PASSAGES
-  // =========================================================================
+  // 3. READING VỚI THANH KÉO 3D DUOLINGO
   async loadCrossModuleReading() {
     const tNum = this.setNum;
     this.readPassages = [];
@@ -319,7 +303,6 @@ class DiagnosticFullTestEngine {
     this.switchReadPassage(0);
   }
 
-  // RENDER READING TRÀN VIỀN 2 CỘT
   switchReadPassage(idx) {
     this.activeReadPassageIdx = idx;
     const passage = this.readPassages[idx];
@@ -448,14 +431,20 @@ class DiagnosticFullTestEngine {
     });
 
     box.innerHTML = `
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; height:calc(100vh - 215px);">
-        <!-- CỘT TRÁI: BÀI ĐỌC -->
-        <div class="reading-passage-split" style="margin-bottom:0; height:100%; overflow-y:auto; padding:24px 26px;">
+      <div id="ftReadSplitWrap" style="display:flex; height:calc(100vh - 215px); position:relative; user-select:none;">
+        <div id="ftReadLeftPane" class="reading-passage-split" style="width:50%; height:100%; overflow-y:auto; margin-bottom:0; padding:24px 26px; box-sizing:border-box;">
           <h3 style="margin:0 0 12px 0; color:var(--tram-red); font-size:18px;">${passage.title || `READING PASSAGE ${idx + 1}`}</h3>
           <div style="line-height:1.8; font-size:15px; color:#1E293B;">${passage.passageHtml || passage.passageText || ''}</div>
         </div>
-        <!-- CỘT PHẢI: CÂU HỎI -->
-        <div style="height:100%; overflow-y:auto; padding-right:6px;">
+
+        <!-- THANH KÉO 3D DUOLINGO -->
+        <div id="ftReadResizer" style="width:20px; cursor:col-resize; display:flex; align-items:center; justify-content:center; z-index:10; flex-shrink:0;">
+          <div style="width:34px; height:60px; background:#FFFFFF; border:2.5px solid #E8E2D8; border-bottom:5px solid #D3CBC0; border-radius:18px; display:flex; align-items:center; justify-content:center; color:#8B1518; font-size:14px; box-shadow:0 4px 12px rgba(0,0,0,0.08); transition:transform 0.1s ease;">
+            <i class="fa-solid fa-arrows-left-right"></i>
+          </div>
+        </div>
+
+        <div id="ftReadRightPane" style="flex:1; height:100%; overflow-y:auto; padding-right:4px; box-sizing:border-box;">
           ${qContentHtml}
         </div>
       </div>
@@ -467,15 +456,72 @@ class DiagnosticFullTestEngine {
       const rad = document.querySelector(`input[name="rad_ft_read_${qid}"][value="${val}"]`);
       if (rad) rad.checked = true;
     });
+
+    this.initDraggableResizer('ftReadSplitWrap', 'ftReadLeftPane', 'ftReadResizer', 'ftReadRightPane');
   }
 
-  // RENDER WRITING TRÀN VIỀN: ĐỀ TRÁI - GÕ PHẢI
+  // CƠ CHẾ KÉO THẢ RESIZER
+  initDraggableResizer(wrapId, leftId, resizerId, rightId) {
+    const wrap = document.getElementById(wrapId);
+    const left = document.getElementById(leftId);
+    const resizer = document.getElementById(resizerId);
+    if (!wrap || !left || !resizer) return;
+
+    let isDragging = false;
+    const handle = resizer.querySelector('div');
+
+    const onMouseDown = () => {
+      isDragging = true;
+      document.body.style.cursor = 'col-resize';
+      document.body.style.userSelect = 'none';
+      if (handle) {
+        handle.style.transform = 'scale(0.92)';
+        handle.style.borderBottomWidth = '2px';
+        handle.style.background = '#FFF5F5';
+      }
+    };
+
+    const onMouseMove = (e) => {
+      if (!isDragging) return;
+      const wrapRect = wrap.getBoundingClientRect();
+      const pointerX = e.clientX || (e.touches && e.touches[0].clientX);
+      if (!pointerX) return;
+
+      const offset = pointerX - wrapRect.left;
+      let pct = (offset / wrapRect.width) * 100;
+      if (pct < 25) pct = 25;
+      if (pct > 75) pct = 75;
+
+      left.style.width = `${pct}%`;
+    };
+
+    const onMouseUp = () => {
+      if (!isDragging) return;
+      isDragging = false;
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+      if (handle) {
+        handle.style.transform = 'scale(1)';
+        handle.style.borderBottomWidth = '5px';
+        handle.style.background = '#FFFFFF';
+      }
+    };
+
+    resizer.addEventListener('mousedown', onMouseDown);
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
+
+    resizer.addEventListener('touchstart', onMouseDown);
+    window.addEventListener('touchmove', onMouseMove);
+    window.addEventListener('touchend', onMouseUp);
+  }
+
+  // 4. WRITING
   renderFullWriting() {
     const mount = document.getElementById('ftWritingMount');
     if (!mount) return;
 
     mount.innerHTML = `
-      <!-- TASK 1 -->
       <div style="background:#FAF7F2; border:2.5px solid #BFDBFE; border-radius:18px; padding:20px; margin-bottom:24px;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:8px;">
           <b style="font-size:16.5px; color:#1E40AF;">📊 TASK 1: BÁO CÁO BIỂU ĐỒ (TỐI THIỂU 150 TỪ)</b>
@@ -497,7 +543,6 @@ class DiagnosticFullTestEngine {
         </div>
       </div>
 
-      <!-- TASK 2 -->
       <div style="background:#FAF7F2; border:2.5px solid #DDD6FE; border-radius:18px; padding:20px;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:8px;">
           <b style="font-size:16.5px; color:#7C3AED;">📝 TASK 2: BÀI LUẬN NGHỊ LUẬN (TỐI THIỂU 250 TỪ)</b>
@@ -530,9 +575,7 @@ class DiagnosticFullTestEngine {
     if (areaId === 'ft_writing_task2') this.userAnswers.writing.task2 = val;
   }
 
-  // =========================================================================
   // 5. SPEAKING
-  // =========================================================================
   renderFullSpeaking() {
     const mount = document.getElementById('ftSpeakingMount');
     if (!mount) return;
@@ -567,9 +610,7 @@ class DiagnosticFullTestEngine {
     `;
   }
 
-  // =========================================================================
-  // 6. TIỆN ÍCH LƯU ĐÁP ÁN & ĐIỀU HƯỚNG
-  // =========================================================================
+  // 6. TIỆN ÍCH
   recordAnswer(skill, qId, val) {
     if (this.userAnswers[skill]) {
       this.userAnswers[skill][qId] = String(val).trim();
@@ -643,9 +684,7 @@ class DiagnosticFullTestEngine {
     }
   }
 
-  // =========================================================================
-  // 7. NỘP BÀI VÀ CHẤM ĐIỂM
-  // =========================================================================
+  // 7. CHẤM ĐIỂM
   async submitFullMockTest() {
     if (!confirm("Em có chắc chắn muốn nộp toàn bộ bài Full Mock Test để xuất Overall Band Score?")) return;
 
@@ -657,7 +696,6 @@ class DiagnosticFullTestEngine {
 
     clearInterval(this.timerInterval);
 
-    // Chấm Ngữ pháp
     let gScore = 0;
     let gTotal = 0;
     (this.grammarData?.parts || []).forEach(part => {
@@ -672,7 +710,6 @@ class DiagnosticFullTestEngine {
       });
     });
 
-    // Chấm Listening (40 câu)
     let lCorrect = 0;
     this.lisParts.forEach(p => {
       Object.entries(p.answers || {}).forEach(([qid, exp]) => {
@@ -686,7 +723,6 @@ class DiagnosticFullTestEngine {
     });
     const lisBand = parseFloat(this.calculateBandScore(lCorrect, 40));
 
-    // Chấm Reading (40 câu)
     let rCorrect = 0;
     this.readPassages.forEach(p => {
       const expAnswers = p.answers || {};
@@ -709,17 +745,14 @@ class DiagnosticFullTestEngine {
     });
     const readBand = parseFloat(this.calculateBandScore(rCorrect, 40));
 
-    // Writing & Speaking
     const wt1Len = (document.getElementById('ft_writing_task1')?.value || '').trim().split(/\s+/).filter(Boolean).length;
     const wt2Len = (document.getElementById('ft_writing_task2')?.value || '').trim().split(/\s+/).filter(Boolean).length;
     const writeBand = (wt1Len >= 120 && wt2Len >= 200) ? 6.5 : (wt1Len >= 80 ? 5.5 : 4.5);
     const spkBand = 5.5;
 
-    // Overall Band
     const rawOverall = (lisBand + readBand + writeBand + spkBand) / 4;
     const overallBand = (Math.round(rawOverall * 2) / 2).toFixed(1);
 
-    // Xuất kết quả
     document.querySelector('.fulltest-container').innerHTML = `
       <div style="background:#FFFFFF; border:3px solid #E8E2D8; border-bottom:7px solid #D3CBC0; border-radius:24px; padding:36px; max-width:850px; margin:30px auto; text-align:center;">
         <div style="font-size:48px; margin-bottom:10px;">🏆</div>
