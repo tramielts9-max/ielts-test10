@@ -1,757 +1,142 @@
 {
   "testId": "test_04",
-  "title": "BÀI KIỂM TRA SỐ 4: ĐỀ KHẢO SÁT CHUYÊN SÂU TOÀN DIỆN (100 CÂU)",
+  "title": "ĐỀ KIỂM TRA NGỮ PHÁP CHUYÊN SÂU TOÀN DIỆN (100 CÂU)",
   "timeMinutes": 90,
   "totalQuestions": 100,
-  "scope": "Toàn bộ 16 chuyên đề cốt lõi (7 Thì cơ bản, Động từ bất quy tắc V2-V3, Câu bị động, Câu điều kiện, Cấu trúc so sánh, Mệnh đề quan hệ, Cấu tạo từ loại, Mạo từ, Giới từ, Lượng từ).",
   "parts": [
     {
-      "partId": "part1_theory",
-      "partTitle": "PHẦN I: KHẢO BÀI LÝ THUYẾT & QUY TẮC CỐT LÕI (CÂU 1 – 20)",
-      "instruction": "Điền từ, công thức hoặc câu trả lời ngắn gọn, chính xác vào chỗ trống theo đúng hệ thống lý thuyết chuẩn:",
+      "partId": "part1_tenses",
+      "partTitle": "PHẦN 1: CHIA ĐỘNG TỪ TRONG NGOẶC (CÂU 1 – 25)",
+      "instruction": "Chia dạng đúng của động từ trong ngoặc để hoàn thành câu:",
       "questions": [
-        {
-          "id": "t4_q01",
-          "num": 1,
-          "type": "theory_open",
-          "prompt": "Viết công thức tổng quát 3 thể (+, –, ?) của thì Hiện tại đơn đối với động từ thường (Action verbs). Chủ ngữ nào đi với trợ động từ do, chủ ngữ nào đi với does?",
-          "standardAnswer": "(+) S + V(s/es) + O; (–) S + do/does + NOT + V0 + O; (?) Do/Does + S + V0 + O? Chủ ngữ đi với Do: I, You, We, They, danh từ số nhiều. Chủ ngữ đi với Does: He, She, It, danh từ số ít."
-        },
-        {
-          "id": "t4_q02",
-          "num": 2,
-          "type": "theory_open",
-          "prompt": "Nêu 4 quy tắc thêm đuôi -s / -es vào sau động từ ở ngôi thứ 3 số ít thì Hiện tại đơn. Cho 01 ví dụ minh họa cho từng quy tắc.",
-          "standardAnswer": "1. Tận cùng s, x, z, ch, sh, o ➔ thêm -es (watches). 2. Phụ âm + y ➔ đổi y thành i + es (studies). 3. Nguyên âm + y ➔ giữ nguyên y + s (plays). 4. Bất quy tắc: have ➔ has. Động từ còn lại thêm -s (works)."
-        },
-        {
-          "id": "t4_q03",
-          "num": 3,
-          "type": "theory_open",
-          "prompt": "Nêu 4 cách sử dụng cốt lõi của thì Hiện tại tiếp diễn (chú ý cách dùng phàn nàn đi kèm trạng từ always).",
-          "standardAnswer": "1. Hành động đang xảy ra tại thời điểm nói. 2. Hành động đang diễn ra xung quanh thời điểm nói mang tính tạm thời. 3. Kế hoạch dự trù sắp đặt trước trong tương lai gần. 4. Phàn nàn về thói quen xấu lặp đi lặp lại gây khó chịu đi với always."
-        },
-        {
-          "id": "t4_q04",
-          "num": 4,
-          "type": "theory_open",
-          "prompt": "Nêu 4 cách sử dụng của thì Hiện tại hoàn thành và nêu rõ vị trí của 3 trạng từ: just, already, yet.",
-          "standardAnswer": "4 cách dùng: (1) Hành động đã hoàn tất không rõ thời gian; (2) Hành động lặp lại nhiều lần từ quá khứ đến hiện tại; (3) Diễn tả kinh nghiệm, trải nghiệm; (4) Hành động trong quá khứ để lại kết quả ở hiện tại. Vị trí: just và already đứng sau have/has và trước V3/ed (already có thể ở cuối câu); yet luôn đứng ở cuối câu phủ định và nghi vấn."
-        },
-        {
-          "id": "t4_q05",
-          "num": 5,
-          "type": "theory_open",
-          "prompt": "Viết công thức phối hợp thì giữa Quá khứ tiếp diễn và Quá khứ đơn khi dùng với liên từ WHEN và WHILE.",
-          "standardAnswer": "Cắt ngang: S + was/were + V-ing + WHEN + S + V2/ed. Song song: S1 + was/were + V-ing + WHILE + S2 + was/were + V-ing."
-        },
-        {
-          "id": "t4_q06",
-          "num": 6,
-          "type": "theory_open",
-          "prompt": "Nêu quy tắc phối hợp thì của Quá khứ hoàn thành với 3 liên từ thời gian: BEFORE, AFTER, và BY THE TIME.",
-          "standardAnswer": "[S + had + V3/ed] + BEFORE + [S + V2/ed]. [S + V2/ed] + AFTER + [S + had + V3/ed]. BY THE TIME + [S + V2/ed], [S + had + V3/ed]."
-        },
-        {
-          "id": "t4_q07",
-          "num": 7,
-          "type": "theory_open",
-          "prompt": "Nêu 6 quy tắc thêm đuôi -ed vào động từ có quy tắc thì Quá khứ đơn (lưu ý trường hợp tận cùng bằng -y, gấp đôi phụ âm và tận cùng bằng -c).",
-          "standardAnswer": "1. Tận cùng -e ➔ thêm -d. 2. Phụ âm + y ➔ đổi y thành i + ed. 3. Nguyên âm + y ➔ giữ nguyên y + ed. 4. Động từ 1 âm tiết có 1 nguyên âm kẹp giữa 2 phụ âm ➔ gấp đôi phụ âm cuối. 5. Tận cùng là -c ➔ thêm -ked. 6. Động từ thông thường khác ➔ thêm -ed."
-        },
-        {
-          "id": "t4_q08",
-          "num": 8,
-          "type": "theory_open",
-          "prompt": "Trình bày công thức và cách dùng của Câu điều kiện loại 1, loại 2, và loại 3. Động từ to be trong câu điều kiện loại 2 được chia như thế nào với các ngôi?",
-          "standardAnswer": "Loại 1: If + S + V(s/es), S + will/can/may + V0. Loại 2: If + S + V2/ed, S + would/could + V0 (to be chia là were cho tất cả các ngôi). Loại 3: If + S + had + V3/ed, S + would/could + have + V3/ed."
-        },
-        {
-          "id": "t4_q09",
-          "num": 9,
-          "type": "theory_open",
-          "prompt": "Viết công thức câu điều kiện hỗn hợp (Mixed conditional) diễn tả một nguyên nhân/giả thiết trong quá khứ dẫn đến kết quả/hệ quả trái ngược ở hiện tại.",
-          "standardAnswer": "If + S + had + V3/ed, S + would/could + V0 (+ now / right now)."
-        },
-        {
-          "id": "t4_q10",
-          "num": 10,
-          "type": "theory_open",
-          "prompt": "Nêu quy tắc chuyển đổi câu mệnh lệnh hoặc câu có or / otherwise sang câu điều kiện dùng liên từ UNLESS.",
-          "standardAnswer": "Unless = If ... not. Câu mệnh lệnh V0 / Do sth + or + S + will + V0 chuyển thành: Unless + S + V(khẳng định), S + will + V0 (Mệnh đề ngay sau Unless tuyệt đối KHÔNG để ở thể phủ định)."
-        },
-        {
-          "id": "t4_q11",
-          "num": 11,
-          "type": "theory_open",
-          "prompt": "Trình bày 5 bước chuyển đổi một câu từ thể chủ động (Active) sang thể bị động (Passive).",
-          "standardAnswer": "Bước 1: Xác định S, V, O và thì của câu chủ động. Bước 2: Đưa O lên làm S mới. Bước 3: Chia to be theo thì câu gốc và hòa hợp với S mới. Bước 4: Chuyển V chính về V3/ed. Bước 5: Đưa S cũ về sau by (đặt làm by O)."
-        },
-        {
-          "id": "t4_q12",
-          "num": 12,
-          "type": "theory_open",
-          "prompt": "Nêu quy tắc về trật tự sắp xếp giữa Nơi chốn (Place), Thời gian (Time) và tác nhân by O. Trường hợp nào được phép lược bỏ và trường hợp nào BẮT BUỘC bỏ by O?",
-          "standardAnswer": "Trật tự chuẩn: Nơi chốn (Place) + by O + Thời gian (Time). Lược bỏ khi là đại từ chung chung: by me/you/us/them/him/her/it. BẮT BUỘC BỎ: by someone/somebody/people/anyone/no one."
-        },
-        {
-          "id": "t4_q13",
-          "num": 13,
-          "type": "theory_open",
-          "prompt": "Viết công thức câu bị động của: (a) Thì Hiện tại hoàn thành; (b) Thì Quá khứ tiếp diễn; (c) Động từ khuyết thiếu (Modal verbs).",
-          "standardAnswer": "(a) HTHT: S + have/has + been + V3/ed. (b) QKTD: S + was/were + being + V3/ed. (c) Modal verbs: S + Modal V + be + V3/ed."
-        },
-        {
-          "id": "t4_q14",
-          "num": 14,
-          "type": "theory_open",
-          "prompt": "Nêu tiêu chuẩn phân biệt tính từ ngắn (Short adj) và tính từ dài (Long adj). Liệt kê ít nhất 5 tính từ 2 âm tiết nhưng vẫn được áp dụng quy tắc tính từ ngắn.",
-          "standardAnswer": "Tính từ ngắn: 1 âm tiết. Tính từ dài: từ 2 âm tiết trở lên. 5 ngoại lệ 2 âm tiết tận cùng -y, -le, -ow, -er, -et vẫn là từ ngắn: happy, easy, simple, narrow, clever, quiet."
-        },
-        {
-          "id": "t4_q15",
-          "num": 15,
-          "type": "theory_open",
-          "prompt": "Viết công thức So sánh kép ở 2 dạng: (a) Càng ngày càng... (với cả từ ngắn và từ dài); (b) Càng... thì càng... (The + comparative...).",
-          "standardAnswer": "(a) Càng ngày càng: Từ ngắn: Adj/Adv-er + and + Adj/Adv-er; Từ dài: more and more + Adj/Adv. (b) Càng... thì càng: The + comparative (+ S + V), the + comparative (+ S + V)."
-        },
-        {
-          "id": "t4_q16",
-          "num": 16,
-          "type": "theory_open",
-          "prompt": "Đại từ quan hệ THAT bắt buộc dùng trong những trường hợp nào và tuyệt đối KHÔNG được dùng trong những trường hợp nào?",
-          "standardAnswer": "Bắt buộc dùng: Sau tiền từ hỗn hợp cả người và vật; sau so sánh nhất; sau đại từ bất định (everything, nothing, all...). Tuyệt đối CẤM dùng: Trong mệnh đề quan hệ không xác định (có dấu phẩy); đứng sau giới từ."
-        },
-        {
-          "id": "t4_q17",
-          "num": 17,
-          "type": "theory_open",
-          "prompt": "Nêu quy tắc về vị trí của giới từ khi đứng trước đại từ quan hệ (được phép đi trước đại từ nào và tuyệt đối cấm đi trước đại từ nào)?",
-          "standardAnswer": "Giới từ chỉ được phép đứng trực tiếp trước 2 đại từ: whom (chỉ người) và which (chỉ vật). Tuyệt đối KHÔNG đặt giới từ trước who và that."
-        },
-        {
-          "id": "t4_q18",
-          "num": 18,
-          "type": "theory_open",
-          "prompt": "Vẽ mô hình tam giác giới từ IN – ON – AT và nêu phạm vi sử dụng lớn - trung bình - nhỏ của từng từ đối với Thời gian và Nơi chốn.",
-          "standardAnswer": "IN (Đỉnh rộng nhất): Thời gian: Buổi, tháng, năm, mùa, thế kỷ. Nơi chốn: Thành phố, quốc gia, châu lục. ON (Khúc giữa): Thời gian: Ngày trong tuần, ngày tháng cụ thể. Nơi chốn: Tên đường, bề mặt phẳng, tầng lầu. AT (Đáy nhỏ nhất - Cụ thể): Thời gian: Giờ giấc chính xác, thời điểm cụ thể. Nơi chốn: Địa chỉ có số nhà cụ thể, địa điểm định vị xác định."
-        },
-        {
-          "id": "t4_q19",
-          "num": 19,
-          "type": "theory_open",
-          "prompt": "Phân biệt sự khác nhau về mặt ngữ nghĩa và loại danh từ đi kèm giữa 4 từ: few, a few, little, a little.",
-          "standardAnswer": "few / a few + Danh từ đếm được số nhiều (a few: một vài, đủ dùng - tích cực; few: rất ít, gần như không có - tiêu cực). little / a little + Danh từ không đếm được (a little: một chút, đủ dùng - tích cực; little: rất ít, hầu như không đáng kể - tiêu cực)."
-        },
-        {
-          "id": "t4_q20",
-          "num": 20,
-          "type": "theory_open",
-          "prompt": "Khi nào dùng most + N và khi nào bắt buộc dùng most of + N?",
-          "standardAnswer": "Dùng most + N khi danh từ phía sau mang nghĩa chung chung không có từ hạn định. Bắt buộc dùng most of + the / tính từ sở hữu / đại từ chỉ định khi danh từ đã được xác định cụ thể."
-        }
+        { "id": "g_q01", "num": 1, "type": "blank", "prompt": "The train to London (depart) [blank] at 8:15 every morning from platform 3.", "answers": ["departs"], "explanation": "Lịch trình tàu xe cố định chia Hiện tại đơn." },
+        { "id": "g_q02", "num": 2, "type": "blank", "prompt": "Listen! The birds (sing) [blank] so sweetly in the garden.", "answers": ["are singing"], "explanation": "Dấu hiệu mệnh lệnh Listen! ➔ chia Hiện tại tiếp diễn." },
+        { "id": "g_q03", "num": 3, "type": "blank", "prompt": "My sister is always (lose) [blank] her keys, which annoys everyone.", "answers": ["losing"], "explanation": "Phàn nàn thói quen xấu đi với always ➔ is always losing." },
+        { "id": "g_q04", "num": 4, "type": "blank", "prompt": "Yesterday afternoon, I (buy) a new laptop and (bring) it home. ➔ Điền: [blank]", "answers": ["bought - brought", "bought, brought", "bought and brought", "bought / brought"], "explanation": "Quá khứ đơn V2 của buy và bring là bought và brought." },
+        { "id": "g_q05", "num": 5, "type": "blank", "prompt": "When the teacher walked into the classroom, the students (quarrel) [blank] loudly.", "answers": ["were quarrelling", "were quarreling"], "explanation": "Hành động đang diễn ra trong quá khứ thì giáo viên bước vào cắt ngang." },
+        { "id": "g_q06", "num": 6, "type": "blank", "prompt": "At 7:00 PM yesterday, while my father was reading a book, my mother (cook) [blank] dinner.", "answers": ["was cooking"], "explanation": "Hai hành động diễn ra song song trong quá khứ đi kèm while." },
+        { "id": "g_q07", "num": 7, "type": "blank", "prompt": "She (never / eat) [blank] sushi before her recent trip to Japan.", "answers": ["had never eaten"], "explanation": "Kinh nghiệm diễn ra trước một mốc quá khứ (her recent trip) ➔ Quá khứ hoàn thành." },
+        { "id": "g_q08", "num": 8, "type": "blank", "prompt": "Up to now, our team (complete) [blank] four major scientific projects.", "answers": ["has completed"], "explanation": "Dấu hiệu Up to now ➔ chia Hiện tại hoàn thành." },
+        { "id": "g_q09", "num": 9, "type": "blank", "prompt": "By the time the fire brigade arrived, the fire (destroy) [blank] half of the building.", "answers": ["had destroyed"], "explanation": "By the time + QKĐ, mệnh đề chính chia Quá khứ hoàn thành." },
+        { "id": "g_q10", "num": 10, "type": "blank", "prompt": "After he (finish) [blank] all his homework, he went out to play basketball.", "answers": ["had finished"], "explanation": "Hành động xảy ra trước hành động đi chơi sau liên từ After ➔ Quá khứ hoàn thành." },
+        { "id": "g_q11", "num": 11, "type": "blank", "prompt": "I believe that she (recover) [blank] from her illness soon.", "answers": ["will recover"], "explanation": "Dự đoán tương lai sau động từ believe và trạng từ soon." },
+        { "id": "g_q12", "num": 12, "type": "blank", "prompt": "My father (call) [blank] you in 5 minutes.", "answers": ["will call"], "explanation": "Dấu hiệu in 5 minutes (trong 5 phút nữa) ➔ Tương lai đơn." },
+        { "id": "g_q13", "num": 13, "type": "blank", "prompt": "If it (not / rain) [blank] this weekend, we will go on a picnic.", "answers": ["does not rain", "doesn't rain"], "explanation": "Mệnh đề If điều kiện loại 1 chia Hiện tại đơn phủ định." },
+        { "id": "g_q14", "num": 14, "type": "blank", "prompt": "If I (be) [blank] in your shoes, I would accept that job offer immediately.", "answers": ["were", "was"], "explanation": "Điều kiện loại 2 giả định trái ngược hiện tại: to be chia là were." },
+        { "id": "g_q15", "num": 15, "type": "blank", "prompt": "If he had driven more carefully yesterday, he (not / crash) [blank] into that tree.", "answers": ["would not have crashed", "wouldn't have crashed"], "explanation": "Mệnh đề chính điều kiện loại 3: would have + V3." },
+        { "id": "g_q16", "num": 16, "type": "blank", "prompt": "If you had taken your medicine last night, you (feel) [blank] much better right now.", "answers": ["would feel", "could feel"], "explanation": "Điều kiện hỗn hợp 3-2: giả định quá khứ (last night), kết quả hiện tại (right now)." },
+        { "id": "g_q17", "num": 17, "type": "blank", "prompt": "A new library (build) [blank] in our town since last summer.", "answers": ["has been built"], "explanation": "Bị động thì Hiện tại hoàn thành có mốc since last summer." },
+        { "id": "g_q18", "num": 18, "type": "blank", "prompt": "Look at those ruins! The old temple (destroy) [blank] by a violent storm last week.", "answers": ["was destroyed"], "explanation": "Bị động Quá khứ đơn có last week." },
+        { "id": "g_q19", "num": 19, "type": "blank", "prompt": "This delicious dish (bring) [blank] to our table by the waiter five minutes ago.", "answers": ["was brought"], "explanation": "Bị động Quá khứ đơn có five minutes ago." },
+        { "id": "g_q20", "num": 20, "type": "blank", "prompt": "The final exam results (announce) [blank] by the school board next Monday.", "answers": ["will be announced"], "explanation": "Bị động Tương lai đơn có next Monday." },
+        { "id": "g_q21", "num": 21, "type": "blank", "prompt": "The lake is frozen. Many children (skate) [blank] on it at the moment.", "answers": ["are skating"], "explanation": "Hiện tại tiếp diễn có dấu hiệu at the moment." },
+        { "id": "g_q22", "num": 22, "type": "blank", "prompt": "He (work) [blank] for this corporation for twenty years before he retired in 2020.", "answers": ["had worked"], "explanation": "Quá khứ hoàn thành xảy ra trước mốc nghỉ hưu năm 2020." },
+        { "id": "g_q23", "num": 23, "type": "blank", "prompt": "All the milk in the fridge (already / drink) [blank] by the children.", "answers": ["has already been drunk"], "explanation": "Bị động thì Hiện tại hoàn thành có already." },
+        { "id": "g_q24", "num": 24, "type": "blank", "prompt": "If people (use) [blank] public transport more, air quality will improve significantly.", "answers": ["use"], "explanation": "Mệnh đề If điều kiện loại 1 chia Hiện tại đơn." },
+        { "id": "g_q25", "num": 25, "type": "blank", "prompt": "Unless she (apologize) [blank] to him, he will never speak to her again.", "answers": ["apologizes", "apologises"], "explanation": "Sau Unless chia khẳng định thì Hiện tại đơn ngôi she." }
       ]
     },
     {
-      "partId": "part2_irregular_verbs",
-      "partTitle": "PHẦN II: MASTER DRILL ĐỘNG TỪ BẤT QUY TẮC (CÂU 21 – 35)",
-      "instruction": "Điền dạng quá khứ đơn (V2) và quá khứ phân từ (V3) của các động từ sau:",
+      "partId": "part2_word_formation",
+      "partTitle": "PHẦN 2: CẤU TẠO TỪ - WORD FORMATION (CÂU 26 – 40)",
+      "instruction": "Dựa vào ngữ cảnh câu và vị trí ngữ pháp, điền dạng thích hợp của từ trong ngoặc:",
       "questions": [
-        { "id": "t4_v21", "num": 21, "type": "drill_v2_v3", "v0": "Begin", "v2": ["began"], "v3": ["begun"], "rule": "Nhóm nguyên âm biến đổi i ➔ a ➔ u." },
-        { "id": "t4_v22", "num": 22, "type": "drill_v2_v3", "v0": "Break", "v2": ["broke"], "v3": ["broken"], "rule": "Nhóm đuôi V3 tận cùng là -en." },
-        { "id": "t4_v23", "num": 23, "type": "drill_v2_v3", "v0": "Bring", "v2": ["brought"], "v3": ["brought"], "rule": "Nhóm V2 = V3 có đuôi -ought." },
-        { "id": "t4_v24", "num": 24, "type": "drill_v2_v3", "v0": "Build", "v2": ["built"], "v3": ["built"], "rule": "Nhóm đổi tận cùng -d thành -t." },
-        { "id": "t4_v25", "num": 25, "type": "drill_v2_v3", "v0": "Buy", "v2": ["bought"], "v3": ["bought"], "rule": "Nhóm V2 = V3 có đuôi -ought." },
-        { "id": "t4_v26", "num": 26, "type": "drill_v2_v3", "v0": "Choose", "v2": ["chose"], "v3": ["chosen"], "rule": "Nhóm V2 rút gọn oo ➔ o, V3 thêm -n." },
-        { "id": "t4_v27", "num": 27, "type": "drill_v2_v3", "v0": "Drink", "v2": ["drank"], "v3": ["drunk"], "rule": "Nhóm nguyên âm biến đổi i ➔ a ➔ u." },
-        { "id": "t4_v28", "num": 28, "type": "drill_v2_v3", "v0": "Drive", "v2": ["drove"], "v3": ["driven"], "rule": "V2 đổi i ➔ o, V3 gấp đôi phụ âm và thêm -en." },
-        { "id": "t4_v29", "num": 29, "type": "drill_v2_v3", "v0": "Forget", "v2": ["forgot"], "v3": ["forgotten"], "rule": "V2 đổi thành forgot, V3 gấp đôi phụ âm: forgotten." },
-        { "id": "t4_v30", "num": 30, "type": "drill_v2_v3", "v0": "Hold", "v2": ["held"], "v3": ["held"], "rule": "Nhóm V2 = V3: đổi o ➔ e." },
-        { "id": "t4_v31", "num": 31, "type": "drill_v2_v3", "v0": "Read", "v2": ["read"], "v3": ["read"], "rule": "Nhóm 3 cột viết giống nhau hoàn toàn, phát âm V2/V3 là /red/." },
-        { "id": "t4_v32", "num": 32, "type": "drill_v2_v3", "v0": "Rise", "v2": ["rose"], "v3": ["risen"], "rule": "V2 đổi thành rose, V3 đổi thành risen." },
-        { "id": "t4_v33", "num": 33, "type": "drill_v2_v3", "v0": "Sing", "v2": ["sang"], "v3": ["sung"], "rule": "Nhóm nguyên âm biến đổi i ➔ a ➔ u." },
-        { "id": "t4_v34", "num": 34, "type": "drill_v2_v3", "v0": "Swim", "v2": ["swam"], "v3": ["swum"], "rule": "Nhóm nguyên âm biến đổi i ➔ a ➔ u." },
-        { "id": "t4_v35", "num": 35, "type": "drill_v2_v3", "v0": "Wear", "v2": ["wore"], "v3": ["worn"], "rule": "V2 đổi thành wore, V3 tận cùng là -orn." }
+        { "id": "g_q26", "num": 26, "type": "blank", "prompt": "The government is investing heavily in the [educate] [blank] system of rural provinces.", "answers": ["educational"], "explanation": "Tính từ bổ nghĩa cho danh từ system: educational system." },
+        { "id": "g_q27", "num": 27, "type": "blank", "prompt": "Using public buses is an [economy] [blank] way to save travel expenses.", "answers": ["economical"], "explanation": "Tính từ mang nghĩa tiết kiệm: economical way." },
+        { "id": "g_q28", "num": 28, "type": "blank", "prompt": "The twins look identical, but they behave very [differ] [blank].", "answers": ["differently"], "explanation": "Trạng từ bổ nghĩa cho động từ thường behave: differently." },
+        { "id": "g_q29", "num": 29, "type": "blank", "prompt": "He is not academically [qualify] [blank] to teach advanced linguistics.", "answers": ["qualified"], "explanation": "Tính từ chỉ đủ trình độ chuyên môn: qualified." },
+        { "id": "g_q30", "num": 30, "type": "blank", "prompt": "Her speech was so [impress] [blank] that the entire audience clapped enthusiastically.", "answers": ["impressive"], "explanation": "Cấu trúc so + adj + that: impressive." },
+        { "id": "g_q31", "num": 31, "type": "blank", "prompt": "Industrial waste has severely [pollute] [blank] the local river.", "answers": ["polluted"], "explanation": "Dạng V3/ed trong thì Hiện tại hoàn thành: polluted." },
+        { "id": "g_q32", "num": 32, "type": "blank", "prompt": "The typhoon caused [destroy] [blank] damage to the coastal fishing village.", "answers": ["destructive"], "explanation": "Tính từ bổ nghĩa cho danh từ damage: destructive damage." },
+        { "id": "g_q33", "num": 33, "type": "blank", "prompt": "He lost his job last month and has been [employ] [blank] since then.", "answers": ["unemployed"], "explanation": "Tính từ chỉ tình trạng thất nghiệp: unemployed." },
+        { "id": "g_q34", "num": 34, "type": "blank", "prompt": "Wearing áo dài during Tet holiday is a long-standing [culture] [blank] tradition.", "answers": ["cultural"], "explanation": "Tính từ thuộc về văn hóa: cultural tradition." },
+        { "id": "g_q35", "num": 35, "type": "blank", "prompt": "The sudden cancellation of the concert was completely [expect] [blank] to all fans.", "answers": ["unexpected"], "explanation": "Tính từ phủ định chỉ sự bất ngờ: unexpected." },
+        { "id": "g_q36", "num": 36, "type": "blank", "prompt": "The devastation left behind by the earthquake was almost [imagine] [blank].", "answers": ["unimaginable"], "explanation": "Tính từ phủ định mang nghĩa không tưởng tượng nổi: unimaginable." },
+        { "id": "g_q37", "num": 37, "type": "blank", "prompt": "Please read the safety warnings [care] [blank] before operating this device.", "answers": ["carefully"], "explanation": "Trạng từ bổ nghĩa cho động từ read: carefully." },
+        { "id": "g_q38", "num": 38, "type": "blank", "prompt": "He attempted to open the locked chest, but his efforts were totally [succeed] [blank].", "answers": ["unsuccessful"], "explanation": "Tính từ phủ định chỉ sự thất bại: unsuccessful." },
+        { "id": "g_q39", "num": 39, "type": "blank", "prompt": "Many conservation programs are trying to protect [danger] [blank] animals from extinction.", "answers": ["endangered"], "explanation": "Cụm danh từ cố định: endangered animals (động vật có nguy cơ tuyệt chủng)." },
+        { "id": "g_q40", "num": 40, "type": "blank", "prompt": "His bizarre excuse sounded completely [believe] [blank], so the teacher rejected it.", "answers": ["unbelievable"], "explanation": "Tính từ phủ định mang nghĩa khó tin: unbelievable." }
       ]
     },
     {
-      "partId": "part3_word_formation",
-      "partTitle": "PHẦN III: CẤU TẠO TỪ LOẠI - WORD FORMATION (CÂU 36 – 50)",
-      "instruction": "Áp dụng 15 vị trí ngữ pháp và bảng tiền tố / hậu tố để cho dạng đúng của từ trong ngoặc:",
+      "partId": "part3_prepositions",
+      "partTitle": "PHẦN 3: GIỚI TỪ, MẠO TỪ & LƯỢNG TỪ (CÂU 41 – 65)",
+      "instruction": "Điền giới từ, mạo từ (a, an, the, Ø) hoặc lượng từ thích hợp:",
       "questions": [
-        { "id": "t4_wf36", "num": 36, "type": "blank", "prompt": "The local government is focusing heavily on [educate] [blank] reform in remote areas.", "answers": ["educational"], "explanation": "Đứng trước danh từ reform cần tính từ bổ nghĩa: educational reform - cải cách giáo dục." },
-        { "id": "t4_wf37", "num": 37, "type": "blank", "prompt": "Solar energy is considered an [economy] [blank] and eco-friendly alternative to fossil fuels.", "answers": ["economical"], "explanation": "Trước danh từ alternative cần tính từ mang nghĩa tiết kiệm/kinh tế: economical." },
-        { "id": "t4_wf38", "num": 38, "type": "blank", "prompt": "The twins look remarkably alike, but they behave quite [differ] [blank] in social situations.", "answers": ["differently"], "explanation": "Bổ nghĩa cho động từ thường behave sau trạng từ chỉ mức độ quite cần một trạng từ: differently." },
-        { "id": "t4_wf39", "num": 39, "type": "blank", "prompt": "She is not sufficiently [qualify] [blank] to lecture at the university level.", "answers": ["qualified"], "explanation": "Sau to be và trạng từ sufficiently cần tính từ chỉ đủ trình độ, chuyên môn: qualified." },
-        { "id": "t4_wf40", "num": 40, "type": "blank", "prompt": "His presentation was so [persuade] [blank] that the board approved the budget immediately.", "answers": ["persuasive"], "explanation": "Cấu trúc so + adj + that, sau to be was cần tính từ: persuasive - có sức thuyết phục." },
-        { "id": "t4_wf41", "num": 41, "type": "blank", "prompt": "The chemical factory was fined for discharging [pollute] [blank] directly into the river.", "answers": ["pollutants"], "explanation": "Sau động từ discharging cần một danh từ số nhiều chỉ chất gây ô nhiễm: pollutants." },
-        { "id": "t4_wf42", "num": 42, "type": "blank", "prompt": "The earthquake caused [destroy] [blank] damage, leaving thousands of residents homeless.", "answers": ["destructive"], "explanation": "Trước danh từ damage cần tính từ mang nghĩa có tính tàn phá: destructive damage." },
-        { "id": "t4_wf43", "num": 43, "type": "blank", "prompt": "He has been [employ] [blank] for almost six months and is actively looking for a job.", "answers": ["unemployed"], "explanation": "Sau has been cần tính từ chỉ tình trạng thất nghiệp: unemployed." },
-        { "id": "t4_wf44", "num": 44, "type": "blank", "prompt": "It is widely believed that wearing áo dài on official ceremonies is a [culture] [blank] tradition.", "answers": ["cultural"], "explanation": "Trước danh từ tradition cần tính từ thuộc về văn hóa: cultural tradition." },
-        { "id": "t4_wf45", "num": 45, "type": "blank", "prompt": "The athlete's sudden withdrawal from the tournament was completely [expect] [blank].", "answers": ["unexpected"], "explanation": "Sau to be was và trạng từ completely, ngữ cảnh rút lui bất ngờ ➔ tính từ mang tiền tố phủ định: unexpected." },
-        { "id": "t4_wf46", "num": 46, "type": "blank", "prompt": "The destruction inflicted on the small island by the tsunami was almost [imagine] [blank].", "answers": ["unimaginable"], "explanation": "Sau to be was và trạng từ almost miêu tả sự tàn phá không thể tưởng tượng nổi ➔ tính từ phủ định: unimaginable." },
-        { "id": "t4_wf47", "num": 47, "type": "blank", "prompt": "You need to read the safety instructions [care] [blank] before operating this heavy machinery.", "answers": ["carefully"], "explanation": "Bổ nghĩa cho động từ hành động read cần một trạng từ: carefully." },
-        { "id": "t4_wf48", "num": 48, "type": "blank", "prompt": "He attempted to resolve the dispute peacefully, but his efforts were totally [succeed] [blank].", "answers": ["unsuccessful"], "explanation": "Liên từ but thể hiện sự đối lập: cố gắng giải quyết nhưng hoàn toàn không thành công ➔ tính từ phủ định: unsuccessful." },
-        { "id": "t4_wf49", "num": 49, "type": "blank", "prompt": "The giant panda has officially been declared an [danger] [blank] species worldwide.", "answers": ["endangered"], "explanation": "Cụm danh từ cố định trong sinh học: an endangered species - loài có nguy cơ tuyệt chủng." },
-        { "id": "t4_wf50", "num": 50, "type": "blank", "prompt": "Her explanation sounded completely [believe] [blank], so no one in the room trusted her.", "answers": ["unbelievable"], "explanation": "Ngữ cảnh vế sau no one in the room trusted her ➔ tính từ phủ định: unbelievable - không thể tin được." }
+        { "id": "g_q41", "num": 41, "type": "blank", "prompt": "The world-famous museum was opened [blank] 1995.", "answers": ["in"], "explanation": "Trước năm dùng giới từ in." },
+        { "id": "g_q42", "num": 42, "type": "blank", "prompt": "The seminar will start promptly [blank] 8:30 AM on Monday morning.", "answers": ["at"], "explanation": "Trước giờ cụ thể dùng giới từ at." },
+        { "id": "g_q43", "num": 43, "type": "blank", "prompt": "Don't sit [blank] the floor; it's very cold. Sit in that armchair.", "answers": ["on"], "explanation": "Trên bề mặt sàn nhà dùng on the floor." },
+        { "id": "g_q44", "num": 44, "type": "blank", "prompt": "My office is located [blank] the third floor of the building.", "answers": ["on"], "explanation": "Tầng lầu dùng on the third floor." },
+        { "id": "g_q45", "num": 45, "type": "blank", "prompt": "We arrived [blank] the airport just in time for our flight.", "answers": ["at"], "explanation": "Địa điểm xác định: at the airport." },
+        { "id": "g_q46", "num": 46, "type": "blank", "prompt": "The technician said the machine would be fixed [blank] 2 hours.", "answers": ["in"], "explanation": "in + khoảng thời gian = trong vòng bao lâu nữa." },
+        { "id": "g_q47", "num": 47, "type": "blank", "prompt": "Jack spends most of his adult life living and working at [blank] sea as a ship captain.", "answers": ["Ø", "none", ""], "explanation": "Thành ngữ at sea không dùng mạo từ." },
+        { "id": "g_q48", "num": 48, "type": "blank", "prompt": "Look at [blank] moon! It looks so bright tonight.", "answers": ["the"], "explanation": "Vật thể duy nhất trong tự nhiên: the moon." },
+        { "id": "g_q49", "num": 49, "type": "blank", "prompt": "He wants to become [blank] software engineer in the future.", "answers": ["a"], "explanation": "Danh từ nghề nghiệp bắt đầu bằng phụ âm: a software engineer." },
+        { "id": "g_q50", "num": 50, "type": "blank", "prompt": "Do you usually watch news on [blank] television or browse the Internet?", "answers": ["Ø", "none", ""], "explanation": "Cụm on television không dùng mạo từ." },
+        { "id": "g_q51", "num": 51, "type": "blank", "prompt": "She bought [blank] used car yesterday. (Điền a hoặc an)", "answers": ["a"], "explanation": "used phiên âm bắt đầu bằng phụ âm /ju:/ nên đi với a." },
+        { "id": "g_q52", "num": 52, "type": "blank", "prompt": "The government needs to introduce more social welfare programs for [blank] poor.", "answers": ["the"], "explanation": "the + adj = nhóm người: the poor = người nghèo." },
+        { "id": "g_q53", "num": 53, "type": "blank", "prompt": "There are billions of galaxies scattered across [blank] outer space.", "answers": ["Ø", "none", ""], "explanation": "outer space không dùng mạo từ." },
+        { "id": "g_q54", "num": 54, "type": "blank", "prompt": "She has [blank] real friends in this city, so she often feels lonely on weekends. (Dùng few / a few)", "answers": ["few"], "explanation": "Ý nghĩa tiêu cực chỉ sự thiếu thốn, cô đơn: few friends." },
+        { "id": "g_q55", "num": 55, "type": "blank", "prompt": "Don't worry! We still have [blank] time left before the train leaves. (Dùng little / a little)", "answers": ["a little"], "explanation": "Ý nghĩa tích cực (còn một chút, đủ dùng): a little time." },
+        { "id": "g_q56", "num": 56, "type": "blank", "prompt": "There isn't [blank] salt left in the kitchen cabinet.", "answers": ["any"], "explanation": "Câu phủ định dùng any." },
+        { "id": "g_q57", "num": 57, "type": "blank", "prompt": "Would you like [blank] orange juice while you wait?", "answers": ["some"], "explanation": "Lời mời lịch sự dùng some." },
+        { "id": "g_q58", "num": 58, "type": "blank", "prompt": "[blank] the students in our school enjoy participating in extracurricular activities. (Dùng Most / Most of)", "answers": ["Most of"], "explanation": "Đứng trước the students bắt buộc dùng Most of." },
+        { "id": "g_q59", "num": 59, "type": "blank", "prompt": "[blank] cars manufactured nowadays are equipped with smart security sensors. (Dùng Most / Most of)", "answers": ["Most"], "explanation": "Đứng trước danh từ số nhiều nói chung dùng Most." },
+        { "id": "g_q60", "num": 60, "type": "blank", "prompt": "Learning a foreign language requires a great deal of [blank]. (patience / mistakes)", "answers": ["patience"], "explanation": "a great deal of đi với danh từ không đếm được: patience." },
+        { "id": "g_q61", "num": 61, "type": "blank", "prompt": "The curtains do not [blank] the sofa at all. (match / match with)", "answers": ["match"], "explanation": "match là ngoại động từ trực tiếp, không đi với giới từ with." },
+        { "id": "g_q62", "num": 62, "type": "blank", "prompt": "She was so angry that she left the room without saying a word [blank] anyone.", "answers": ["to"], "explanation": "say a word to someone: nói lời nào với ai." },
+        { "id": "g_q63", "num": 63, "type": "blank", "prompt": "They decided to enrol in the training program with a view to [blank] their professional skills. (improve / improving)", "answers": ["improving"], "explanation": "with a view to + V-ing: nhằm mục đích làm gì." },
+        { "id": "g_q64", "num": 64, "type": "blank", "prompt": "He gave place [blank] an elderly woman on the crowded bus.", "answers": ["to"], "explanation": "give place to someone: nhường chỗ cho ai." },
+        { "id": "g_q65", "num": 65, "type": "blank", "prompt": "You can take advantage [blank] this discount to buy standard textbooks.", "answers": ["of"], "explanation": "take advantage of: tận dụng cái gì." }
       ]
     },
     {
-      "partId": "part4_mcq_advanced",
-      "partTitle": "PHẦN IV: BÀI TẬP TRẮC NGHIỆM CHUYÊN SÂU & BẪY NGỮ PHÁP (CÂU 51 – 75)",
-      "instruction": "Chọn đáp án chính xác nhất (A, B, C hoặc D):",
+      "partId": "part4_mcq",
+      "partTitle": "PHẦN 4: TRẮC NGHIỆM TỔNG HỢP & BẪY NGỮ PHÁP (CÂU 66 – 85)",
+      "instruction": "Chọn phương án đúng nhất (A, B, C hoặc D):",
       "questions": [
-        {
-          "id": "t4_mcq51",
-          "num": 51,
-          "type": "choice",
-          "prompt": "By the time the rescue team reached the remote valley, the survivors ________ without clean water for three days.",
-          "options": ["A. survived", "B. were surviving", "C. had been surviving", "D. have survived"],
-          "correctIndex": 2,
-          "answer": "C",
-          "explanation": "By the time + QKĐ, vế chính chia Quá khứ hoàn thành. Vì nhấn mạnh tính kéo dài liên tục 'suốt 3 ngày' nên dùng QKHT tiếp diễn: had been surviving."
-        },
-        {
-          "id": "t4_mcq52",
-          "num": 52,
-          "type": "choice",
-          "prompt": "While we ________ dinner in the living room, a strange noise suddenly ________ from the attic.",
-          "options": ["A. were having / came", "B. had / was coming", "C. have had / comes", "D. were having / was coming"],
-          "correctIndex": 0,
-          "answer": "A",
-          "explanation": "Hành động đang diễn ra trong quá khứ were having thì hành động ngắn bất ngờ cắt ngang came chia Quá khứ đơn."
-        },
-        {
-          "id": "t4_mcq53",
-          "num": 53,
-          "type": "choice",
-          "prompt": "My father ________ at the national hospital for thirty years before he retired last spring.",
-          "options": ["A. works", "B. has worked", "C. had worked", "D. is working"],
-          "correctIndex": 2,
-          "answer": "C",
-          "explanation": "Hành động làm việc đã diễn ra và hoàn tất trong suốt 30 năm trước mốc thời gian ông nghỉ hưu trong quá khứ before he retired ➔ chia Quá khứ hoàn thành had worked."
-        },
-        {
-          "id": "t4_mcq54",
-          "num": 54,
-          "type": "choice",
-          "prompt": "Unless you ________ your seatbelt fastened, the warning sensor ________ beeping.",
-          "options": ["A. keep / won't stop", "B. don't keep / will stop", "C. keep / will stop", "D. didn't keep / would stop"],
-          "correctIndex": 0,
-          "answer": "A",
-          "explanation": "Unless = If not. Vế sau Unless chia khẳng định hiện tại đơn keep, vế chính chia tương lai phủ định won't stop: 'Trừ khi bạn thắt dây an toàn, nếu không chuông báo sẽ không ngừng kêu'."
-        },
-        {
-          "id": "t4_mcq55",
-          "num": 55,
-          "type": "choice",
-          "prompt": "If she ________ the flight ticket earlier yesterday, she ________ stuck at the airport right now.",
-          "options": ["A. booked / wouldn't be", "B. had booked / wouldn't be", "C. had booked / wouldn't have been", "D. books / won't be"],
-          "correctIndex": 1,
-          "answer": "B",
-          "explanation": "Bẫy câu điều kiện hỗn hợp 3-2: Giả thiết ngược quá khứ có yesterday dùng had booked, nhưng kết quả trái ngược hiện tại có right now dùng wouldn't be."
-        },
-        {
-          "id": "t4_mcq56",
-          "num": 56,
-          "type": "choice",
-          "prompt": "What ________ if you ________ an alien standing in front of your house tonight?",
-          "options": ["A. will you do / saw", "B. would you do / saw", "C. would you do / see", "D. did you do / had seen"],
-          "correctIndex": 1,
-          "answer": "B",
-          "explanation": "Giả định tưởng tượng không có thật ở hiện tại/tương lai ➔ If loại 2: What would you do if you saw..."
-        },
-        {
-          "id": "t4_mcq57",
-          "num": 57,
-          "type": "choice",
-          "prompt": "The harder you work on this academic research, ________ you will understand the subject.",
-          "options": ["A. the deeper", "B. the more deeply", "C. deeper", "D. more deep"],
-          "correctIndex": 1,
-          "answer": "B",
-          "explanation": "So sánh kép: The harder you work..., the more deeply you will understand... Vì bổ nghĩa cho động từ understand nên cần trạng từ deeply ➔ the more deeply."
-        },
-        {
-          "id": "t4_mcq58",
-          "num": 58,
-          "type": "choice",
-          "prompt": "Her academic test result this semester is much ________ than that of last year.",
-          "options": ["A. well", "B. good", "C. better", "D. more better"],
-          "correctIndex": 2,
-          "answer": "C",
-          "explanation": "Trạng từ much dùng để nhấn mạnh cho so sánh hơn của tính từ good ➔ much better."
-        },
-        {
-          "id": "t4_mcq59",
-          "num": 59,
-          "type": "choice",
-          "prompt": "The old castle, ________ walls were severely cracked during the war, is being completely restored.",
-          "options": ["A. which", "B. whose", "C. that", "D. of which"],
-          "correctIndex": 1,
-          "answer": "B",
-          "explanation": "Đại từ quan hệ chỉ sở hữu đồ vật: whose walls = những bức tường của tòa lâu đài đó."
-        },
-        {
-          "id": "t4_mcq60",
-          "num": 60,
-          "type": "choice",
-          "prompt": "The professor to ________ my father spoke during the seminar is an internationally recognized scientist.",
-          "options": ["A. that", "B. who", "C. whom", "D. whose"],
-          "correctIndex": 2,
-          "answer": "C",
-          "explanation": "Giới từ to đứng trước đại từ quan hệ chỉ người bắt buộc phải dùng whom; cấm dùng to that hoặc to who."
-        },
-        {
-          "id": "t4_mcq61",
-          "num": 61,
-          "type": "choice",
-          "prompt": "He failed his driving test three times, ________ disappointed his parents deeply.",
-          "options": ["A. that", "B. which", "C. what", "D. who"],
-          "correctIndex": 1,
-          "answer": "B",
-          "explanation": "Dùng , which đứng sau dấu phẩy để thay thế cho toàn bộ sự việc đứng trước 'anh ấy trượt bằng lái 3 lần'."
-        },
-        {
-          "id": "t4_mcq62",
-          "num": 62,
-          "type": "choice",
-          "prompt": "This historical monument ________ in 1890 by skilled French architects.",
-          "options": ["A. was erected", "B. erected", "C. has been erected", "D. had erected"],
-          "correctIndex": 0,
-          "answer": "A",
-          "explanation": "Chủ ngữ là vật thể chịu tác động, có mốc thời gian quá khứ in 1890 ➔ Bị động quá khứ đơn: was erected."
-        },
-        {
-          "id": "t4_mcq63",
-          "num": 63,
-          "type": "choice",
-          "prompt": "English grammar ________ to the foreign students thoroughly by Mrs. Thompson every Monday.",
-          "options": ["A. is explained", "B. was explained", "C. has explained", "D. is being explained"],
-          "correctIndex": 0,
-          "answer": "A",
-          "explanation": "Bị động thì Hiện tại đơn diễn tả lịch học định kỳ every Monday: is explained."
-        },
-        {
-          "id": "t4_mcq64",
-          "num": 64,
-          "type": "choice",
-          "prompt": "Harry is a dedicated sailor. He spends nine months of every year living at ________ sea.",
-          "options": ["A. a", "B. an", "C. the", "D. Ø (no article)"],
-          "correctIndex": 3,
-          "answer": "D",
-          "explanation": "Bẫy mạo từ rỗng: Thành ngữ cố định chỉ nghề thủy thủ đi biển làm nhiệm vụ: at sea, không dùng mạo từ (Zero article - Ø)."
-        },
-        {
-          "id": "t4_mcq65",
-          "num": 65,
-          "type": "choice",
-          "prompt": "We looked up and observed hundreds of shooting stars blazing across ________ sky.",
-          "options": ["A. a", "B. an", "C. the", "D. Ø"],
-          "correctIndex": 2,
-          "answer": "C",
-          "explanation": "Bầu trời là vật thể duy nhất trong tự nhiên, luôn đi kèm mạo từ xác định: the sky."
-        },
-        {
-          "id": "t4_mcq66",
-          "num": 66,
-          "type": "choice",
-          "prompt": "The Apollo 11 mission was the first human spaceflight to land on ________ Moon.",
-          "options": ["A. Ø", "B. the", "C. a", "D. an"],
-          "correctIndex": 1,
-          "answer": "B",
-          "explanation": "Mặt trăng là thiên thể duy nhất, bắt buộc dùng: the Moon."
-        },
-        {
-          "id": "t4_mcq67",
-          "num": 67,
-          "type": "choice",
-          "prompt": "She walked into the store and bought ________ used violin and ________ European art magazine.",
-          "options": ["A. an / a", "B. a / an", "C. a / a", "D. an / an"],
-          "correctIndex": 2,
-          "answer": "C",
-          "explanation": "Bẫy phiên âm /ju:/: Cả used (/juːzd/) và European (/ˌjʊərəˈpiːən/) đều bắt đầu bằng phụ âm /j/ nên cả hai đều đi với mạo từ a."
-        },
-        {
-          "id": "t4_mcq68",
-          "num": 68,
-          "type": "choice",
-          "prompt": "The new curtains in the dining room do not ________ the carpet at all.",
-          "options": ["A. match with", "B. match to", "C. match", "D. match against"],
-          "correctIndex": 2,
-          "answer": "C",
-          "explanation": "Bẫy giới từ: Động từ match mang nghĩa phù hợp với cái gì là ngoại động từ trực tiếp ➔ match the carpet, không dùng giới từ."
-        },
-        {
-          "id": "t4_mcq69",
-          "num": 69,
-          "type": "choice",
-          "prompt": "With a view to ________ customer service quality, the company organized a weekend workshop.",
-          "options": ["A. enhance", "B. enhancing", "C. enhancement", "D. enhanced"],
-          "correctIndex": 1,
-          "answer": "B",
-          "explanation": "Cấu trúc liên từ chỉ mục đích nâng cao: with a view to + V-ing ➔ enhancing."
-        },
-        {
-          "id": "t4_mcq70",
-          "num": 70,
-          "type": "choice",
-          "prompt": "The conference is scheduled to commence promptly ________ 8:30 AM ________ Monday morning.",
-          "options": ["A. at / in", "B. on / at", "C. at / on", "D. in / on"],
-          "correctIndex": 2,
-          "answer": "C",
-          "explanation": "Mốc giờ chính xác 8:30 AM dùng giới từ at; buổi đi kèm thứ cụ thể trong tuần Monday morning dùng giới từ on."
-        },
-        {
-          "id": "t4_mcq71",
-          "num": 71,
-          "type": "choice",
-          "prompt": "He has ________ genuine friends because his arrogant attitude drives people away.",
-          "options": ["A. a few", "B. few", "C. a little", "D. little"],
-          "correctIndex": 1,
-          "answer": "B",
-          "explanation": "Ngữ cảnh tiêu cực do thái độ kiêu ngạo nên gần như không có bạn bè ➔ dùng few đi với danh từ số nhiều friends."
-        },
-        {
-          "id": "t4_mcq72",
-          "num": 72,
-          "type": "choice",
-          "prompt": "Don't worry! We still have ________ time left before the boarding gate closes.",
-          "options": ["A. little", "B. a little", "C. few", "D. a few"],
-          "correctIndex": 1,
-          "answer": "B",
-          "explanation": "Ngữ cảnh tích cực khuyên đừng lo vì vẫn còn một chút thời gian ➔ dùng a little đi với danh từ không đếm được time."
-        },
-        {
-          "id": "t4_mcq73",
-          "num": 73,
-          "type": "choice",
-          "prompt": "________ the students in our faculty have submitted their graduate dissertations on time.",
-          "options": ["A. Most", "B. Most of", "C. Many", "D. Almost"],
-          "correctIndex": 1,
-          "answer": "B",
-          "explanation": "Phía sau có mạo từ xác định the students bắt buộc phải dùng Most of."
-        },
-        {
-          "id": "t4_mcq74",
-          "num": 74,
-          "type": "choice",
-          "prompt": "Would you like ________ hot green tea while waiting for the manager?",
-          "options": ["A. any", "B. some", "C. many", "D. a few"],
-          "correctIndex": 1,
-          "answer": "B",
-          "explanation": "Lời mời lịch sự Would you like...? dùng lượng từ some."
-        },
-        {
-          "id": "t4_mcq75",
-          "num": 75,
-          "type": "choice",
-          "prompt": "Which of the following sentences contains a GRAMMATICAL MISTAKE?",
-          "options": [
-            "A. She has worked as a lecturer since she graduated from Harvard.",
-            "B. The more fast you drive, the more dangerous it becomes.",
-            "C. Neither of the two proposals was accepted by the board.",
-            "D. The house in which I was born has been demolished."
-          ],
-          "correctIndex": 1,
-          "answer": "B",
-          "explanation": "Lỗi sai: fast là tính từ/trạng từ ngắn, dạng so sánh hơn là faster, không dùng more fast. Câu đúng phải là: The faster you drive..."
-        }
+        { "id": "g_q66", "num": 66, "type": "choice", "prompt": "The ________ you practice speaking English, the ________ confident you become.", "options": ["A. more / more", "B. more / most", "C. most / most", "D. better / most"], "answer": "A", "explanation": "So sánh kép: The more... the more..." },
+        { "id": "g_q67", "num": 67, "type": "choice", "prompt": "This mathematics exercise is ________ than the one we solved yesterday.", "options": ["A. more easy", "B. much easier", "C. more easier", "D. easiest"], "answer": "B", "explanation": "easy ➔ easier, nhấn mạnh bằng much: much easier." },
+        { "id": "g_q68", "num": 68, "type": "choice", "prompt": "She danced ________ than any other ballerina at the theatre.", "options": ["A. more graceful", "B. more gracefully", "C. gracefuler", "D. most gracefully"], "answer": "B", "explanation": "Bổ nghĩa cho động từ danced cần trạng từ: more gracefully." },
+        { "id": "g_q69", "num": 69, "type": "choice", "prompt": "The Sears Tower is one of the ________ buildings in North America.", "options": ["A. taller", "B. more tall", "C. tallest", "D. most tallest"], "answer": "C", "explanation": "So sánh nhất tính từ ngắn: the tallest." },
+        { "id": "g_q70", "num": 70, "type": "choice", "prompt": "The middle-aged gentleman to ________ my father was talking is a renowned surgeon.", "options": ["A. who", "B. that", "C. whom", "D. whose"], "answer": "C", "explanation": "Giới từ to đứng trước đại từ quan hệ chỉ người ➔ to whom." },
+        { "id": "g_q71", "num": 71, "type": "choice", "prompt": "That is the musician ________ latest song hit number one on the charts.", "options": ["A. who", "B. whom", "C. which", "D. whose"], "answer": "D", "explanation": "Chỉ sở hữu: whose latest song (bài hát của nhạc sĩ đó)." },
+        { "id": "g_q72", "num": 72, "type": "choice", "prompt": "She failed the entrance exam three times, ________ disappointed her entire family.", "options": ["A. that", "B. which", "C. what", "D. who"], "answer": "B", "explanation": "Thay thế cho toàn bộ sự việc đứng trước dùng dấu phẩy + which." },
+        { "id": "g_q73", "num": 73, "type": "choice", "prompt": "This is the house ________ I spent my childhood years.", "options": ["A. which", "B. where", "C. that", "D. what"], "answer": "B", "explanation": "Nơi chốn nơi tôi từng sống ➔ where." },
+        { "id": "g_q74", "num": 74, "type": "choice", "prompt": "By the time we ________ at the stadium, the concert ________ for 20 minutes.", "options": ["A. arrived / had started", "B. had arrived / started", "C. were arriving / started", "D. arrived / has started"], "answer": "A", "explanation": "By the time + QKĐ, mệnh đề chính chia QKHT: arrived / had started." },
+        { "id": "g_q75", "num": 75, "type": "choice", "prompt": "While Peter ________ his bicycle, a dog ran across the street.", "options": ["A. rode", "B. was riding", "C. had ridden", "D. is riding"], "answer": "B", "explanation": "Hành động đang diễn ra was riding thì hành động cắt ngang chia QKĐ." },
+        { "id": "g_q76", "num": 76, "type": "choice", "prompt": "Unless it ________ heavily tomorrow, our school will organize an outdoor sports day.", "options": ["A. rains", "B. doesn't rain", "C. will rain", "D. rained"], "answer": "A", "explanation": "Sau Unless chia khẳng định hiện tại đơn: rains." },
+        { "id": "g_q77", "num": 77, "type": "choice", "prompt": "If he had checked the weather forecast, he ________ an umbrella with him.", "options": ["A. would bring", "B. brought", "C. would have brought", "D. had brought"], "answer": "C", "explanation": "Điều kiện loại 3 mệnh đề chính: would have brought." },
+        { "id": "g_q78", "num": 78, "type": "choice", "prompt": "If I were you, I ________ those toxic chemicals without wearing protective gloves.", "options": ["A. wouldn't touch", "B. won't touch", "C. hadn't touched", "D. didn't touch"], "answer": "A", "explanation": "Điều kiện loại 2 mệnh đề chính: wouldn't touch." },
+        { "id": "g_q79", "num": 79, "type": "choice", "prompt": "The report ________ thoroughly by the executive board before the meeting began.", "options": ["A. had been reviewed", "B. was reviewing", "C. reviewed", "D. has been reviewed"], "answer": "A", "explanation": "Bị động Quá khứ hoàn thành xảy ra trước before: had been reviewed." },
+        { "id": "g_q80", "num": 80, "type": "choice", "prompt": "How many official languages ________ in Singapore?", "options": ["A. are speaking", "B. do they speak", "C. are spoken", "D. speak"], "answer": "C", "explanation": "Câu hỏi bị động thì Hiện tại đơn: are spoken." },
+        { "id": "g_q81", "num": 81, "type": "choice", "prompt": "Turn left at the crossroads and the library will be on ________ right.", "options": ["A. a", "B. an", "C. the", "D. your"], "answer": "D", "explanation": "Chỉ hướng: on your right (hoặc on the right)." },
+        { "id": "g_q82", "num": 82, "type": "choice", "prompt": "________ Apollo 11 was the first spaceflight that landed humans on the Moon.", "options": ["A. The", "B. A", "C. An", "D. Ø"], "answer": "D", "explanation": "Tên chuyến bay/tàu vũ trụ có số thứ tự thường không dùng mạo từ (Ø)." },
+        { "id": "g_q83", "num": 83, "type": "choice", "prompt": "Peter drank ________ wine last night, so he has a severe headache today.", "options": ["A. too many", "B. too much", "C. few", "D. a large number of"], "answer": "B", "explanation": "wine không đếm được dùng too much." },
+        { "id": "g_q84", "num": 84, "type": "choice", "prompt": "Choose the sentence with NO grammatical errors:", "options": ["A. The faster you walk, the more tired you get.", "B. The more faster you walk, the more tired you get.", "C. The fast you walk, the tired you get.", "D. The faster you walk, the tiredest you get."], "answer": "A", "explanation": "So sánh kép chuẩn: The faster..., the more tired..." },
+        { "id": "g_q85", "num": 85, "type": "choice", "prompt": "Choose the sentence with INCORRECT preposition usage:", "options": ["A. She is responsible for managing the project.", "B. He graduated from Oxford University in 2015.", "C. The color of this shirt doesn't match with your trousers.", "D. We are looking forward to hearing from you."], "answer": "C", "explanation": "match là ngoại động từ trực tiếp, không dùng match with." }
       ]
     },
     {
-      "partId": "part5_sentence_transformation",
-      "partTitle": "PHẦN V: TỰ LUẬN BIẾN ĐỔI CÂU & ĐẲNG CẤU TRÚC (CÂU 76 – 100)",
-      "instruction": "Viết lại các câu sau sao cho nghĩa không đổi, bắt đầu bằng từ/cụm từ gợi ý:",
+      "partId": "part5_rewrite",
+      "partTitle": "PHẦN 5: BÀI TẬP DIỄN ĐẠT & VIẾT LẠI CÂU (CÂU 86 – 100)",
+      "instruction": "Viết lại câu theo đúng cấu trúc hoặc chủ điểm ngữ pháp yêu cầu:",
       "questions": [
-        {
-          "id": "t4_rw76",
-          "num": 76,
-          "type": "rewrite",
-          "prompt": "My father waters these bonsai trees every morning.",
-          "targetStart": "These bonsai trees ",
-          "answers": ["are watered by my father every morning.", "are watered every morning by my father."],
-          "explanation": "Bị động hiện tại đơn số nhiều: These bonsai trees are watered by my father every morning."
-        },
-        {
-          "id": "t4_rw77",
-          "num": 77,
-          "type": "rewrite",
-          "prompt": "Her mother is preparing a special dinner in the kitchen right now.",
-          "targetStart": "A special dinner ",
-          "answers": [
-            "is being prepared in the kitchen right now by her mother.",
-            "is being prepared right now by her mother in the kitchen.",
-            "is being prepared by her mother in the kitchen right now."
-          ],
-          "explanation": "Bị động hiện tại tiếp diễn: A special dinner is being prepared in the kitchen right now by her mother."
-        },
-        {
-          "id": "t4_rw78",
-          "num": 78,
-          "type": "rewrite",
-          "prompt": "The technician has repaired my laptop completely.",
-          "targetStart": "My laptop ",
-          "answers": [
-            "has been repaired completely by the technician.",
-            "has been completely repaired by the technician."
-          ],
-          "explanation": "Bị động hiện tại hoàn thành: My laptop has been repaired completely by the technician."
-        },
-        {
-          "id": "t4_rw79",
-          "num": 79,
-          "type": "rewrite",
-          "prompt": "The secretary didn’t send the confidential documents to the manager yesterday.",
-          "targetStart": "The confidential documents ",
-          "answers": [
-            "were not sent to the manager yesterday by the secretary.",
-            "weren't sent to the manager yesterday by the secretary."
-          ],
-          "explanation": "Bị động quá khứ đơn phủ định số nhiều: The confidential documents were not sent to the manager yesterday by the secretary."
-        },
-        {
-          "id": "t4_rw80",
-          "num": 80,
-          "type": "rewrite",
-          "prompt": "The board of directors will announce the final decision tomorrow morning.",
-          "targetStart": "The final decision ",
-          "answers": [
-            "will be announced tomorrow morning by the board of directors.",
-            "will be announced by the board of directors tomorrow morning."
-          ],
-          "explanation": "Bị động tương lai đơn: The final decision will be announced tomorrow morning by the board of directors."
-        },
-        {
-          "id": "t4_rw81",
-          "num": 81,
-          "type": "rewrite",
-          "prompt": "Hurry up or you will miss the morning train to the capital.",
-          "targetStart": "If you don't ",
-          "answers": [
-            "hurry up, you will miss the morning train to the capital.",
-            "hurry, you will miss the morning train to the capital."
-          ],
-          "explanation": "If loại 1: If you don't hurry up, you will miss the morning train to the capital."
-        },
-        {
-          "id": "t4_rw82",
-          "num": 82,
-          "type": "rewrite",
-          "prompt": "She doesn't practice speaking English regularly, so she can't communicate fluently.",
-          "targetStart": "If she ",
-          "answers": [
-            "practiced speaking English regularly, she could communicate fluently.",
-            "practised speaking English regularly, she could communicate fluently."
-          ],
-          "explanation": "If loại 2 (ngược hiện tại): If she practiced speaking English regularly, she could communicate fluently."
-        },
-        {
-          "id": "t4_rw83",
-          "num": 83,
-          "type": "rewrite",
-          "prompt": "Factories dump untreated chemical waste into the river, so many aquatic animals die.",
-          "targetStart": "If factories ",
-          "answers": [
-            "didn't dump untreated chemical waste into the river, many aquatic animals wouldn't die.",
-            "did not dump untreated chemical waste into the river, many aquatic animals would not die."
-          ],
-          "explanation": "If loại 2: If factories didn't dump untreated chemical waste into the river, many aquatic animals wouldn't die."
-        },
-        {
-          "id": "t4_rw84",
-          "num": 84,
-          "type": "rewrite",
-          "prompt": "He didn't check the car's brakes yesterday, so he had a severe road accident.",
-          "targetStart": "If he ",
-          "answers": [
-            "had checked the car's brakes yesterday, he wouldn't have had a severe road accident.",
-            "had checked the car's brakes yesterday, he would not have had a severe road accident."
-          ],
-          "explanation": "If loại 3 (ngược quá khứ): If he had checked the car's brakes yesterday, he wouldn't have had a severe road accident."
-        },
-        {
-          "id": "t4_rw85",
-          "num": 85,
-          "type": "rewrite",
-          "prompt": "She worked all night without rest, so she feels exhausted right now.",
-          "targetStart": "If she ",
-          "answers": [
-            "hadn't worked all night without rest, she wouldn't feel exhausted right now.",
-            "had not worked all night without rest, she would not feel exhausted right now."
-          ],
-          "explanation": "Điều kiện hỗn hợp 3-2 (quá khứ ➔ hiện tại): If she hadn't worked all night without rest, she wouldn't feel exhausted right now."
-        },
-        {
-          "id": "t4_rw86",
-          "num": 86,
-          "type": "rewrite",
-          "prompt": "If you don't wear a warm coat outside, you will catch a bad cold.",
-          "targetStart": "Unless you ",
-          "answers": [
-            "wear a warm coat outside, you will catch a bad cold."
-          ],
-          "explanation": "Unless = If not: Unless you wear a warm coat outside, you will catch a bad cold."
-        },
-        {
-          "id": "t4_rw87",
-          "num": 87,
-          "type": "rewrite",
-          "prompt": "Unless she invites me personally, I will not attend her birthday party.",
-          "targetStart": "If she ",
-          "answers": [
-            "doesn't invite me personally, I will not attend her birthday party.",
-            "does not invite me personally, I will not attend her birthday party."
-          ],
-          "explanation": "Đổi từ Unless sang If not: If she doesn't invite me personally, I will not attend her birthday party."
-        },
-        {
-          "id": "t4_rw88",
-          "num": 88,
-          "type": "rewrite",
-          "prompt": "This is the rarest opportunity. You should take full advantage of it to advance your career. (Dùng of which)",
-          "targetStart": "This is the rarest opportunity ",
-          "answers": [
-            "of which you should take full advantage to advance your career."
-          ],
-          "explanation": "Giới từ trước đại từ quan hệ: of which you should take full advantage to advance your career."
-        },
-        {
-          "id": "t4_rw89",
-          "num": 89,
-          "type": "rewrite",
-          "prompt": "The young boy is my cousin. You made fun of him yesterday. (Dùng of whom)",
-          "targetStart": "The young boy ",
-          "answers": [
-            "of whom you made fun yesterday is my cousin.",
-            "whom you made fun of yesterday is my cousin."
-          ],
-          "explanation": "Giới từ trước đại từ quan hệ chỉ người: The young boy of whom you made fun yesterday is my cousin."
-        },
-        {
-          "id": "t4_rw90",
-          "num": 90,
-          "type": "rewrite",
-          "prompt": "Max isn’t home yet. That worries his parents a lot. (Dùng đại từ quan hệ nối câu)",
-          "targetStart": "Max isn’t home yet, ",
-          "answers": [
-            "which worries his parents a lot."
-          ],
-          "explanation": "Dùng , which thay thế cho cả mệnh đề: Max isn't home yet, which worries his parents a lot."
-        },
-        {
-          "id": "t4_rw91",
-          "num": 91,
-          "type": "rewrite",
-          "prompt": "Do you know the building? The windows of the building are painted emerald green. (Dùng whose)",
-          "targetStart": "Do you know the building ",
-          "answers": [
-            "whose windows are painted emerald green?"
-          ],
-          "explanation": "whose chỉ sở hữu đồ vật: Do you know the building whose windows are painted emerald green?"
-        },
-        {
-          "id": "t4_rw92",
-          "num": 92,
-          "type": "rewrite",
-          "prompt": "No one in my class is taller than Peter.",
-          "targetStart": "Peter is the ",
-          "answers": [
-            "tallest student in my class.",
-            "tallest person in my class.",
-            "tallest in my class."
-          ],
-          "explanation": "So sánh nhất: Peter is the tallest student in my class."
-        },
-        {
-          "id": "t4_rw93",
-          "num": 93,
-          "type": "rewrite",
-          "prompt": "This is the first time I have ever watched such an intriguing movie.",
-          "targetStart": "This is the most ",
-          "answers": [
-            "intriguing movie I have ever watched.",
-            "intriguing film I have ever watched."
-          ],
-          "explanation": "Cấu trúc This is the most + adj + N + S + have ever + V3: This is the most intriguing movie I have ever watched."
-        },
-        {
-          "id": "t4_rw94",
-          "num": 94,
-          "type": "rewrite",
-          "prompt": "Japanese cars are more expensive than black Chinese ones.",
-          "targetStart": "Black Chinese cars are ",
-          "answers": [
-            "cheaper than Japanese ones.",
-            "less expensive than Japanese ones."
-          ],
-          "explanation": "So sánh ngược: Black Chinese cars are cheaper than Japanese ones (hoặc less expensive than Japanese ones)."
-        },
-        {
-          "id": "t4_rw95",
-          "num": 95,
-          "type": "rewrite",
-          "prompt": "If we finish this task early, we can leave the office soon. (Dùng cấu trúc so sánh kép The... the...)",
-          "targetStart": "The faster ",
-          "answers": [
-            "we finish this task, the sooner we can leave the office."
-          ],
-          "explanation": "So sánh kép: The faster we finish this task, the sooner we can leave the office."
-        },
-        {
-          "id": "t4_rw96",
-          "num": 96,
-          "type": "rewrite",
-          "prompt": "She wrote the comprehensive report. Then the weekly meeting began. (Dùng liên từ Before)",
-          "targetStart": "She had ",
-          "answers": [
-            "written the comprehensive report before the weekly meeting began."
-          ],
-          "explanation": "Quá khứ hoàn thành trước Before: She had written the comprehensive report before the weekly meeting began."
-        },
-        {
-          "id": "t4_rw97",
-          "num": 97,
-          "type": "rewrite",
-          "prompt": "The taxi arrived at our house. Before that, we had packed all our luggage. (Dùng By the time)",
-          "targetStart": "By the time ",
-          "answers": [
-            "the taxi arrived at our house, we had packed all our luggage."
-          ],
-          "explanation": "By the time + QKĐ, QKHT: By the time the taxi arrived at our house, we had packed all our luggage."
-        },
-        {
-          "id": "t4_rw98",
-          "num": 98,
-          "type": "rewrite",
-          "prompt": "I turned off my desktop computer. After that, my mother arrived home from work. (Dùng After)",
-          "targetStart": "My mother arrived home after ",
-          "answers": [
-            "I had turned off my desktop computer."
-          ],
-          "explanation": "QKĐ + after + QKHT: My mother arrived home after I had turned off my desktop computer."
-        },
-        {
-          "id": "t4_rw99",
-          "num": 99,
-          "type": "rewrite",
-          "prompt": "She had never eaten fresh sushi before her trip to Tokyo. (Chuyển sang câu hỏi nghi vấn)",
-          "targetStart": "Had she ",
-          "answers": [
-            "ever eaten fresh sushi before her trip to Tokyo?"
-          ],
-          "explanation": "Đảo Had lên đầu câu và never đổi thành ever: Had she ever eaten fresh sushi before her trip to Tokyo?"
-        },
-        {
-          "id": "t4_rw100",
-          "num": 100,
-          "type": "rewrite",
-          "prompt": "They had already finished their homework when the teacher entered the classroom. (Chuyển sang thể phủ định)",
-          "targetStart": "They had not ",
-          "answers": [
-            "finished their homework yet when the teacher entered the classroom."
-          ],
-          "explanation": "Phủ định quá khứ hoàn thành đổi already thành yet ở cuối mệnh đề: They had not finished their homework yet when the teacher entered the classroom."
-        }
+        { "id": "g_q86", "num": 86, "type": "rewrite", "prompt": "Tình huống: My mother cleans our living room every morning. (Dùng Câu bị động)", "targetStart": "Our living room ", "answers": ["is cleaned by my mother every morning.", "is cleaned every morning by my mother."], "explanation": "Bị động Hiện tại đơn: is cleaned by my mother every morning." },
+        { "id": "g_q87", "num": 87, "type": "rewrite", "prompt": "Tình huống: The workers are repairing the road outside our house right now. (Bị động Hiện tại tiếp diễn)", "targetStart": "The road outside our house ", "answers": ["is being repaired by the workers right now.", "is being repaired right now by the workers.", "is being repaired right now."], "explanation": "Bị động Hiện tại tiếp diễn: is being repaired by the workers right now." },
+        { "id": "g_q88", "num": 88, "type": "rewrite", "prompt": "Tình huống: The secretary didn't send the contract to the manager yesterday. (Bị động Quá khứ đơn)", "targetStart": "The contract ", "answers": ["was not sent to the manager by the secretary yesterday.", "wasn't sent to the manager by the secretary yesterday.", "wasn't sent to the manager yesterday."], "explanation": "Bị động Quá khứ đơn: was not sent to the manager by the secretary yesterday." },
+        { "id": "g_q89", "num": 89, "type": "rewrite", "prompt": "Tình huống: Someone has stolen his expensive bicycle from the garage. (Bị động Hiện tại hoàn thành)", "targetStart": "His expensive bicycle ", "answers": ["has been stolen from the garage.", "has been stolen from the garage by someone."], "explanation": "Bị động Hiện tại hoàn thành: has been stolen from the garage." },
+        { "id": "g_q90", "num": 90, "type": "rewrite", "prompt": "Tình huống: The board of directors will announce the new policy tomorrow. (Bị động Tương lai đơn)", "targetStart": "The new policy ", "answers": ["will be announced tomorrow by the board of directors.", "will be announced by the board of directors tomorrow."], "explanation": "Bị động Tương lai đơn: will be announced tomorrow by the board of directors." },
+        { "id": "g_q91", "num": 91, "type": "rewrite", "prompt": "Tình huống: Hurry up, or you will be late for school. (Dùng If hoặc Unless)", "targetStart": "If you ", "answers": ["don't hurry up, you will be late for school.", "do not hurry up, you will be late for school."], "explanation": "If loại 1: If you don't hurry up, you will be late for school." },
+        { "id": "g_q92", "num": 92, "type": "rewrite", "prompt": "Tình huống: I don't have his phone number, so I can't call him for advice. (Dùng Câu điều kiện loại 2)", "targetStart": "If I ", "answers": ["had his phone number, I could call him for advice.", "had his phone number, I would be able to call him for advice."], "explanation": "If loại 2 (ngược hiện tại): If I had his phone number, I could call him for advice." },
+        { "id": "g_q93", "num": 93, "type": "rewrite", "prompt": "Tình huống: She didn't study hard for the final exam, so she failed it last week. (Dùng Câu điều kiện loại 3)", "targetStart": "If she ", "answers": ["had studied hard for the final exam, she wouldn't have failed it.", "had studied hard for the final exam, she would not have failed it."], "explanation": "If loại 3 (ngược quá khứ): If she had studied hard for the final exam, she wouldn't have failed it." },
+        { "id": "g_q94", "num": 94, "type": "rewrite", "prompt": "Tình huống: He stayed up all night playing games yesterday, so he feels exhausted right now. (Điều kiện hỗn hợp 3-2)", "targetStart": "If he ", "answers": ["hadn't stayed up all night playing games yesterday, he wouldn't feel exhausted right now.", "had not stayed up all night playing games yesterday, he would not feel exhausted right now."], "explanation": "Điều kiện hỗn hợp 3-2: If he hadn't stayed up all night..., he wouldn't feel exhausted right now." },
+        { "id": "g_q95", "num": 95, "type": "rewrite", "prompt": "Tình huống: The woman is a famous doctor. You spoke to her on the phone yesterday. (Dùng Mệnh đề quan hệ)", "targetStart": "The woman ", "answers": ["whom you spoke to on the phone yesterday is a famous doctor.", "to whom you spoke on the phone yesterday is a famous doctor.", "that you spoke to on the phone yesterday is a famous doctor.", "who you spoke to on the phone yesterday is a famous doctor."], "explanation": "Mệnh đề quan hệ chỉ người: The woman whom you spoke to on the phone yesterday is a famous doctor." },
+        { "id": "g_q96", "num": 96, "type": "rewrite", "prompt": "Tình huống: I bought a new car last month. Its engine runs very smoothly. (Dùng đại từ whose)", "targetStart": "I bought ", "answers": ["a new car whose engine runs very smoothly last month.", "a new car last month whose engine runs very smoothly."], "explanation": "whose chỉ sở hữu đồ vật: a new car whose engine runs very smoothly." },
+        { "id": "g_q97", "num": 97, "type": "rewrite", "prompt": "Tình huống: Max was late for the final interview. That made his parents very disappointed. (Dùng which thay cả mệnh đề)", "targetStart": "Max was late for the final interview, ", "answers": ["which made his parents very disappointed.", "which disappointed his parents a lot."], "explanation": ", which thay thế cho cả sự việc đứng trước." },
+        { "id": "g_q98", "num": 98, "type": "rewrite", "prompt": "Tình huống: No one in our basketball club is taller than David. (So sánh nhất với David làm chủ ngữ)", "targetStart": "David is the ", "answers": ["tallest person in our basketball club.", "tallest player in our basketball club.", "tallest member in our basketball club.", "tallest in our basketball club."], "explanation": "So sánh nhất: David is the tallest person in our basketball club." },
+        { "id": "g_q99", "num": 99, "type": "rewrite", "prompt": "Tình huống: When you read more books, you gain more useful knowledge. (Dùng cấu trúc The more..., the more...)", "targetStart": "The more books you read, ", "answers": ["the more useful knowledge you gain.", "the more knowledge you get."], "explanation": "So sánh kép: The more books you read, the more useful knowledge you gain." },
+        { "id": "g_q100", "num": 100, "type": "rewrite", "prompt": "Tình huống: She finished her work at the office. Then she went home to have dinner with her family. (Dùng Before)", "targetStart": "She had ", "answers": ["finished her work at the office before she went home to have dinner with her family."], "explanation": "Quá khứ hoàn thành trước Before: She had finished her work at the office before she went home..." }
       ]
     }
   ]
