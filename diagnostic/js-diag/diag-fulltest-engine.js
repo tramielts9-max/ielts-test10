@@ -1,19 +1,22 @@
 /**
  * diagnostic/js-diag/diag-fulltest-engine.js
- * BỘ ĐIỀU PHỐI FULL TEST CHUẨN XÁC 100% - TOÀN DIỆN CẢ READING LẪN LISTENING ĐỦ 3 SET
+ * BỘ ĐIỀU PHỐI FULL TEST CHUẨN XÁC 100%
+ * CÓ NÚT CHẤM NGỮ PHÁP RIÊNG BẰNG AI + CHẾ ĐỘ XEM LẠI TÔ MÀU ĐÚNG SAI 100 CÂU
  */
 
 const _WRITING_PREFIX = "AQ.Ab8RN6KGTRGy";
 const _WRITING_SUFFIX = "SZoGpqs3vT-ikWDLUSWjloCCVlzZhAQque_34w";
 function getWritingKey() { return `${_WRITING_PREFIX}${_WRITING_SUFFIX}`; }
 
-const _SPEAKING_SEEDS = [
-  65, 81, 46, 65, 98, 56, 82, 78, 54, 75, 116, 80, 107, 51, 45, 50,
-  75, 103, 117, 114, 119, 117, 116, 65, 115, 55, 95, 118, 82, 66,
-  121, 81, 110, 113, 67, 48, 77, 86, 55, 52, 66, 119, 107, 82, 107,
-  80, 110, 74, 89, 70, 90, 49, 119
+const _AI_KEY_SEEDS = [
+  65, 81, 46, 65, 98, 56, 82, 78, 54, 75, 52, 95, 111, 68, 102, 97, 
+  106, 111, 54, 107, 54, 106, 48, 118, 110, 83, 82, 87, 95, 87, 110, 
+  122, 48, 65, 103, 117, 103, 72, 82, 48, 45, 97, 115, 45, 84, 95, 
+  109, 86, 121, 116, 101, 83, 81
 ];
-function getSpeakingKey() { return _SPEAKING_SEEDS.map(c => String.fromCharCode(c)).join(''); }
+function getGeminiKey() {
+  return _AI_KEY_SEEDS.map(c => String.fromCharCode(c)).join('');
+}
 
 class DiagnosticFullTestEngine {
   constructor() {
@@ -38,6 +41,7 @@ class DiagnosticFullTestEngine {
     this.activeReadPassageIdx = 0;
     this.isRecording = false;
     this.speechRecognition = null;
+    this.isGrammarReviewed = false;
   }
 
   async init() {
@@ -60,7 +64,9 @@ class DiagnosticFullTestEngine {
     this.startTimer();
   }
 
-  // 1. NGỮ PHÁP 100 CÂU
+  // =========================================================================
+  // 1. RENDER 100 CÂU NGỮ PHÁP + NÚT CHẤM AI & XEM LẠI RIÊNG BIỆT
+  // =========================================================================
   async loadGrammar100() {
     const mount = document.getElementById('ftGrammarMount');
     if (!mount) return;
@@ -70,18 +76,36 @@ class DiagnosticFullTestEngine {
       if (!res.ok) throw new Error("Không thể tải file test4-grammar.json");
       this.grammarData = await res.json();
 
-      let html = '';
+      let html = `
+        <!-- BẢNG BÁO CÁO ĐIỂM NGỮ PHÁP (SẼ HIỆN KHI BẤM CHẤM) -->
+        <div id="ftGrammarScoreBanner" style="display:none; background:#ECFDF5; border:2.5px solid #10B981; border-radius:18px; padding:20px; margin-bottom:24px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+            <div>
+              <span style="font-size:12px; font-weight:900; background:#D1FAE5; color:#065F46; padding:3px 10px; border-radius:8px; text-transform:uppercase;">KẾT QUẢ PHẦN NGỮ PHÁP</span>
+              <h3 style="margin:6px 0 0 0; color:#065F46; font-size:22px; font-weight:900;" id="ftGrammarScoreText">Đang tính điểm...</h3>
+            </div>
+            <div style="display:flex; gap:8px;">
+              <button type="button" class="btn-3d btn-3d-white" onclick="window.ftEngine.resetGrammarSection()" style="padding:8px 16px; font-size:13px;">
+                🔄 Làm lại phần này
+              </button>
+            </div>
+          </div>
+          <div id="ftGrammarAiFeedbackBox" style="margin-top:14px; padding-top:14px; border-top:1.5px dashed #A7F3D0; font-size:14px; line-height:1.7; color:#1E293B;"></div>
+        </div>
+      `;
+
       (this.grammarData.parts || []).forEach(part => {
         html += `
-          <div style="background:#FFFFFF; border:2px solid #E8E2D8; border-radius:18px; padding:20px; margin-bottom:22px;">
-            <div style="font-size:16px; font-weight:900; color:#059669; margin-bottom:6px;">${part.partTitle}</div>
-            <div style="font-size:13px; font-weight:700; color:#64748B; margin-bottom:16px;">${part.instruction}</div>
+          <div style="background:#FFFFFF; border:2px solid #E8E2D8; border-radius:18px; padding:22px; margin-bottom:22px; box-shadow:0 4px 12px rgba(0,0,0,0.02);">
+            <div style="font-size:16px; font-weight:900; color:#059669; margin-bottom:4px;">${part.partTitle}</div>
+            <div style="font-size:13px; font-weight:700; color:#64748B; margin-bottom:18px;">${part.instruction}</div>
         `;
 
         (part.questions || []).forEach(q => {
+          // Trắc nghiệm (Part 4)
           if (q.type === 'choice') {
             html += `
-              <div class="q-item-box" style="margin-bottom:12px;">
+              <div class="q-item-box" id="ft_gbox_${q.id}" style="margin-bottom:14px; background:#FAF7F2;">
                 <b style="font-size:14px; color:#1E293B; display:block; margin-bottom:8px;">Câu ${q.num}. ${q.prompt}</b>
                 <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:6px;">
                   ${(q.options || []).map(opt => `
@@ -91,32 +115,20 @@ class DiagnosticFullTestEngine {
                     </label>
                   `).join('')}
                 </div>
+                <div id="ft_gfb_${q.id}" style="display:none; font-size:13px; font-weight:800; margin-top:8px; padding:8px 12px; border-radius:8px;"></div>
               </div>
             `;
-          } else if (q.type === 'drill_v2_v3') {
+          // Điền từ (Part 1, 2, 3) & Viết lại câu (Part 5)
+          } else {
+            const promptText = q.prompt ? q.prompt.replace('[blank]', '_______') : '';
             html += `
-              <div class="q-item-box" style="margin-bottom:10px; display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
-                <b style="width:120px; font-size:14px; color:#1E293B;">#${q.num}. ${q.v0}</b>
-                <input type="text" class="diag-input" style="flex:1; min-width:140px;" placeholder="Điền V2..." oninput="window.ftEngine.recordAnswer('grammar', '${q.id}_v2', this.value)">
-                <input type="text" class="diag-input" style="flex:1; min-width:140px;" placeholder="Điền V3..." oninput="window.ftEngine.recordAnswer('grammar', '${q.id}_v3', this.value)">
-              </div>
-            `;
-          } else if (q.type === 'blank' || q.type === 'rewrite') {
-            const promptText = q.type === 'blank' ? q.prompt.replace('[blank]', '_______') : q.prompt;
-            html += `
-              <div class="q-item-box" style="margin-bottom:12px;">
+              <div class="q-item-box" id="ft_gbox_${q.id}" style="margin-bottom:14px; background:#FAF7F2;">
                 <b style="font-size:14px; color:#1E293B; display:block; margin-bottom:6px;">Câu ${q.num}. ${promptText}</b>
                 <div style="display:flex; align-items:center; gap:8px;">
-                  ${q.targetStart ? `<span style="font-weight:800; color:#059669;">${q.targetStart}</span>` : ''}
-                  <input type="text" class="diag-input" style="flex:1;" placeholder="Điền câu trả lời..." oninput="window.ftEngine.recordAnswer('grammar', '${q.id}', this.value)">
+                  ${q.targetStart ? `<span style="font-weight:800; color:#059669; font-size:14px;">${q.targetStart}</span>` : ''}
+                  <input type="text" class="diag-input" id="inp_ft_g_${q.id}" placeholder="Điền câu trả lời..." oninput="window.ftEngine.recordAnswer('grammar', '${q.id}', this.value)" style="flex:1; margin-top:0;">
                 </div>
-              </div>
-            `;
-          } else {
-            html += `
-              <div class="q-item-box" style="margin-bottom:12px;">
-                <b style="font-size:14px; color:#1E293B; display:block; margin-bottom:6px;">Câu ${q.num}. ${q.prompt}</b>
-                <textarea class="diag-textarea" style="height:65px;" placeholder="Gõ câu trả lời lý thuyết..." oninput="window.ftEngine.recordAnswer('grammar', '${q.id}', this.value)"></textarea>
+                <div id="ft_gfb_${q.id}" style="display:none; font-size:13px; font-weight:800; margin-top:8px; padding:8px 12px; border-radius:8px;"></div>
               </div>
             `;
           }
@@ -125,13 +137,158 @@ class DiagnosticFullTestEngine {
         html += `</div>`;
       });
 
+      // CỤM NÚT CHẤM RIÊNG BIỆT CHO NGỮ PHÁP NẰM DƯỚI CÂU 100
+      html += `
+        <div style="background:#FAF7F2; border:2.5px solid #CBD5E1; border-radius:18px; padding:20px; margin-top:24px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+          <div>
+            <b style="font-size:15px; color:#1E293B; display:block;">Đã làm xong 100 câu ngữ pháp?</b>
+            <span style="font-size:13px; color:#64748B;">Bấm nút bên phải để chấm điểm và xem lời giải chi tiết từng câu.</span>
+          </div>
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <button type="button" class="btn-3d btn-3d-white" onclick="window.ftEngine.gradeGrammarSection(false)">
+              ⚡ Chấm Nhanh Hệ Thống
+            </button>
+            <button type="button" class="btn-3d btn-3d-blue" onclick="window.ftEngine.gradeGrammarSection(true)" style="background:#059669; border-bottom-color:#047857;">
+              🤖 CHẤM BẰNG AI & XEM LẠI BÀI
+            </button>
+          </div>
+        </div>
+      `;
+
       mount.innerHTML = html;
     } catch (e) {
       mount.innerHTML = `<div style="text-align:center; padding:30px; color:#DC2626; font-weight:800;">❌ Lỗi nạp ngữ pháp: ${e.message}</div>`;
     }
   }
 
-  // 2. NẠP LIÊN HOÀN 4 PARTS LISTENING ĐỦ 3 SET
+  // =========================================================================
+  // CHẤM ĐIỂM VÀ BẬT CHẾ ĐỘ XEM LẠI ĐÚNG SAI CHO RIÊNG PHẦN NGỮ PHÁP
+  // =========================================================================
+  async gradeGrammarSection(useAI = true) {
+    if (!this.grammarData) return;
+
+    let score = 0;
+    let total = 0;
+
+    const banner = document.getElementById('ftGrammarScoreBanner');
+    const scoreText = document.getElementById('ftGrammarScoreText');
+    const aiBox = document.getElementById('ftGrammarAiFeedbackBox');
+
+    (this.grammarData.parts || []).forEach(part => {
+      (part.questions || []).forEach(q => {
+        total++;
+        const u = (this.userAnswers.grammar[q.id] || '').trim();
+        let isCorrect = false;
+
+        if (q.type === 'choice') {
+          isCorrect = u.toUpperCase() === (q.answer || '').toUpperCase();
+        } else {
+          const answersList = q.answers || (q.answer ? [q.answer] : []);
+          const cleanU = this.cleanText(u);
+          const cleanTarget = q.targetStart ? this.cleanText(q.targetStart) : "";
+          const strippedU = cleanTarget && cleanU.startsWith(cleanTarget) ? cleanU.replace(cleanTarget, '').trim() : cleanU;
+
+          for (const ans of answersList) {
+            const cleanAns = this.cleanText(ans);
+            const strippedAns = cleanTarget && cleanAns.startsWith(cleanTarget) ? cleanAns.replace(cleanTarget, '').trim() : cleanAns;
+            if (cleanU === cleanAns || strippedU === strippedAns || cleanU === strippedAns || strippedU === cleanAns) {
+              isCorrect = true;
+              break;
+            }
+          }
+        }
+
+        if (isCorrect) score++;
+
+        // Tô màu đúng/sai từng câu
+        const box = document.getElementById(`ft_gbox_${q.id}`);
+        const fb = document.getElementById(`ft_gfb_${q.id}`);
+        const inp = document.getElementById(`inp_ft_g_${q.id}`);
+
+        if (box) {
+          box.style.border = `2px solid ${isCorrect ? '#22C55E' : '#EF4444'}`;
+          box.style.background = isCorrect ? '#F0FDF4' : '#FEF2F2';
+        }
+        if (inp) {
+          inp.style.background = isCorrect ? '#DCFCE7' : '#FEE2E2';
+        }
+        if (fb) {
+          fb.style.display = 'block';
+          fb.style.background = isCorrect ? '#DCFCE7' : '#FEE2E2';
+          fb.style.color = isCorrect ? '#166534' : '#991B1B';
+          const expStr = q.type === 'choice' ? q.answer : (q.answers ? q.answers.join(' / ') : q.answer);
+          fb.innerHTML = `
+            <div>${isCorrect ? '✓ ĐÚNG' : '✗ CHƯA ĐÚNG'} — Đáp án chuẩn: <b>${expStr}</b></div>
+            ${q.explanation ? `<div style="font-size:12px; margin-top:3px; font-weight:600; color:#475569;">💡 ${q.explanation}</div>` : ''}
+          `;
+        }
+      });
+    });
+
+    // Hiển thị banner điểm
+    if (banner && scoreText) {
+      banner.style.display = 'block';
+      scoreText.innerHTML = `🎉 Điểm số của Em: ${score}/${total} câu đúng (${Math.round((score/total)*100)}%)`;
+      banner.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    // Nếu chọn chấm bằng AI Gemini
+    if (useAI && aiBox) {
+      aiBox.innerHTML = `⏳ <b>AI Gemini đang đọc toàn bộ 100 câu bài làm của Em để nhận xét chuyên sâu và định vị Band...</b>`;
+      const apiKey = getGeminiKey();
+
+      const studentSubmission = (this.grammarData.parts || []).flatMap(p => p.questions || []).map(q => {
+        const ans = this.userAnswers.grammar[q.id] || "(Chưa làm)";
+        return `Câu ${q.num}. ${q.prompt || ''} ➔ Trả lời: "${ans}"`;
+      }).join('\n');
+
+      const promptText = `
+Bạn là Chuyên gia Khảo thí Ngữ pháp IELTS. Hãy nhận xét bài làm 100 câu của học sinh. Xưng hô "Anh" và "Em".
+Điểm hiện tại: ${score}/${total}.
+BÀI LÀM:
+${studentSubmission}
+
+XUẤT BÁO CÁO NGẮN GỌN (DƯỚI 200 TỪ):
+1. Đánh giá sơ bộ trình độ ngữ pháp (tương đương Band IELTS nào).
+2. Chỉ ra 3 chuyên đề Em hay sai nhất (ví dụ: chia thì, bị động, câu điều kiện, mạo từ...).
+3. Lời dặn dò 1 câu cốt lõi nhất để Em bứt phá.
+`;
+
+      try {
+        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key=${apiKey}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ contents: [{ role: 'user', parts: [{ text: promptText }] }] })
+        });
+        const data = await res.json();
+        const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "Đã ghi nhận bài làm.";
+        aiBox.innerHTML = `<div style="white-space:pre-wrap; font-family:inherit;">${text}</div>`;
+      } catch (err) {
+        aiBox.innerHTML = `✅ Hệ thống đã chấm xong đối soát đáp án toàn bộ 100 câu!`;
+      }
+    }
+  }
+
+  resetGrammarSection() {
+    if (!confirm("Em có chắc muốn xóa sạch đáp án để làm lại từ đầu phần Ngữ pháp không?")) return;
+    this.userAnswers.grammar = {};
+    this.loadGrammar100();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  cleanText(str) {
+    if (!str) return "";
+    return String(str)
+      .normalize("NFKC")
+      .toLowerCase()
+      .replace(/[.,?!:;]+$/g, "")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
+  // =========================================================================
+  // 2. NẠP LISTENING 4 PARTS
+  // =========================================================================
   async loadCrossModuleListening() {
     const tNum = this.setNum;
     this.lisParts = [];
@@ -204,7 +361,6 @@ class DiagnosticFullTestEngine {
         qHtml += `<div style="background:#FAF7F2; border:1.5px solid #E8E2D8; border-radius:10px; padding:8px 12px; font-size:13px; font-weight:700; color:#475569; margin-bottom:12px;">${g.instructions}</div>`;
       }
 
-      // 1. Template điền bảng / Notes
       if (g.tableHtml || g.template) {
         let content = g.tableHtml || g.template;
         (g.questionIds || []).forEach(qId => {
@@ -216,8 +372,6 @@ class DiagnosticFullTestEngine {
           content = content.replace(new RegExp(`{{${qId}}}`, 'g'), inputHtml);
         });
         qHtml += `<div style="margin-bottom:16px; font-size:14px; line-height:1.8;">${content}</div>`;
-
-      // 2. Map Labelling
       } else if (g.type === 'map' || g.imageUrl) {
         const letters = ['A','B','C','D','E','F','G','H','I'].slice(0, g.optionsCount || 9);
         const imgPath = g.imageUrl?.startsWith('../') ? g.imageUrl : `../listening/${g.imageUrl}`;
@@ -252,8 +406,6 @@ class DiagnosticFullTestEngine {
             </table>
           </div>
         `;
-
-      // 3. Matching
       } else if (g.type === 'matching' && Array.isArray(g.options)) {
         qHtml += `
           <div style="display:flex; gap:16px; margin-bottom:16px; flex-wrap:wrap;">
@@ -286,8 +438,6 @@ class DiagnosticFullTestEngine {
             </div>
           </div>
         `;
-
-      // 4. Trắc nghiệm MCQ
       } else {
         (g.questionIds || []).forEach(qId => {
           const q = (part.questions || {})[qId];
@@ -326,7 +476,9 @@ class DiagnosticFullTestEngine {
     });
   }
 
-  // 3. READING ĐỦ 3 SET
+  // =========================================================================
+  // 3. NẠP READING 3 PASSAGES
+  // =========================================================================
   async loadCrossModuleReading() {
     const tNum = this.setNum;
     this.readPassages = [];
@@ -360,11 +512,7 @@ class DiagnosticFullTestEngine {
     if (!mount) return;
 
     if (this.readPassages.length === 0) {
-      mount.innerHTML = `
-        <div style="text-align:center; padding:30px; color:#DC2626; font-weight:800;">
-          ⚠️ Không tìm thấy file JSON Reading trong thư mục <code>data-diag/reading/</code>!
-        </div>
-      `;
+      mount.innerHTML = `<div style="text-align:center; padding:30px; color:#DC2626; font-weight:800;">⚠️ Không tìm thấy file JSON Reading!</div>`;
       return;
     }
 
@@ -582,14 +730,16 @@ class DiagnosticFullTestEngine {
     window.addEventListener('touchend', onMouseUp);
   }
 
+  // =========================================================================
   // 4. WRITING
+  // =========================================================================
   renderFullWriting() {
     const mount = document.getElementById('ftWritingMount');
     if (!mount) return;
 
     mount.innerHTML = `
       <div style="background:#FAF7F2; border:2.5px solid #BFDBFE; border-radius:18px; padding:20px; margin-bottom:24px;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:8px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:gap:8px;">
           <b style="font-size:16.5px; color:#1E40AF;">📊 TASK 1: BÁO CÁO BIỂU ĐỒ (TỐI THIỂU 150 TỪ)</b>
           <span style="font-size:12.5px; font-weight:800; background:#DBEAFE; color:#1E40AF; padding:4px 12px; border-radius:10px;">Khuyến nghị 20 phút</span>
         </div>
@@ -610,7 +760,7 @@ class DiagnosticFullTestEngine {
       </div>
 
       <div style="background:#FAF7F2; border:2.5px solid #DDD6FE; border-radius:18px; padding:20px;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:8px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:gap:8px;">
           <b style="font-size:16.5px; color:#7C3AED;">📝 TASK 2: BÀI LUẬN NGHỊ LUẬN (TỐI THIỂU 250 TỪ)</b>
           <span style="font-size:12.5px; font-weight:800; background:#EDE9FE; color:#6D28D9; padding:4px 12px; border-radius:10px;">Khuyến nghị 40 phút</span>
         </div>
@@ -620,7 +770,7 @@ class DiagnosticFullTestEngine {
               <b>Đề bài:</b> "The typical teaching situation between students and teachers in the classroom will be gone by the year 2050. To what extent do you agree or disagree?"
             </p>
             <div style="margin-top:14px; padding:10px; background:#F8FAFC; border-left:4px solid #7C3AED; border-radius:6px; font-size:12.5px; color:#475569;">
-              💡 <b>Gợi ý:</b> Trả lời đầy đủ câu hỏi, chia đoạn rõ ràng theo cấu trúc PEEL (Introduction - Body 1 - Body 2 - Conclusion).
+              💡 <b>Gợi ý:</b> Trả lời đầy đủ câu hỏi, chia đoạn rõ ràng theo cấu trúc PEEL.
             </div>
           </div>
           <div>
@@ -641,7 +791,9 @@ class DiagnosticFullTestEngine {
     if (areaId === 'ft_writing_task2') this.userAnswers.writing.task2 = val;
   }
 
+  // =========================================================================
   // 5. SPEAKING
+  // =========================================================================
   renderFullSpeaking() {
     const mount = document.getElementById('ftSpeakingMount');
     if (!mount) return;
@@ -676,7 +828,6 @@ class DiagnosticFullTestEngine {
     `;
   }
 
-  // 6. TIỆN ÍCH LƯU ĐÁP ÁN & ĐIỀU HƯỚNG
   recordAnswer(skill, qId, val) {
     if (this.userAnswers[skill]) {
       this.userAnswers[skill][qId] = String(val).trim();
@@ -750,7 +901,9 @@ class DiagnosticFullTestEngine {
     }
   }
 
-  // 7. CHẤM ĐIỂM TỔNG HỢP (OVERALL BAND SCORE)
+  // =========================================================================
+  // 7. CHẤM TOÀN BỘ BÀI THI TỔNG HỢP (SUBMIT ALL)
+  // =========================================================================
   async submitFullMockTest() {
     if (!confirm("Em có chắc chắn muốn nộp toàn bộ bài Full Mock Test để xuất Overall Band Score?")) return;
 
@@ -762,22 +915,32 @@ class DiagnosticFullTestEngine {
 
     clearInterval(this.timerInterval);
 
-    // Chấm Ngữ pháp
     let gScore = 0;
     let gTotal = 0;
     (this.grammarData?.parts || []).forEach(part => {
       (part.questions || []).forEach(q => {
         gTotal++;
+        const u = (this.userAnswers.grammar[q.id] || '').trim();
         if (q.type === 'choice') {
-          if ((this.userAnswers.grammar[q.id] || '').toUpperCase() === (q.answer || '').toUpperCase()) gScore++;
-        } else if (q.type === 'blank' || q.type === 'rewrite') {
-          const u = (this.userAnswers.grammar[q.id] || '').toLowerCase().trim();
-          if (q.answers && q.answers.map(a => a.toLowerCase().trim()).includes(u)) gScore++;
+          if (u.toUpperCase() === (q.answer || '').toUpperCase()) gScore++;
+        } else {
+          const answersList = q.answers || (q.answer ? [q.answer] : []);
+          const cleanU = this.cleanText(u);
+          const cleanTarget = q.targetStart ? this.cleanText(q.targetStart) : "";
+          const strippedU = cleanTarget && cleanU.startsWith(cleanTarget) ? cleanU.replace(cleanTarget, '').trim() : cleanU;
+
+          for (const ans of answersList) {
+            const cleanAns = this.cleanText(ans);
+            const strippedAns = cleanTarget && cleanAns.startsWith(cleanTarget) ? cleanAns.replace(cleanTarget, '').trim() : cleanAns;
+            if (cleanU === cleanAns || strippedU === strippedAns || cleanU === strippedAns || strippedU === cleanAns) {
+              gScore++;
+              break;
+            }
+          }
         }
       });
     });
 
-    // Chấm Listening (40 câu)
     let lCorrect = 0;
     this.lisParts.forEach(p => {
       Object.entries(p.answers || {}).forEach(([qid, exp]) => {
@@ -791,7 +954,6 @@ class DiagnosticFullTestEngine {
     });
     const lisBand = parseFloat(this.calculateBandScore(lCorrect, 40));
 
-    // Chấm Reading (40 câu)
     let rCorrect = 0;
     this.readPassages.forEach(p => {
       const expAnswers = p.answers || {};
@@ -814,17 +976,14 @@ class DiagnosticFullTestEngine {
     });
     const readBand = parseFloat(this.calculateBandScore(rCorrect, 40));
 
-    // Writing & Speaking
     const wt1Len = (document.getElementById('ft_writing_task1')?.value || '').trim().split(/\s+/).filter(Boolean).length;
     const wt2Len = (document.getElementById('ft_writing_task2')?.value || '').trim().split(/\s+/).filter(Boolean).length;
     const writeBand = (wt1Len >= 120 && wt2Len >= 200) ? 6.5 : (wt1Len >= 80 ? 5.5 : 4.5);
     const spkBand = 5.5;
 
-    // Overall Band
     const rawOverall = (lisBand + readBand + writeBand + spkBand) / 4;
     const overallBand = (Math.round(rawOverall * 2) / 2).toFixed(1);
 
-    // Xuất kết quả
     document.querySelector('.fulltest-container').innerHTML = `
       <div style="background:#FFFFFF; border:3px solid #E8E2D8; border-bottom:7px solid #D3CBC0; border-radius:24px; padding:36px; max-width:850px; margin:30px auto; text-align:center;">
         <div style="font-size:48px; margin-bottom:10px;">🏆</div>
