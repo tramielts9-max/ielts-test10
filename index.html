@@ -14,6 +14,7 @@
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/components.css">
   <link rel="stylesheet" href="curriculum-system/style-system.css">
+  <link rel="stylesheet" href="css/calendar.css">
 
   <style>
     /* ===================================================
@@ -286,11 +287,13 @@
 
     <!-- VIEW ADMIN -->
     <div id="adminPanelSection" class="admin-panel" style="display: none;">
-      <div style="display: flex; gap: 10px; margin-bottom: 16px; border-bottom: 2px solid var(--duo-border); padding-bottom: 12px;">
+      <div style="display: flex; gap: 10px; margin-bottom: 16px; border-bottom: 2px solid var(--duo-border); padding-bottom: 12px; flex-wrap: wrap;">
         <button type="button" class="admin-tab-btn active" id="btnAdminTabStudents" onclick="switchAdminTab('students')">👥 Danh Sách Học Sinh</button>
+        <button type="button" class="admin-tab-btn" id="btnAdminTabCalendar" onclick="switchAdminTab('calendar')">📅 Lịch Dạy & Học (Google Calendar)</button>
         <button type="button" class="admin-tab-btn" id="btnAdminTabModules" onclick="switchAdminTab('modules')">⚙️ Bật / Tắt Phân Hệ</button>
       </div>
 
+      <!-- TAB 1: DANH SÁCH HỌC SINH -->
       <div id="adminTabContentStudents">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 10px;">
           <div>
@@ -304,6 +307,12 @@
         </div>
       </div>
 
+      <!-- TAB 2: LỊCH DẠY & HỌC GOOGLE CALENDAR -->
+      <div id="adminTabContentCalendar" style="display: none;">
+        <div id="adminCalendarMountPoint"></div>
+      </div>
+
+      <!-- TAB 3: BẬT / TẮT PHÂN HỆ -->
       <div id="adminTabContentModules" style="display: none;">
         <h4 style="margin: 0 0 12px 0; font-size: 16px; font-weight: 900;">⚙️ Quản lý trạng thái phân hệ học tập:</h4>
         <div id="adminModuleToggleList" style="display: flex; flex-direction: column; gap: 10px;"></div>
@@ -332,7 +341,7 @@
         </a>
       </div>
 
-      <!-- BANNER 2: TRUNG TÂM LUYỆN NGHE PHIM ẢNH & YOUTUBE IMMERSION (MỚI) -->
+      <!-- BANNER 2: TRUNG TÂM LUYỆN NGHE PHIM ẢNH & YOUTUBE IMMERSION -->
       <div style="background: linear-gradient(135deg, #141414 0%, #1E1B18 50%, #8B1518 100%); border-radius: 20px; padding: 18px 22px; margin-bottom: 22px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; box-shadow: 0 4px 0 #5E0C0E; color: white;">
         <div>
           <div style="display: flex; align-items: center; gap: 8px;">
@@ -354,7 +363,7 @@
       <!-- 1. KHỐI LỘ TRÌNH TỰ ĐỘNG CỦA HỆ THỐNG -->
       <div id="roadmapSectionMount"></div>
 
-      <!-- 2. KHUNG BÀI TẬP ĐÃ LÀM HÔM NAY & LỊCH CHUYÊN CẦN -->
+      <!-- 2. KHUNG BÀI TẬP ĐÃ LÀM HÔM NAY & LỊCH CHUYÊN CẦN (KÈM LỊCH HỌC) -->
       <div class="history-section">
         <div class="history-header-bar">
           <h3>
@@ -548,7 +557,6 @@
       </div>
     </div>
 
-    <!-- ẢNH DANH THIẾP QR ZALO CỦA BẠN (assets/zalo-qr.png) -->
     <div style="margin-bottom:16px;">
       <div style="font-size:12.5px; font-weight:800; color:#334155; margin-bottom:8px;">Quét mã QR Zalo Thầy Phúc để kích hoạt:</div>
       <img src="assets/zalo-qr.png" onerror="this.onerror=null; this.src='zalo-qr.png';" alt="QR Zalo Đinh Nguyên Phúc" style="width:170px; height:170px; border-radius:14px; border:2px solid #E8E2D8; object-fit:cover; margin:0 auto; display:block;">
@@ -592,6 +600,7 @@
   import { CONFIG } from './js/config.js';
   import { stateManager } from './js/state.js';
   import { curriculumUI } from './curriculum-system/ui-system.js';
+  import { adminCalendar } from './js/calendar-system.js';
 
   let rawAdminAttempts = [];
   let studentsMap = {};
@@ -610,7 +619,7 @@
 
   const currentStudentId = getOrCreateStudentId();
 
-function isStudentUnlocked() {
+  function isStudentUnlocked() {
     const user = stateManager.getUser();
     if (checkIsAdmin(user.email)) return true;
     return localStorage.getItem('tram_access_status') === 'active';
@@ -675,12 +684,10 @@ function isStudentUnlocked() {
       return;
     }
 
-    // 1. Cập nhật trên máy hiện tại nếu trùng mã
     if (code === currentStudentId) {
       localStorage.setItem('tram_access_status', status);
     }
 
-    // 2. Gửi lệnh duyệt từ xa lên Google Drive
     if (CONFIG.DRIVE_STORAGE_URL) {
       try {
         await fetch(CONFIG.DRIVE_STORAGE_URL, {
@@ -695,7 +702,7 @@ function isStudentUnlocked() {
     location.reload();
   };
 
-  // 2. ĐIỀU HƯỚNG NÚT "XEM LẠI" (HỖ TRỢ TOÀN BỘ PHÂN HỆ VÀ DIAGNOSTIC)
+  // 2. ĐIỀU HƯỚNG NÚT "XEM LẠI"
   function resolveReviewPageUrl(pageUrl, attemptId = '', email = '') {
     if (!pageUrl) return `reading/runner-reading.html?attemptId=${attemptId}&email=${encodeURIComponent(email)}`;
 
@@ -783,8 +790,8 @@ function isStudentUnlocked() {
     }
   }
 
-function bindModuleGateInterceptors() {
-    // ĐÃ GỠ KHÓA BANNER: Cho phép học sinh bấm vào xem nội dung bài học thoải mái
+  function bindModuleGateInterceptors() {
+    // Cho phép học sinh bấm vào xem nội dung bài học thoải mái
   }
 
   window.switchMainView = (view) => {
@@ -810,20 +817,34 @@ function bindModuleGateInterceptors() {
   window.switchAdminTab = (tab) => {
     const tabStudents = document.getElementById('adminTabContentStudents');
     const tabModules = document.getElementById('adminTabContentModules');
+    const tabCalendar = document.getElementById('adminTabContentCalendar');
     const btnS = document.getElementById('btnAdminTabStudents');
     const btnM = document.getElementById('btnAdminTabModules');
+    const btnC = document.getElementById('btnAdminTabCalendar');
 
     if (tab === 'modules') {
-      tabStudents.style.display = 'none';
-      tabModules.style.display = 'block';
-      btnM.classList.add('active');
-      btnS.classList.remove('active');
+      if (tabStudents) tabStudents.style.display = 'none';
+      if (tabModules) tabModules.style.display = 'block';
+      if (tabCalendar) tabCalendar.style.display = 'none';
+      if (btnM) btnM.classList.add('active');
+      if (btnS) btnS.classList.remove('active');
+      if (btnC) btnC.classList.remove('active');
       renderAdminModuleToggles();
+    } else if (tab === 'calendar') {
+      if (tabStudents) tabStudents.style.display = 'none';
+      if (tabModules) tabModules.style.display = 'none';
+      if (tabCalendar) tabCalendar.style.display = 'block';
+      if (btnC) btnC.classList.add('active');
+      if (btnS) btnS.classList.remove('active');
+      if (btnM) btnM.classList.remove('active');
+      adminCalendar.init('adminCalendarMountPoint');
     } else {
-      tabStudents.style.display = 'block';
-      tabModules.style.display = 'none';
-      btnS.classList.add('active');
-      btnM.classList.remove('active');
+      if (tabStudents) tabStudents.style.display = 'block';
+      if (tabModules) tabModules.style.display = 'none';
+      if (tabCalendar) tabCalendar.style.display = 'none';
+      if (btnS) btnS.classList.add('active');
+      if (btnM) btnM.classList.remove('active');
+      if (btnC) btnC.classList.remove('active');
     }
   };
 
