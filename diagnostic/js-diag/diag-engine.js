@@ -1,7 +1,11 @@
 /**
  * diagnostic/js-diag/diag-engine.js
  * BỘ MÁY ĐIỀU PHỐI KHẢO THÍ CHẨN ĐOÁN THÍCH ỨNG MASTER (TEST 1, 2, 3 & 3 SET XOAY TUA)
- * BẢN FULL ĐẦY ĐỦ 100% - ĐIỀU PHỐI ĐỒNG BỘ CẢ 4 BỘ MÁY: GRAMMAR, LISTENING, READING, WRITING
+ * BẢN FULL ĐẦY ĐỦ 100% - KHÔNG CẮT BỚT BẤT KỲ TÍNH NĂNG NÀO
+ * - ĐIỀU PHỐI ĐỒNG BỘ CẢ 4 BỘ MÁY: GRAMMAR, LISTENING, READING, WRITING
+ * - TÍCH HỢP AI GEMINI CHẤM WRITING & SPEAKING
+ * - BẢNG BÁO CÁO DASHBOARD MỔ XẺ TỪNG CÂU SAI VÀ LỖ HỔNG KIẾN THỨC
+ * - CHẾ ĐỘ XEM LẠI REVIEW MODE TỪ LỊCH SỬ VÀ ĐỒNG BỘ CLOUD GOOGLE SHEETS
  */
 
 import { diagGrammarEngine } from './diag-grammar.js';
@@ -10,7 +14,7 @@ import { diagReadingEngine } from './diag-reading.js';
 import { diagWritingEngine } from './diag-writing.js';
 
 // =========================================================================
-// 1. MÃ HÓA 3 API KEY RIÊNG BIỆT (BẢO MẬT CHỐNG F12)
+// 1. MÃ HÓA CÁC API KEY BẢO MẬT
 // =========================================================================
 const _READING_SEEDS = [
   65, 81, 46, 65, 98, 56, 82, 78, 54, 74, 111, 118, 45, 99, 119, 83,
@@ -35,7 +39,7 @@ function getSpeakingKey() { return _SPEAKING_SEEDS.map(c => String.fromCharCode(
 const CLOUD_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyNErQQFdciAQM0k9KUrACtpX7rxKkopjChYAC2Ubwj5MGzFOeekDEGs8C1n7P9cNR6vg/exec";
 
 // =========================================================================
-// 2. METADATA VÀ CẤU HÌNH THỜI LƯỢNG CHO TỪNG BÀI TEST
+// 2. METADATA VÀ CẤU HÌNH BÀI THI
 // =========================================================================
 const DIAGNOSTIC_META = {
   test_01: { title: "TEST 1: KHẢO SÁT NỀN TẢNG (45 PHÚT)", targetBand: "0 - 5.0" },
@@ -65,7 +69,7 @@ class DiagnosticEngineMaster {
     this.testId = urlParams.get('testId') || 'test_01';
     
     const rawSet = parseInt(urlParams.get('set') || urlParams.get('ver'), 10);
-    this.setNum = (!isNaN(rawSet) && rawSet >= 1 && rawSet <= 3) ? rawSet : Math.floor(Math.random() * 3) + 1;
+    this.setNum = (!isNaN(rawSet) && rawSet >= 1 && rawSet <= 3) ? rawSet : 1;
 
     const meta = DIAGNOSTIC_META[this.testId] || DIAGNOSTIC_META.test_01;
     const titleEl = document.getElementById('currentTestTitle');
@@ -73,30 +77,30 @@ class DiagnosticEngineMaster {
       titleEl.innerText = `${meta.title} • Set ${this.setNum}`;
     }
 
-    // 1. NẠP ĐỀ NGỮ PHÁP TỪ FILE JSON RIÊNG BIỆT (MỚI)
+    // 1. Nạp Ngữ pháp
     await this.initGrammarFromJson();
 
-    // 2. NẠP ĐỀ LISTENING TỪ FILE JSON RIÊNG BIỆT
+    // 2. Nạp Listening (cho tất cả các test, không bị chặn)
     await this.initListeningFromJson();
 
-    // 3. NẠP ĐỀ READING TỪ FILE JSON RIÊNG BIỆT
+    // 3. Nạp Reading
     await this.initReadingFromJson();
 
-    // 4. NẠP ĐỀ WRITING TỪ FILE JSON RIÊNG BIỆT
+    // 4. Nạp Writing
     await this.initWritingFromJson();
 
     // 5. Khởi tạo Speaking, Mic & Timer
     this.initSpeechRecognition();
     this.startTimer();
 
-    // 6. Kiểm tra Review Mode nếu có attemptId
+    // 6. Khôi phục Review Mode nếu có attemptId trên URL
     const attemptId = urlParams.get('attemptId');
     if (attemptId) {
       this.restoreReviewMode(attemptId);
     }
   }
 
-  // --- NẠP NGỮ PHÁP TỪ FILE JSON QUA DIAG-GRAMMAR.JS ---
+  // --- NẠP NGỮ PHÁP QUA DIAG-GRAMMAR.JS ---
   async initGrammarFromJson() {
     const testNum = this.testId.replace('test_0', '').replace('test_', '');
     const jsonPath = `data-diag/grammar/test${testNum}-grammar.json`;
@@ -107,20 +111,18 @@ class DiagnosticEngineMaster {
     }
   }
 
-  // --- NẠP LISTENING TỪ FILE JSON QUA DIAG-LISTENING.JS ---
+  // --- NẠP LISTENING QUA DIAG-LISTENING.JS (KHÔNG BỊ CHẶN TEST 1) ---
   async initListeningFromJson() {
     const testNum = this.testId.replace('test_0', '').replace('test_', '');
-    if (this.testId === 'test_02' || this.testId === 'test_03') {
-      const jsonPath = `data-diag/listening/test${testNum}-listening-s${this.setNum}.json`;
-      console.log(`[DiagEngine] Đang nạp Listening JSON: ${jsonPath}`);
-      const success = await diagListeningEngine.loadTestFromJson(jsonPath);
-      if (success) {
-        diagListeningEngine.render();
-      }
+    const jsonPath = `data-diag/listening/test${testNum}-listening-s${this.setNum}.json`;
+    console.log(`[DiagEngine] Đang nạp Listening JSON: ${jsonPath}`);
+    const success = await diagListeningEngine.loadTestFromJson(jsonPath);
+    if (success) {
+      diagListeningEngine.render();
     }
   }
 
-  // --- NẠP READING TỪ FILE JSON QUA DIAG-READING.JS ---
+  // --- NẠP READING QUA DIAG-READING.JS ---
   async initReadingFromJson() {
     const testNum = this.testId.replace('test_0', '').replace('test_', '');
     const jsonPath = `data-diag/reading/test${testNum}-reading-s${this.setNum}.json`;
@@ -131,7 +133,7 @@ class DiagnosticEngineMaster {
     }
   }
 
-  // --- NẠP WRITING TỪ FILE JSON QUA DIAG-WRITING.JS ---
+  // --- NẠP WRITING QUA DIAG-WRITING.JS ---
   async initWritingFromJson() {
     const testNum = this.testId.replace('test_0', '').replace('test_', '');
     const jsonPath = `data-diag/writing/test${testNum}-writing-s${this.setNum}.json`;
@@ -179,7 +181,7 @@ class DiagnosticEngineMaster {
 
   toggleSpeech(targetAreaId, btnId) {
     if (!this.speechRecognition) {
-      alert("⚠️ Trình duyệt của em chưa hỗ trợ Web Speech. Em hãy gõ trực tiếp câu trả lời vào ô nhé!");
+      alert("⚠️ Trình duyệt chưa hỗ trợ Web Speech. Em hãy gõ trực tiếp câu trả lời vào ô nhé!");
       return;
     }
     const btn = document.getElementById(btnId);
@@ -206,7 +208,7 @@ class DiagnosticEngineMaster {
   }
 
   // =========================================================================
-  // 4. CHẤM BÀI TOÀN DIỆN QUA 4 ENGINE & XUẤT DASHBOARD
+  // 4. CHẤM BÀI TOÀN DIỆN QUA CÁC ENGINE & TÍCH HỢP AI GEMINI
   // =========================================================================
   async submitFullExam() {
     if (!confirm("Em có chắc chắn muốn nộp bài thi để hệ thống phân tích phản xạ, đối soát câu chữ và chấm điểm AI không?")) {
@@ -230,8 +232,8 @@ class DiagnosticEngineMaster {
     // 3. Chấm Reading qua DiagReadingEngine
     const readingResult = diagReadingEngine.evaluate();
 
-    // 4. Lấy bài Writing qua DiagWritingEngine và gọi AI chấm
-    const writingSubData = diagWritingEngine.getWritingSubmissionData();
+    // 4. Lấy bài Writing và gọi AI Gemini chấm
+    const writingSubData = diagWritingEngine.getWritingSubmissionData ? diagWritingEngine.getWritingSubmissionData() : {};
     const wt1Text = writingSubData.task1Text || '';
     const wt2Text = writingSubData.task2Text || '';
 
@@ -337,7 +339,7 @@ class DiagnosticEngineMaster {
       body: JSON.stringify({ action: "save_attempt", attempt: attemptSnapshot })
     }).catch(() => {});
 
-    // 7. Hiển thị Dashboard
+    // 7. Hiển thị Dashboard phân tích chi tiết
     this.renderComprehensiveDashboard(attemptSnapshot);
   }
 
@@ -351,7 +353,9 @@ class DiagnosticEngineMaster {
     return d.candidates?.[0]?.content?.parts?.[0]?.text || "Đã ghi nhận bài làm.";
   }
 
-  // --- RENDER BẢNG BÁO CÁO DASHBOARD ---
+  // =========================================================================
+  // 5. RENDER BẢNG BÁO CÁO DASHBOARD PHÂN TÍCH LỖI SAI (KHÔI PHỤC 100%)
+  // =========================================================================
   renderComprehensiveDashboard(attempt) {
     const d = attempt.details;
     let wrongQuestionsHtml = '';
@@ -476,7 +480,9 @@ class DiagnosticEngineMaster {
     `;
   }
 
-  // --- REVIEW MODE: KHÔI PHỤC VÀ TÔ MÀU ĐÚNG SAI QUA CÁC ENGINE ---
+  // =========================================================================
+  // 6. REVIEW MODE: KHÔI PHỤC VÀ TÔ MÀU ĐÚNG SAI QUA CÁC ENGINE
+  // =========================================================================
   restoreReviewMode(attemptId) {
     this.isReviewMode = true;
     try {
@@ -501,12 +507,10 @@ class DiagnosticEngineMaster {
       }
 
       // 2. Khôi phục bài nghe qua DiagListeningEngine
-      if (this.testId === 'test_02' || this.testId === 'test_03') {
-        diagListeningEngine.renderReviewMode({
-          answersSnapshot: d.listeningSnapshot || {},
-          details: d.lDetails || []
-        });
-      }
+      diagListeningEngine.renderReviewMode({
+        answersSnapshot: d.listeningSnapshot || {},
+        details: d.lDetails || []
+      });
 
       // 3. Tô màu Reading qua DiagReadingEngine
       if (d.rDetails) {
