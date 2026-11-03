@@ -1,11 +1,7 @@
 /**
  * diagnostic/js-diag/diag-listening.js
- * BỘ ĐIỀU KHIỂN LISTENING KHẢO THÍ CHUYÊN BIỆT (TEST 1, 2, 3 & 3 SET XOAY TUA)
- * BẢN FULL ĐẦY ĐỦ 100% - KHÔNG CẮT BỚT BẤT KỲ TÍNH NĂNG NÀO
- * - TỰ ĐỘNG THÍCH ỨNG: NẠP FILE GỘP TEST2/3 HOẶC NẠP LIÊN HOÀN FILE RỜI P1, P2, P3, P4
- * - HỖ TRỢ ĐỦ 4 DẠNG: ĐIỀN BẢNG CÓ NÚT TUA GIÂY TỪNG CÂU, MAP LABELLING, MATCHING 2 CỘT CÓ ANSWER BANK, MCQ
- * - AUDIO CONTROLLER TỰ NHẢY STARTTIME THEO PART
- * - REVIEW MODE TÍCH HỢP TRANSCRIPT CLICK-TO-SEEK & GIẢI THÍCH CHI TIẾT
+ * BỘ ĐIỀU KHIỂN LISTENING KHẢO THÍ CHUYÊN BIỆT (TEST 1, 2, 3 & 3 SET)
+ * BẢN FULL ĐẦY ĐỦ 100% - BẢO TOÀN TẤT CẢ TÍNH NĂNG GỐC + HIGHLIGHT KHÔNG GIỚI HẠN
  */
 
 export class DiagListeningEngine {
@@ -20,15 +16,14 @@ export class DiagListeningEngine {
     this.audioUrl = "";
     this.activePartIndex = 0;
 
-    // Bộ nhớ lưu đáp án học sinh: { [qId]: "A" | "text" }
+    // Bộ nhớ đáp án: { [qId]: "A" | "text" }
     this.userAnswers = {};
-    // Bộ đo phản xạ Telemetry
     this.metrics = {};
     this.isReviewMode = false;
   }
 
   // =========================================================================
-  // 1. NẠP DỮ LIỆU ĐA TẦNG (HỖ TRỢ CẢ FILE GỘP CŨ VÀ FILE CAM 21 MỚI)
+  // 1. NẠP DỮ LIỆU ĐA TẦNG (TEST 1 DÙNG 3 FILE GỐC, TEST 2 & 3 CHUẨN CAM)
   // =========================================================================
   async loadTestFromJson(jsonUrl) {
     const urlParams = new URLSearchParams(window.location.search);
@@ -41,13 +36,34 @@ export class DiagListeningEngine {
     this.metrics = {};
     this.isReviewMode = false;
 
-    // A. THỬ NẠP FILE TRỰC TIẾP TỪ ĐƯỜNG DẪN TRUYỀN VÀO (FILE GỘP test2-listening-s1.json)
+    // A. NẾU LÀ TEST 1: NẠP ĐÚNG FILE GỐC test1-listening-s1/s2/s3.json
+    if (this.testId === 'test_01') {
+      const t1Urls = [
+        `data-diag/listening/test1-listening-s${this.setNum}.json`,
+        jsonUrl
+      ];
+      for (const u of t1Urls) {
+        try {
+          const res = await fetch(`${u}?t=${Date.now()}`);
+          if (res.ok) {
+            const data = await res.json();
+            if (Array.isArray(data.parts)) {
+              this.parts = data.parts;
+              this.audioUrl = data.parts[0]?.audioUrl || "";
+              return true;
+            }
+          }
+        } catch (e) {}
+      }
+    }
+
+    // B. THỬ NẠP FILE TỪ jsonUrl (FILE GỘP CŨ test2-listening-s*.json HOẶC test3)
     try {
       const res = await fetch(`${jsonUrl}?t=${Date.now()}`);
       if (res.ok) {
         const data = await res.json();
         if (Array.isArray(data.parts) && data.parts.length > 0) {
-          this.audioUrl = data.audioUrl || "";
+          this.audioUrl = data.audioUrl || data.parts[0]?.audioUrl || "";
           this.parts = data.parts;
           this.parts.forEach(p => {
             if (!p.audioUrl && this.audioUrl) p.audioUrl = this.audioUrl;
@@ -62,37 +78,28 @@ export class DiagListeningEngine {
       }
     } catch (e) {}
 
-    // B. NẾU KHÔNG CÓ FILE GỘP, TỰ TÌM CÁC FILE RỜI CAM 21 THEO TỪNG TEST
-    // • Test 1: Khảo sát nền tảng -> Part 1
-    // • Test 2: Nửa đầu đề thi -> Part 1 & Part 2
-    // • Test 3: Nửa sau đề thi -> Part 3 & Part 4
-    let partsToLoad = [1];
-    if (this.testId === 'test_02') partsToLoad = [1, 2];
+    // C. NẾU LÀ CÁC FILE RỜI CAM 21 (cam21-lis-test*-p*.json)
+    let partsToLoad = [1, 2];
     if (this.testId === 'test_03') partsToLoad = [3, 4];
 
     for (const pNum of partsToLoad) {
       const tryUrls = [
         `data-diag/listening/cam21-lis-test${this.setNum}-p${pNum}.json`,
         `../listening/data-l/cam21-lis-test${this.setNum}/cam21-lis-test${this.setNum}-p${pNum}.json`,
-        `data-diag/listening/cam21-test${this.setNum}-p${pNum}.json`,
-        `data-diag/listening/test${this.testId.replace('test_0','')}-listening-s${this.setNum}.json`
+        `data-diag/listening/cam21-test${this.setNum}-p${pNum}.json`
       ];
 
-      let partData = null;
       for (const u of tryUrls) {
         try {
           const res = await fetch(`${u}?t=${Date.now()}`);
           if (res.ok) {
-            partData = await res.json();
+            const partData = await res.json();
+            partData.partNum = partData.partNum || pNum;
+            if (!this.audioUrl && partData.audioUrl) this.audioUrl = partData.audioUrl;
+            this.parts.push(partData);
             break;
           }
         } catch (e) {}
-      }
-
-      if (partData) {
-        partData.partNum = partData.partNum || pNum;
-        if (!this.audioUrl && partData.audioUrl) this.audioUrl = partData.audioUrl;
-        this.parts.push(partData);
       }
     }
 
@@ -110,7 +117,7 @@ export class DiagListeningEngine {
       mount.innerHTML = `
         <div style="background:#EFF6FF; border:2px solid #BFDBFE; border-radius:16px; padding:24px; text-align:center;">
           <h4 style="color:#0369A1; margin:0 0 8px 0; font-size:16px;">🎧 PHẦN KHẢO SÁT LISTENING</h4>
-          <p style="color:#475569; font-size:13.5px; margin:0 0 16px 0;">Đang chuẩn bị file âm thanh. Em có thể bấm tiếp tục sang phần thi Reading bên dưới.</p>
+          <p style="color:#475569; font-size:13.5px; margin:0 0 16px 0;">Em có thể kiểm tra file âm thanh hoặc bấm tiếp tục sang bài Reading.</p>
           <button type="button" onclick="window.switchSkillSection('reading')" class="btn-3d btn-3d-blue">
             Tiếp tục sang phần Reading &rarr;
           </button>
@@ -119,7 +126,7 @@ export class DiagListeningEngine {
       return;
     }
 
-    // Gán file âm thanh chung vào Audio Player
+    // Nạp link âm thanh của Part đầu tiên
     const audioEl = document.getElementById(this.audioElementId);
     const firstAudio = this.parts[0]?.audioUrl || this.audioUrl;
     if (audioEl && firstAudio) {
@@ -154,7 +161,7 @@ export class DiagListeningEngine {
       ${tabsHtml}
       <div id="activePartContainer"></div>
 
-      <!-- KHUNG BĂNG KÝ ÂM TRANSCRIPT (TỰ ĐỘNG BẬT KHI NỘP BÀI) -->
+      <!-- KHUNG BĂNG KÝ ÂM TRANSCRIPT (HIỆN KHI REVIEW MODE) -->
       <div id="listeningTranscriptContainer" style="display:none; margin-top:24px; background:#FFFFFF; border:2px solid #BAE6FD; border-left:6px solid #0284C7; border-radius:16px; padding:20px 24px; max-height:480px; overflow-y:auto; line-height:1.8; font-size:14px;">
         <h4 style="margin:0 0 10px 0; color:#0284C7; font-size:16px; font-weight:900;">
           📜 BĂNG KÝ ÂM TRANSCRIPT (BẤM VÀO TỪNG CÂU ĐỂ TUA AUDIO ĐẾN ĐÚNG ĐOẠN ĐÓ):
@@ -164,10 +171,11 @@ export class DiagListeningEngine {
     `;
 
     this.switchPart(0, false);
+    this.initTextHighlighter(mount);
   }
 
   // =========================================================================
-  // 3. CHUYỂN PART & TỰ ĐỘNG TUA AUDIO (SEEK TO STARTTIME)
+  // 3. CHUYỂN PART & TỰ ĐỘNG TUA / ĐỔI LINK AUDIO
   // =========================================================================
   switchPart(partIndex, shouldSeekAndPlay = true) {
     if (!this.parts[partIndex]) return;
@@ -175,15 +183,11 @@ export class DiagListeningEngine {
     this.activePartIndex = partIndex;
     const part = this.parts[partIndex];
 
-    // Cập nhật trạng thái Active trên nút Sub-tab
     this.parts.forEach((_, idx) => {
       const btn = document.getElementById(`btnPartTab_${idx}`);
-      if (btn) {
-        btn.className = `btn-3d ${idx === partIndex ? 'btn-3d-blue' : 'btn-3d-white'}`;
-      }
+      if (btn) btn.className = `btn-3d ${idx === partIndex ? 'btn-3d-blue' : 'btn-3d-white'}`;
     });
 
-    // Cập nhật tiêu đề audio và thời gian bắt đầu
     const audioEl = document.getElementById(this.audioElementId);
     const labelEl = document.getElementById(this.audioLabelId);
     if (labelEl) {
@@ -191,16 +195,15 @@ export class DiagListeningEngine {
       labelEl.innerText = `${part.title || `Part ${part.partNum || partIndex + 1}`}${timeStr}`;
     }
 
-    // Đổi file âm thanh nếu từng part dùng file mp3 riêng
+    // Đổi link âm thanh nếu Part đó dùng file MP3 riêng biệt (như ở Test 1)
     if (audioEl && part.audioUrl && audioEl.src !== part.audioUrl) {
       audioEl.src = part.audioUrl;
     }
 
-    // Nhảy mốc giây audio
+    // Nhảy mốc giây nếu dùng chung 1 file MP3 dài (như ở Test 2, 3, 4)
     if (audioEl && shouldSeekAndPlay) {
       let seekTarget = part.startTime;
       if (seekTarget === undefined) {
-        // Tự tìm mốc giây từ câu hỏi đầu tiên
         const firstQId = (part.groups?.[0]?.questionIds || [])[0];
         if (firstQId && part.questions?.[firstQId]?.time) {
           seekTarget = Math.max(0, part.questions[firstQId].time - 20);
@@ -212,17 +215,15 @@ export class DiagListeningEngine {
       }
     }
 
-    // Render nội dung câu hỏi
     const container = document.getElementById('activePartContainer');
     if (container) {
       container.innerHTML = this.buildPartQuestionsHtml(part);
       this.restoreUserInputsUI(part);
     }
 
-    // Nạp Transcript nếu đang ở Review Mode
     const tMount = document.getElementById('transcriptLinesMount');
-    if (tMount) {
-      tMount.innerHTML = part.transcriptHtml || 'Bản ký âm transcript chưa sẵn sàng.';
+    if (tMount && part.transcriptHtml) {
+      tMount.innerHTML = part.transcriptHtml;
       this.bindTranscriptClickEvents();
     }
   }
@@ -241,13 +242,38 @@ export class DiagListeningEngine {
       </div>
     `;
 
+    // TRƯỜNG HỢP A: ĐỀ TEST 1 CỦA MÀY (CÂU HỎI NẰM DẠNG DICTIONARY part.questions)
+    if (part.questions && !part.groups) {
+      Object.entries(part.questions).forEach(([qId, q]) => {
+        html += `
+          <div class="q-item-box" id="box_${qId}" style="background:#FAF7F2; border:2px solid #E8E2D8; border-radius:16px; padding:18px; margin-bottom:14px;">
+            <b style="font-size:14.5px; color:#1E293B; display:block; margin-bottom:10px;">${q.q || q.text || `Câu ${q.num}`}</b>
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:8px;">
+              ${(q.options || []).map(opt => {
+                const letter = opt.charAt(0);
+                return `
+                  <label class="option-label" onclick="window.diagListeningEngine.recordAnswer('${qId}', '${letter}')">
+                    <input type="radio" name="ans_${qId}" value="${letter}">
+                    <span>${opt}</span>
+                  </label>
+                `;
+              }).join('')}
+            </div>
+            <div id="fb_${qId}" style="display:none; font-size:12.5px; font-weight:800; margin-top:8px; padding:6px 10px; border-radius:8px;"></div>
+          </div>
+        `;
+      });
+      return html;
+    }
+
+    // TRƯỜNG HỢP B: ĐỀ CAMBRIDGE 21 (CÓ GROUPS, TEMPLATES, MAP, MATCHING)
     (part.groups || []).forEach(group => {
       html += `<div style="font-size:15px; font-weight:900; color:#1E293B; margin:16px 0 6px 0;">${group.title || ''}</div>`;
       if (group.instructions) {
         html += `<div style="background:#FAF7F2; border:1.5px solid #E8E2D8; border-radius:10px; padding:8px 12px; font-size:13px; font-weight:700; color:#475569; margin-bottom:12px;">${group.instructions}</div>`;
       }
 
-      // A. ĐIỀN TỪ DẠNG BẢNG (TABLE) HOẶC NOTES (CÓ NÚT TUA GIÂY TỪNG CÂU)
+      // 1. Điền từ dạng Table hoặc Notes
       if (group.type === 'table' || group.type === 'notes' || group.tableHtml || group.template) {
         let contentBody = group.tableHtml || group.template || '';
         (group.questionIds || []).forEach(qId => {
@@ -277,7 +303,7 @@ export class DiagListeningEngine {
 
         html += `<div style="background:#FFFFFF; border:1.5px solid #CBD5E1; border-radius:12px; padding:16px 18px; margin-bottom:18px; font-size:14px; line-height:1.85;">${contentBody}</div>`;
 
-      // B. DẠNG BẢN ĐỒ MAP LABELLING
+      // 2. Map Labelling
       } else if (group.type === 'map' || group.imageUrl) {
         const optsLetters = ['A','B','C','D','E','F','G','H','I','J'].slice(0, group.optionsCount || 9);
         const imgPath = group.imageUrl?.startsWith('../') ? group.imageUrl : (group.imageUrl?.startsWith('data-l/') ? `../listening/${group.imageUrl}` : (group.imageUrl || '../listening/data-l/images/cam21-t2-p2-map.png'));
@@ -289,7 +315,7 @@ export class DiagListeningEngine {
           <table style="width:100%; border-collapse:collapse; background:#FFFFFF; border:2px solid #E8E2D8; border-radius:12px; overflow:hidden; margin-bottom:18px;">
             <thead>
               <tr style="background:#FAF7F2;">
-                <th style="padding:10px 12px; text-align:left; font-size:13.5px;">Địa điểm cần xác định</th>
+                <th style="padding:10px 12px; text-align:left; font-size:13.5px;">Địa điểm</th>
                 ${optsLetters.map(l => `<th style="padding:10px 4px; text-align:center; font-size:13px;">${l}</th>`).join('')}
               </tr>
             </thead>
@@ -316,11 +342,10 @@ export class DiagListeningEngine {
           </table>
         `;
 
-      // C. DẠNG NỐI THÔNG TIN MATCHING 2 CỘT (CÓ HỘP ANSWER BANK BÊN PHẢI)
+      // 3. Matching 2 Cột với Hộp Answer Bank
       } else if (group.type === 'matching' && Array.isArray(group.options)) {
         html += `
           <div style="display:flex; gap:18px; margin-bottom:18px; flex-wrap:wrap; align-items:flex-start;">
-            <!-- Cột trái: Câu hỏi + Menu chọn đáp án -->
             <div style="flex:1.4; min-width:280px; display:flex; flex-direction:column; gap:8px;">
               ${(group.questionIds || []).map(qId => {
                 const q = (part.questions || {})[qId];
@@ -344,7 +369,7 @@ export class DiagListeningEngine {
               }).join('')}
             </div>
 
-            <!-- Cột phải: Ngân hàng đáp án (Answer Bank) -->
+            <!-- Answer Bank -->
             <div style="flex:1; min-width:240px; background:#FFFFFF; border:2px solid #E8E2D8; border-radius:14px; padding:14px; position:sticky; top:10px;">
               <b style="font-size:13.5px; color:#0369A1; display:block; margin-bottom:10px;">📋 ${group.optionsTitle || 'Danh mục lựa chọn'}:</b>
               <div style="display:flex; flex-direction:column; gap:6px;">
@@ -359,7 +384,7 @@ export class DiagListeningEngine {
           </div>
         `;
 
-      // D. DẠNG TRẮC NGHIỆM MCQ (CÓ NÚT TUA GIÂY TỪNG CÂU)
+      // 4. Trắc nghiệm MCQ
       } else {
         (group.questionIds || []).forEach(qId => {
           const q = (part.questions || {})[qId];
@@ -398,7 +423,7 @@ export class DiagListeningEngine {
   }
 
   // =========================================================================
-  // 5. GHI NHỚ ĐÁP ÁN & ĐỒNG BỘ UI
+  // 5. GHI NHẬN ĐÁP ÁN & ĐỒNG BỘ GIAO DIỆN
   // =========================================================================
   recordAnswer(qId, val) {
     if (this.isReviewMode) return;
@@ -445,7 +470,7 @@ export class DiagListeningEngine {
   }
 
   // =========================================================================
-  // 6. CHẤM ĐIỂM CHUẨN XÁC TUYỆT ĐỐI (EVALUATOR)
+  // 6. CHẤM ĐIỂM CHUẨN XÁC TUYỆT ĐỐI (EVALUATE)
   // =========================================================================
   evaluate() {
     let score = 0;
@@ -474,7 +499,7 @@ export class DiagListeningEngine {
         if (isCorrect) score++;
 
         const expStr = Array.isArray(expected) ? expected.join(' / ') : String(expected);
-        const qTitle = part.questions?.[qId]?.text || `Câu ${part.questions?.[qId]?.num || qId}`;
+        const qTitle = part.questions?.[qId]?.text || part.questions?.[qId]?.q || `Câu ${part.questions?.[qId]?.num || qId}`;
 
         const item = {
           questionId: qId,
@@ -513,14 +538,11 @@ export class DiagListeningEngine {
     this.isReviewMode = true;
     this.userAnswers = evalResult.answersSnapshot || this.userAnswers;
 
-    // Mở khung Transcript
     const tBox = document.getElementById('listeningTranscriptContainer');
     if (tBox) tBox.style.display = 'block';
 
-    // Mở Part đầu tiên
     this.switchPart(0, false);
 
-    // Tô viền xanh/đỏ cho các câu hỏi
     (evalResult.details || []).forEach(item => {
       const fb = document.getElementById(`fb_${item.questionId}`);
       const inp = document.getElementById(`inp_${item.questionId}`);
@@ -553,6 +575,81 @@ export class DiagListeningEngine {
         `;
       }
     });
+  }
+
+  // =========================================================================
+  // 8. CÔNG CỤ HIGHLIGHT KHÔNG GIỚI HẠN (IELTS CBT TEXT HIGHLIGHTER)
+  // =========================================================================
+  initTextHighlighter(container) {
+    if (!container || container._hasHighlighter) return;
+    container._hasHighlighter = true;
+
+    // Tạo popup nút highlight nổi
+    let pop = document.getElementById('ielts_highlighter_pop');
+    if (!pop) {
+      pop = document.createElement('div');
+      pop.id = 'ielts_highlighter_pop';
+      pop.style.cssText = `
+        position: absolute; display: none; z-index: 99999;
+        background: #1E293B; border-radius: 8px; padding: 4px 6px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.25); gap: 4px; align-items: center;
+      `;
+      pop.innerHTML = `
+        <button type="button" id="btnDoHighlight" style="background:#FEF08A; color:#854D0E; border:none; border-radius:5px; padding:4px 8px; font-weight:800; font-size:12px; cursor:pointer;">
+          🖍 Tô vàng
+        </button>
+        <button type="button" id="btnClearHighlight" style="background:#475569; color:white; border:none; border-radius:5px; padding:4px 8px; font-weight:800; font-size:12px; cursor:pointer;">
+          ✕ Xóa
+        </button>
+      `;
+      document.body.appendChild(pop);
+    }
+
+    let savedRange = null;
+
+    const checkSelection = (e) => {
+      const sel = window.getSelection();
+      if (!sel || sel.isCollapsed || !sel.toString().trim()) {
+        if (!pop.contains(e.target)) pop.style.display = 'none';
+        return;
+      }
+
+      savedRange = sel.getRangeAt(0).cloneRange();
+      const rect = savedRange.getBoundingClientRect();
+      pop.style.top = `${window.scrollY + rect.top - 38}px`;
+      pop.style.left = `${window.scrollX + rect.left + rect.width / 2 - 40}px`;
+      pop.style.display = 'flex';
+    };
+
+    container.addEventListener('mouseup', checkSelection);
+    container.addEventListener('touchend', checkSelection);
+
+    document.getElementById('btnDoHighlight').onclick = () => {
+      if (!savedRange) return;
+      const span = document.createElement('mark');
+      span.style.cssText = 'background:#FEF08A; color:inherit; padding:1px 2px; border-radius:3px; cursor:pointer;';
+      span.className = 'ielts-user-highlight';
+      span.title = 'Bấm để xóa highlight';
+      span.onclick = (e) => {
+        e.stopPropagation();
+        const p = span.parentNode;
+        while (span.firstChild) p.insertBefore(span.firstChild, span);
+        p.removeChild(span);
+      };
+      try {
+        savedRange.surroundContents(span);
+      } catch (err) {
+        document.execCommand('hiliteColor', false, '#FEF08A');
+      }
+      pop.style.display = 'none';
+      window.getSelection().removeAllRanges();
+    };
+
+    document.getElementById('btnClearHighlight').onclick = () => {
+      document.execCommand('removeFormat', false, null);
+      pop.style.display = 'none';
+      window.getSelection().removeAllRanges();
+    };
   }
 }
 
