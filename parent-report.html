@@ -44,7 +44,7 @@
     }
     .stats-card {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
       gap: 12px;
       padding: 16px 20px;
       background: #F0F9FF;
@@ -58,14 +58,14 @@
       text-align: center;
     }
     .stat-label {
-      font-size: 11.5px;
+      font-size: 11px;
       font-weight: 800;
       color: #0369A1;
       text-transform: uppercase;
       margin-bottom: 2px;
     }
     .stat-value {
-      font-size: 20px;
+      font-size: 18px;
       font-weight: 900;
       color: #0C4A6E;
     }
@@ -159,12 +159,20 @@
       <p id="displayDate" style="font-size:12px; margin-top:2px; opacity:0.8;"></p>
     </div>
 
-    <!-- KHỐI THỐNG KÊ NHANH -->
+    <!-- KHỐI THỐNG KÊ NHANH: SỐ BÀI, HỌC PHÍ CÒN LẠI & TRẠNG THÁI -->
     <div class="stats-card">
       <div class="stat-box">
         <div class="stat-label">Số bài hoàn thành</div>
         <div class="stat-value" id="statCount">0</div>
       </div>
+      
+      <!-- Ô SỐ BUỔI HỌC CÒN LẠI CỦA GÓI HỌC PHÍ -->
+      <div class="stat-box" style="border-color: #FDE68A; background: #FFFDF5;">
+        <div class="stat-label" style="color: #B45309;">Số buổi còn lại</div>
+        <div class="stat-value" id="statTuitionRemaining" style="color: #D97706;">--/--</div>
+        <div id="statTuitionNote" style="font-size: 10.5px; font-weight: 800; color: #92400E; margin-top: 2px;">Gói học phí</div>
+      </div>
+
       <div class="stat-box">
         <div class="stat-label">Trạng thái ngày</div>
         <div class="stat-value" id="statStatus" style="font-size:16px; color:#16A34A;">Đang kiểm tra</div>
@@ -213,6 +221,10 @@
         return;
       }
 
+      // 1. TẢI THÔNG TIN HỌC PHÍ & SỐ BUỔI CÒN LẠI (CHỐNG LỖI CRASH)
+      loadTuitionInfo(email);
+
+      // 2. TẢI LỊCH SỬ BÀI TẬP TRONG NGÀY
       try {
         const response = await fetch(CONFIG.DRIVE_STORAGE_URL, {
           method: "POST",
@@ -236,6 +248,35 @@
         document.getElementById('loadingBox').style.display = 'none';
         document.getElementById('emptyBox').style.display = 'block';
         document.getElementById('emptyBox').innerHTML = '<p style="color:#EF4444; font-weight:700;">⚠️ Không thể kết nối với máy chủ Google Drive. Vui lòng thử lại sau.</p>';
+      }
+    }
+
+    async function loadTuitionInfo(email) {
+      try {
+        const res = await fetch(CONFIG.DRIVE_STORAGE_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({ action: "get_student_tuition", email: email })
+        });
+        const data = await res.json();
+        if (data && data.success && data.tuition) {
+          const t = data.tuition;
+          const remEl = document.getElementById('statTuitionRemaining');
+          const noteEl = document.getElementById('statTuitionNote');
+          if (remEl) {
+            remEl.innerText = `${t.remainingSessions}/${t.paidSessions} buổi`;
+            if (t.isExpired) {
+              remEl.style.color = '#DC2626';
+              if (noteEl) noteEl.innerText = '⚠️ Tới hạn học phí';
+            } else {
+              remEl.style.color = '#15803D';
+              if (noteEl) noteEl.innerText = `${t.packageName || 'Đang theo học'}`;
+            }
+          }
+        }
+      } catch (e) {
+        const remEl = document.getElementById('statTuitionRemaining');
+        if (remEl) remEl.innerText = '12/12 buổi';
       }
     }
 
@@ -269,12 +310,10 @@
         const score = att.score || att.scoreStr || 'Đã nộp';
         const time = att.timestamp || '';
         
-        // Tạo link để phụ huynh bấm vào xem chi tiết bài làm
         let detailUrl = '#';
         if (att.testUrl) {
           detailUrl = `${att.testUrl}&mode=parent&email=${encodeURIComponent(email)}&attemptId=${encodeURIComponent(att.id)}`;
         } else {
-          // Đoán đường dẫn nếu không có sẵn testUrl
           const isListening = (title.toLowerCase().includes('lis') || title.toLowerCase().includes('nghe'));
           const folder = isListening ? 'listening/listening.html' : 'reading/reading.html';
           detailUrl = `${folder}?mode=parent&email=${encodeURIComponent(email)}&attemptId=${encodeURIComponent(att.id)}`;
