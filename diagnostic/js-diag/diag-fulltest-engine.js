@@ -1,7 +1,8 @@
 /**
  * diagnostic/js-diag/diag-fulltest-engine.js
- * BỘ ĐIỀU PHỐI FULL TEST CHUẨN XÁC 100%
- * CÓ NÚT CHẤM NGỮ PHÁP RIÊNG BẰNG AI + CHẾ ĐỘ XEM LẠI TÔ MÀU ĐÚNG SAI 100 CÂU
+ * BỘ ĐIỀU PHỐI FULL MOCK TEST CAMBRIDGE 21 CHUẨN XÁC 100%
+ * BẢN FULL ĐẦY ĐỦ 100% - KHÔNG XÓA MÀN HÌNH KHI NỘP BÀI - AI CHẤM TRỰC TIẾP TRÊN GIAO DIỆN
+ * TÍCH HỢP HIGHLIGHT KHÔNG GIỚI HẠN & 3D DUOLINGO RESIZER
  */
 
 const _WRITING_PREFIX = "AQ.Ab8RN6KGTRGy";
@@ -41,7 +42,7 @@ class DiagnosticFullTestEngine {
     this.activeReadPassageIdx = 0;
     this.isRecording = false;
     this.speechRecognition = null;
-    this.isGrammarReviewed = false;
+    this.isReviewMode = false;
   }
 
   async init() {
@@ -65,7 +66,7 @@ class DiagnosticFullTestEngine {
   }
 
   // =========================================================================
-  // 1. RENDER 100 CÂU NGỮ PHÁP + NÚT CHẤM AI & XEM LẠI RIÊNG BIỆT
+  // 1. NGỮ PHÁP 100 CÂU
   // =========================================================================
   async loadGrammar100() {
     const mount = document.getElementById('ftGrammarMount');
@@ -77,7 +78,6 @@ class DiagnosticFullTestEngine {
       this.grammarData = await res.json();
 
       let html = `
-        <!-- BẢNG BÁO CÁO ĐIỂM NGỮ PHÁP (SẼ HIỆN KHI BẤM CHẤM) -->
         <div id="ftGrammarScoreBanner" style="display:none; background:#ECFDF5; border:2.5px solid #10B981; border-radius:18px; padding:20px; margin-bottom:24px;">
           <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
             <div>
@@ -102,7 +102,6 @@ class DiagnosticFullTestEngine {
         `;
 
         (part.questions || []).forEach(q => {
-          // Trắc nghiệm (Part 4)
           if (q.type === 'choice') {
             html += `
               <div class="q-item-box" id="ft_gbox_${q.id}" style="margin-bottom:14px; background:#FAF7F2;">
@@ -118,7 +117,6 @@ class DiagnosticFullTestEngine {
                 <div id="ft_gfb_${q.id}" style="display:none; font-size:13px; font-weight:800; margin-top:8px; padding:8px 12px; border-radius:8px;"></div>
               </div>
             `;
-          // Điền từ (Part 1, 2, 3) & Viết lại câu (Part 5)
           } else {
             const promptText = q.prompt ? q.prompt.replace('[blank]', '_______') : '';
             html += `
@@ -137,12 +135,11 @@ class DiagnosticFullTestEngine {
         html += `</div>`;
       });
 
-      // CỤM NÚT CHẤM RIÊNG BIỆT CHO NGỮ PHÁP NẰM DƯỚI CÂU 100
       html += `
         <div style="background:#FAF7F2; border:2.5px solid #CBD5E1; border-radius:18px; padding:20px; margin-top:24px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
           <div>
             <b style="font-size:15px; color:#1E293B; display:block;">Đã làm xong 100 câu ngữ pháp?</b>
-            <span style="font-size:13px; color:#64748B;">Bấm nút bên phải để chấm điểm và xem lời giải chi tiết từng câu.</span>
+            <span style="font-size:13px; color:#64748B;">Bấm nút bên phải để chấm điểm và xem lời giải chi tiết.</span>
           </div>
           <div style="display:flex; gap:10px; flex-wrap:wrap;">
             <button type="button" class="btn-3d btn-3d-white" onclick="window.ftEngine.gradeGrammarSection(false)">
@@ -161,15 +158,11 @@ class DiagnosticFullTestEngine {
     }
   }
 
-  // =========================================================================
-  // CHẤM ĐIỂM VÀ BẬT CHẾ ĐỘ XEM LẠI ĐÚNG SAI CHO RIÊNG PHẦN NGỮ PHÁP
-  // =========================================================================
   async gradeGrammarSection(useAI = true) {
     if (!this.grammarData) return;
 
     let score = 0;
     let total = 0;
-
     const banner = document.getElementById('ftGrammarScoreBanner');
     const scoreText = document.getElementById('ftGrammarScoreText');
     const aiBox = document.getElementById('ftGrammarAiFeedbackBox');
@@ -200,7 +193,6 @@ class DiagnosticFullTestEngine {
 
         if (isCorrect) score++;
 
-        // Tô màu đúng/sai từng câu
         const box = document.getElementById(`ft_gbox_${q.id}`);
         const fb = document.getElementById(`ft_gfb_${q.id}`);
         const inp = document.getElementById(`inp_ft_g_${q.id}`);
@@ -211,6 +203,7 @@ class DiagnosticFullTestEngine {
         }
         if (inp) {
           inp.style.background = isCorrect ? '#DCFCE7' : '#FEE2E2';
+          inp.disabled = true;
         }
         if (fb) {
           fb.style.display = 'block';
@@ -225,16 +218,14 @@ class DiagnosticFullTestEngine {
       });
     });
 
-    // Hiển thị banner điểm
     if (banner && scoreText) {
       banner.style.display = 'block';
       scoreText.innerHTML = `🎉 Điểm số của Em: ${score}/${total} câu đúng (${Math.round((score/total)*100)}%)`;
       banner.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
-    // Nếu chọn chấm bằng AI Gemini
     if (useAI && aiBox) {
-      aiBox.innerHTML = `⏳ <b>AI Gemini đang đọc toàn bộ 100 câu bài làm của Em để nhận xét chuyên sâu và định vị Band...</b>`;
+      aiBox.innerHTML = `⏳ <b>AI Gemini đang đọc toàn bộ 100 câu bài làm để đánh giá và định vị Band...</b>`;
       const apiKey = getGeminiKey();
 
       const studentSubmission = (this.grammarData.parts || []).flatMap(p => p.questions || []).map(q => {
@@ -248,9 +239,9 @@ Bạn là Chuyên gia Khảo thí Ngữ pháp IELTS. Hãy nhận xét bài làm 
 BÀI LÀM:
 ${studentSubmission}
 
-XUẤT BÁO CÁO NGẮN GỌN (DƯỚI 200 TỪ):
+XUẤT BÁO CÁO (DƯỚI 200 TỪ):
 1. Đánh giá sơ bộ trình độ ngữ pháp (tương đương Band IELTS nào).
-2. Chỉ ra 3 chuyên đề Em hay sai nhất (ví dụ: chia thì, bị động, câu điều kiện, mạo từ...).
+2. Chỉ ra 3 chuyên đề Em hay sai nhất.
 3. Lời dặn dò 1 câu cốt lõi nhất để Em bứt phá.
 `;
 
@@ -287,7 +278,7 @@ XUẤT BÁO CÁO NGẮN GỌN (DƯỚI 200 TỪ):
   }
 
   // =========================================================================
-  // 2. NẠP LISTENING 4 PARTS
+  // 2. LISTENING 4 PARTS
   // =========================================================================
   async loadCrossModuleListening() {
     const tNum = this.setNum;
@@ -338,6 +329,7 @@ XUẤT BÁO CÁO NGẮN GỌN (DƯỚI 200 TỪ):
 
     mount.innerHTML = html;
     this.switchLisPart(0);
+    this.initTextHighlighter(mount);
   }
 
   switchLisPart(idx) {
@@ -477,7 +469,7 @@ XUẤT BÁO CÁO NGẮN GỌN (DƯỚI 200 TỪ):
   }
 
   // =========================================================================
-  // 3. NẠP READING 3 PASSAGES
+  // 3. READING 3 PASSAGES
   // =========================================================================
   async loadCrossModuleReading() {
     const tNum = this.setNum;
@@ -529,6 +521,7 @@ XUẤT BÁO CÁO NGẮN GỌN (DƯỚI 200 TỪ):
 
     mount.innerHTML = html;
     this.switchReadPassage(0);
+    this.initTextHighlighter(mount);
   }
 
   switchReadPassage(idx) {
@@ -739,7 +732,7 @@ XUẤT BÁO CÁO NGẮN GỌN (DƯỚI 200 TỪ):
 
     mount.innerHTML = `
       <div style="background:#FAF7F2; border:2.5px solid #BFDBFE; border-radius:18px; padding:20px; margin-bottom:24px;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:gap:8px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:8px;">
           <b style="font-size:16.5px; color:#1E40AF;">📊 TASK 1: BÁO CÁO BIỂU ĐỒ (TỐI THIỂU 150 TỪ)</b>
           <span style="font-size:12.5px; font-weight:800; background:#DBEAFE; color:#1E40AF; padding:4px 12px; border-radius:10px;">Khuyến nghị 20 phút</span>
         </div>
@@ -760,7 +753,7 @@ XUẤT BÁO CÁO NGẮN GỌN (DƯỚI 200 TỪ):
       </div>
 
       <div style="background:#FAF7F2; border:2.5px solid #DDD6FE; border-radius:18px; padding:20px;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:gap:8px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:8px;">
           <b style="font-size:16.5px; color:#7C3AED;">📝 TASK 2: BÀI LUẬN NGHỊ LUẬN (TỐI THIỂU 250 TỪ)</b>
           <span style="font-size:12.5px; font-weight:800; background:#EDE9FE; color:#6D28D9; padding:4px 12px; border-radius:10px;">Khuyến nghị 40 phút</span>
         </div>
@@ -902,27 +895,31 @@ XUẤT BÁO CÁO NGẮN GỌN (DƯỚI 200 TỪ):
   }
 
   // =========================================================================
-  // 7. CHẤM TOÀN BỘ BÀI THI TỔNG HỢP (SUBMIT ALL)
+  // 6. CHẤM TOÀN BỘ FULL TEST TRỰC TIẾP TRÊN GIAO DIỆN (IN-PLACE REVIEW & AI INLINE)
   // =========================================================================
   async submitFullMockTest() {
-    if (!confirm("Em có chắc chắn muốn nộp toàn bộ bài Full Mock Test để xuất Overall Band Score?")) return;
+    if (!confirm("Em có chắc chắn muốn nộp toàn bộ bài Full Mock Test để xuất Overall Band Score và xem AI chấm trực tiếp trên từng phần không?")) return;
 
     const btn = document.getElementById('btnSubmitFullMockTest');
     if (btn) {
       btn.disabled = true;
-      btn.innerHTML = `⏳ Đang chấm điểm 4 kỹ năng & Ngữ pháp...`;
+      btn.innerHTML = `⏳ AI đang chấm bài trực tiếp trên từng kỹ năng...`;
     }
 
     clearInterval(this.timerInterval);
+    this.isReviewMode = true;
 
+    // 1. Chấm Ngữ pháp 100 câu
     let gScore = 0;
     let gTotal = 0;
     (this.grammarData?.parts || []).forEach(part => {
       (part.questions || []).forEach(q => {
         gTotal++;
         const u = (this.userAnswers.grammar[q.id] || '').trim();
+        let isCorrect = false;
+
         if (q.type === 'choice') {
-          if (u.toUpperCase() === (q.answer || '').toUpperCase()) gScore++;
+          isCorrect = u.toUpperCase() === (q.answer || '').toUpperCase();
         } else {
           const answersList = q.answers || (q.answer ? [q.answer] : []);
           const cleanU = this.cleanText(u);
@@ -941,6 +938,7 @@ XUẤT BÁO CÁO NGẮN GỌN (DƯỚI 200 TỪ):
       });
     });
 
+    // 2. Chấm Listening 40 câu
     let lCorrect = 0;
     this.lisParts.forEach(p => {
       Object.entries(p.answers || {}).forEach(([qid, exp]) => {
@@ -954,6 +952,7 @@ XUẤT BÁO CÁO NGẮN GỌN (DƯỚI 200 TỪ):
     });
     const lisBand = parseFloat(this.calculateBandScore(lCorrect, 40));
 
+    // 3. Chấm Reading 40 câu
     let rCorrect = 0;
     this.readPassages.forEach(p => {
       const expAnswers = p.answers || {};
@@ -976,57 +975,269 @@ XUẤT BÁO CÁO NGẮN GỌN (DƯỚI 200 TỪ):
     });
     const readBand = parseFloat(this.calculateBandScore(rCorrect, 40));
 
-    const wt1Len = (document.getElementById('ft_writing_task1')?.value || '').trim().split(/\s+/).filter(Boolean).length;
-    const wt2Len = (document.getElementById('ft_writing_task2')?.value || '').trim().split(/\s+/).filter(Boolean).length;
+    // 4. Writing & Speaking
+    const wt1Text = (document.getElementById('ft_writing_task1')?.value || '').trim();
+    const wt2Text = (document.getElementById('ft_writing_task2')?.value || '').trim();
+    const spk1Text = (document.getElementById('ft_spk_part1')?.value || '').trim();
+    const spk2Text = (document.getElementById('ft_spk_part2')?.value || '').trim();
+    const spk3Text = (document.getElementById('ft_spk_part3')?.value || '').trim();
+
+    const wt1Len = wt1Text.split(/\s+/).filter(Boolean).length;
+    const wt2Len = wt2Text.split(/\s+/).filter(Boolean).length;
     const writeBand = (wt1Len >= 120 && wt2Len >= 200) ? 6.5 : (wt1Len >= 80 ? 5.5 : 4.5);
     const spkBand = 5.5;
 
+    // 5. Overall Band
     const rawOverall = (lisBand + readBand + writeBand + spkBand) / 4;
     const overallBand = (Math.round(rawOverall * 2) / 2).toFixed(1);
 
-    document.querySelector('.fulltest-container').innerHTML = `
-      <div style="background:#FFFFFF; border:3px solid #E8E2D8; border-bottom:7px solid #D3CBC0; border-radius:24px; padding:36px; max-width:850px; margin:30px auto; text-align:center;">
-        <div style="font-size:48px; margin-bottom:10px;">🏆</div>
-        <h2 style="color:#8B1518; margin:0 0 6px 0; font-size:26px; font-weight:900;">KẾT QUẢ IELTS FULL MOCK TEST</h2>
-        <p style="color:#64748B; font-weight:700; margin-bottom:24px;">Bài thi chuẩn hóa Cambridge 21 • Thời gian: ${Math.round(this.timerSeconds / 60)} phút</p>
+    // 6. KÍCH HOẠT REVIEW MODE CHO CÁC PHẦN
+    this.gradeGrammarSection(false);
 
-        <div style="background:#FEF3C7; border:2px solid #FCD34D; border-radius:18px; padding:22px; margin-bottom:24px;">
-          <div style="font-size:14px; font-weight:800; color:#92400E; text-transform:uppercase;">OVERALL BAND SCORE</div>
-          <div style="font-size:46px; font-weight:900; color:#B45309; margin:4px 0;">${overallBand}</div>
-          <div style="font-size:13.5px; font-weight:700; color:#78350F;">Chúc mừng Em đã hoàn thành bài thi mô phỏng áp lực thực tế!</div>
+    // Tô màu Reading
+    this.readPassages.forEach(p => {
+      Object.entries(p.answers || {}).forEach(([qid, exp]) => {
+        const inp = document.getElementById(`inp_ft_read_${qid}`);
+        const u = (this.userAnswers.reading[qid] || '').toLowerCase().trim();
+        let isCorrect = false;
+        if (Array.isArray(exp)) {
+          isCorrect = exp.some(a => String(a).toLowerCase().trim() === u);
+        } else {
+          isCorrect = u === String(exp).toLowerCase().trim();
+        }
+        if (inp) {
+          inp.style.background = isCorrect ? '#DCFCE7' : '#FEE2E2';
+          inp.disabled = true;
+        }
+      });
+    });
+
+    // Tô màu Listening
+    this.lisParts.forEach(p => {
+      Object.entries(p.answers || {}).forEach(([qid, exp]) => {
+        const inp = document.getElementById(`inp_ft_lis_${qid}`);
+        const u = (this.userAnswers.listening[qid] || '').toLowerCase().trim();
+        let isCorrect = false;
+        if (Array.isArray(exp)) {
+          isCorrect = exp.some(a => String(a).toLowerCase().trim() === u);
+        } else {
+          isCorrect = u === String(exp).toLowerCase().trim();
+        }
+        if (inp) {
+          inp.style.background = isCorrect ? '#DCFCE7' : '#FEE2E2';
+          inp.disabled = true;
+        }
+      });
+    });
+
+    // 7. HIỂN THỊ THANH BANNER NỔI TRÊN ĐẦU TRANG (KHÔNG XÓA DOM)
+    this.renderInPlaceResultBanner({
+      overallBand,
+      timeSpent: `${Math.round(this.timerSeconds / 60)} phút`,
+      lisBand,
+      lCorrect,
+      readBand,
+      rCorrect,
+      writeBand,
+      spkBand,
+      gScore,
+      gTotal
+    });
+
+    // 8. GỌI AI CHẤM TRỰC TIẾP DƯỚI BÀI VIẾT WRITING
+    this.renderInlineWritingAICard(wt1Text, wt2Text);
+
+    // 9. GỌI AI CHẤM TRỰC TIẾP DƯỚI BÀI NÓI SPEAKING
+    this.renderInlineSpeakingAICard(spk1Text, spk2Text, spk3Text);
+
+    if (btn) {
+      btn.innerHTML = `✓ ĐÃ NỘP BÀI — ĐANG Ở CHẾ ĐỘ XEM LẠI`;
+      btn.style.background = "#059669";
+    }
+  }
+
+  // --- RENDER THANH BANNER NỔI TRÊN ĐẦU FULL TEST ---
+  renderInPlaceResultBanner(data) {
+    let banner = document.getElementById('ftStickyResultBanner');
+    if (!banner) {
+      banner = document.createElement('div');
+      banner.id = 'ftStickyResultBanner';
+      const container = document.querySelector('.fulltest-container');
+      if (container) container.insertBefore(banner, container.firstChild);
+    }
+
+    banner.innerHTML = `
+      <div style="background:#FFFFFF; border:3px solid #8B1518; border-bottom:6px solid #5E0C0E; border-radius:22px; padding:22px 26px; margin-bottom:20px; box-shadow:0 8px 24px rgba(139, 21, 24, 0.15);">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+          <div>
+            <span style="font-size:12px; font-weight:900; background:#FEE2E2; color:#991B1B; padding:3px 10px; border-radius:8px; text-transform:uppercase;">
+              KẾT QUẢ IELTS FULL MOCK TEST (CAM 21)
+            </span>
+            <div style="display:flex; align-items:baseline; gap:12px; margin-top:4px;">
+              <span style="font-size:36px; font-weight:900; color:#8B1518;">Band ${data.overallBand}</span>
+              <span style="font-size:15px; font-weight:800; color:#475569;">Thời gian: ${data.timeSpent} • Em có thể bấm vào các Tab để xem AI chấm chi tiết</span>
+            </div>
+          </div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <a href="index-diag.html" class="btn-3d btn-3d-white" style="padding:8px 16px; font-size:13px;">← Danh mục đề</a>
+            <a href="../curriculum-system/roadmap.html" class="btn-3d btn-3d-blue" style="padding:8px 16px; font-size:13px;">🚀 Lộ trình học &rarr;</a>
+          </div>
         </div>
 
-        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:12px; margin-bottom:26px;">
-          <div style="background:#F0FDF4; border:1.5px solid #86EFAC; padding:12px; border-radius:12px;">
-            <div style="font-size:11px; font-weight:800; color:#166534;">LISTENING</div>
-            <b style="font-size:20px; color:#15803D;">Band ${lisBand}</b>
-            <div style="font-size:11.5px; color:#64748B;">(${lCorrect}/40 câu)</div>
-          </div>
-          <div style="background:#F0F9FF; border:1.5px solid #BAE6FD; padding:12px; border-radius:12px;">
-            <div style="font-size:11px; font-weight:800; color:#0369A1;">READING</div>
-            <b style="font-size:20px; color:#0284C7;">Band ${readBand}</b>
-            <div style="font-size:11.5px; color:#64748B;">(${rCorrect}/40 câu)</div>
-          </div>
-          <div style="background:#EFF6FF; border:1.5px solid #BFDBFE; padding:12px; border-radius:12px;">
-            <div style="font-size:11px; font-weight:800; color:#1E40AF;">WRITING</div>
-            <b style="font-size:20px; color:#2563EB;">Band ${writeBand}</b>
-          </div>
-          <div style="background:#FFFBEB; border:1.5px solid #FDE68A; padding:12px; border-radius:12px;">
-            <div style="font-size:11px; font-weight:800; color:#92400E;">SPEAKING</div>
-            <b style="font-size:20px; color:#D97706;">Band ${spkBand}</b>
-          </div>
-          <div style="background:#FAF5FF; border:1.5px solid #DDD6FE; padding:12px; border-radius:12px;">
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:10px; margin-top:16px;">
+          <div style="background:#FAF5FF; border:1.5px solid #DDD6FE; padding:10px; border-radius:12px; text-align:center;">
             <div style="font-size:11px; font-weight:800; color:#6D28D9;">NGỮ PHÁP</div>
-            <b style="font-size:20px; color:#7C3AED;">${gScore}/${gTotal}</b>
+            <b style="font-size:17px; color:#7C3AED;">${data.gScore}/${data.gTotal}</b>
           </div>
-        </div>
-
-        <div style="display:flex; gap:12px; justify-content:center;">
-          <a href="index-diag.html" class="btn-3d btn-3d-white" style="flex:1;">← Danh mục đề</a>
-          <a href="../curriculum-system/roadmap.html" class="btn-3d btn-3d-blue" style="flex:1;">🚀 Kích hoạt Lộ trình học &rarr;</a>
+          <div style="background:#F0FDF4; border:1.5px solid #86EFAC; padding:10px; border-radius:12px; text-align:center;">
+            <div style="font-size:11px; font-weight:800; color:#166534;">LISTENING</div>
+            <b style="font-size:17px; color:#15803D;">Band ${data.lisBand}</b>
+            <div style="font-size:11px; color:#64748B;">(${data.lCorrect}/40)</div>
+          </div>
+          <div style="background:#F0F9FF; border:1.5px solid #BAE6FD; padding:10px; border-radius:12px; text-align:center;">
+            <div style="font-size:11px; font-weight:800; color:#0369A1;">READING</div>
+            <b style="font-size:17px; color:#0284C7;">Band ${data.readBand}</b>
+            <div style="font-size:11px; color:#64748B;">(${data.rCorrect}/40)</div>
+          </div>
+          <div style="background:#EFF6FF; border:1.5px solid #BFDBFE; padding:10px; border-radius:12px; text-align:center;">
+            <div style="font-size:11px; font-weight:800; color:#1E40AF;">WRITING</div>
+            <b style="font-size:17px; color:#2563EB;">Band ${data.writeBand}</b>
+          </div>
+          <div style="background:#FFFBEB; border:1.5px solid #FDE68A; padding:10px; border-radius:12px; text-align:center;">
+            <div style="font-size:11px; font-weight:800; color:#92400E;">SPEAKING</div>
+            <b style="font-size:17px; color:#D97706;">Band ${data.spkBand}</b>
+          </div>
         </div>
       </div>
     `;
+
+    banner.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  // --- RENDER AI CHẤM TRỰC TIẾP WRITING TASK 1 & 2 ---
+  async renderInlineWritingAICard(t1, t2) {
+    const secWriting = document.getElementById('section_ft_writing');
+    if (!secWriting) return;
+
+    let aiCard = document.getElementById('ftInlineWritingAiReport');
+    if (!aiCard) {
+      aiCard = document.createElement('div');
+      aiCard.id = 'ftInlineWritingAiReport';
+      secWriting.appendChild(aiCard);
+    }
+
+    aiCard.innerHTML = `
+      <div style="background:#FFFFFF; border:3px solid #2563EB; border-radius:18px; padding:22px; margin-top:24px;">
+        <h4 style="color:#1E40AF; margin:0 0 10px 0; font-size:18px; font-weight:900;">
+          🤖 PHIẾU CHẤM ĐIỂM WRITING TRỰC TIẾP TỪ AI GEMINI (TASK 1 & TASK 2)
+        </h4>
+        <div id="ftInlineWritingAiStream" style="font-size:14px; line-height:1.75; color:#1E293B;">
+          ⏳ <b>AI Gemini đang đọc toàn bộ bài viết, đối soát tiêu chí chấm điểm IELTS...</b>
+        </div>
+      </div>
+    `;
+
+    const streamBox = document.getElementById('ftInlineWritingAiStream');
+    const wKey = getWritingKey();
+
+    const promptText = `
+Bạn là Giám khảo Khảo thí IELTS Writing cự phách. Hãy đọc bài viết dưới đây của học sinh và xuất phiếu chấm điểm chi tiết.
+Xưng hô: "Anh" và gọi học viên là "Em".
+
+BÀI VIẾT:
+- Task 1: "${t1 || '(Chưa làm)'}"
+- Task 2: "${t2 || '(Chưa làm)'}"
+
+XUẤT BÁO CÁO THEO ĐÚNG CẤU TRÚC MARKDOWN:
+# 🎯 BẢNG ĐIỂM 4 TIÊU CHÍ IELTS WRITING:
+- Task Achievement / Response: [Điểm]/9.0
+- Coherence & Cohesion: [Điểm]/9.0
+- Lexical Resource: [Điểm]/9.0
+- Grammatical Range & Accuracy: [Điểm]/9.0
+### 🏆 OVERALL WRITING BAND: [Band điểm]
+
+# 🔍 CÁC LỖI SAI CẦN SỬA GẤP TRONG BÀI CỦA EM:
+(Chỉ ra các câu sai ngữ pháp và cách sửa).
+
+# 📖 GỢI Ý CÂU VĂN NÂNG CẤP BAND 8.0:
+(Viết lại 2 đoạn văn mẫu hay hơn).
+`;
+
+    try {
+      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key=${wKey}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contents: [{ role: 'user', parts: [{ text: promptText }] }] })
+      });
+      const data = await res.json();
+      const feedback = data.candidates?.[0]?.content?.parts?.[0]?.text || "Đã ghi nhận bài làm.";
+
+      if (window.marked && streamBox) {
+        streamBox.innerHTML = window.marked.parse(feedback);
+      } else if (streamBox) {
+        streamBox.innerHTML = `<pre style="white-space:pre-wrap; font-family:inherit;">${feedback}</pre>`;
+      }
+    } catch(e) {
+      if (streamBox) streamBox.innerHTML = `<span style="color:#DC2626;">❌ Không thể kết nối AI: ${e.message}</span>`;
+    }
+  }
+
+  // --- RENDER AI CHẤM TRỰC TIẾP SPEAKING ---
+  async renderInlineSpeakingAICard(s1, s2, s3) {
+    const secSpeaking = document.getElementById('section_ft_speaking');
+    if (!secSpeaking) return;
+
+    let aiCard = document.getElementById('ftInlineSpeakingAiReport');
+    if (!aiCard) {
+      aiCard = document.createElement('div');
+      aiCard.id = 'ftInlineSpeakingAiReport';
+      secSpeaking.appendChild(aiCard);
+    }
+
+    aiCard.innerHTML = `
+      <div style="background:#FFFFFF; border:3px solid #D97706; border-radius:18px; padding:22px; margin-top:24px;">
+        <h4 style="color:#B45309; margin:0 0 10px 0; font-size:18px; font-weight:900;">
+          🎤 NHẬN XÉT PHẢN XẠ NÓI TRỰC TIẾP TỪ AI GEMINI (PART 1, 2, 3)
+        </h4>
+        <div id="ftInlineSpeakingAiStream" style="font-size:14px; line-height:1.75; color:#1E293B;">
+          ⏳ <b>AI Gemini đang đọc bản ký âm và đánh giá phản xạ...</b>
+        </div>
+      </div>
+    `;
+
+    const streamBox = document.getElementById('ftInlineSpeakingAiStream');
+    const apiKey = getGeminiKey();
+
+    const promptText = `
+Bạn là Chuyên gia Khảo thí IELTS Speaking. Hãy nhận xét bài nói dưới đây của học sinh. Xưng hô "Anh" và "Em".
+BẢN KÝ ÂM SPEAKING:
+- Part 1: "${s1 || '(Chưa nói)'}"
+- Part 2: "${s2 || '(Chưa nói)'}"
+- Part 3: "${s3 || '(Chưa nói)'}"
+
+XUẤT BÁO CÁO:
+1. 🎯 Ước lượng Band điểm Speaking và nhận xét độ trôi chảy (Fluency).
+2. 🔍 Chỉ ra các lỗi ngữ pháp hoặc diễn đạt chưa tự nhiên.
+3. 💡 Lời khuyên 1 câu cốt lõi nhất để nâng Band Speaking.
+`;
+
+    try {
+      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key=${apiKey}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contents: [{ role: 'user', parts: [{ text: promptText }] }] })
+      });
+      const data = await res.json();
+      const feedback = data.candidates?.[0]?.content?.parts?.[0]?.text || "Đã ghi nhận bài làm.";
+
+      if (window.marked && streamBox) {
+        streamBox.innerHTML = window.marked.parse(feedback);
+      } else if (streamBox) {
+        streamBox.innerHTML = `<pre style="white-space:pre-wrap; font-family:inherit;">${feedback}</pre>`;
+      }
+    } catch(e) {
+      if (streamBox) streamBox.innerHTML = `<span style="color:#DC2626;">❌ Không thể kết nối AI: ${e.message}</span>`;
+    }
   }
 
   calculateBandScore(correct, total = 40) {
@@ -1045,6 +1256,80 @@ XUẤT BÁO CÁO NGẮN GỌN (DƯỚI 200 TỪ):
     if (s >= 8)  return "3.5";
     if (s >= 6)  return "3.0";
     return "2.5";
+  }
+
+  // =========================================================================
+  // 7. HIGHLIGHT KHÔNG GIỚI HẠN (IELTS CBT TEXT HIGHLIGHTER)
+  // =========================================================================
+  initTextHighlighter(container) {
+    if (!container || container._hasHighlighter) return;
+    container._hasHighlighter = true;
+
+    let pop = document.getElementById('ft_highlighter_pop');
+    if (!pop) {
+      pop = document.createElement('div');
+      pop.id = 'ft_highlighter_pop';
+      pop.style.cssText = `
+        position: absolute; display: none; z-index: 99999;
+        background: #1E293B; border-radius: 8px; padding: 4px 6px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.25); gap: 4px; align-items: center;
+      `;
+      pop.innerHTML = `
+        <button type="button" id="btnDoFtHighlight" style="background:#FEF08A; color:#854D0E; border:none; border-radius:5px; padding:4px 8px; font-weight:800; font-size:12px; cursor:pointer;">
+          🖍 Tô vàng
+        </button>
+        <button type="button" id="btnClearFtHighlight" style="background:#475569; color:white; border:none; border-radius:5px; padding:4px 8px; font-weight:800; font-size:12px; cursor:pointer;">
+          ✕ Xóa
+        </button>
+      `;
+      document.body.appendChild(pop);
+    }
+
+    let savedRange = null;
+
+    const checkSelection = (e) => {
+      const sel = window.getSelection();
+      if (!sel || sel.isCollapsed || !sel.toString().trim()) {
+        if (!pop.contains(e.target)) pop.style.display = 'none';
+        return;
+      }
+
+      savedRange = sel.getRangeAt(0).cloneRange();
+      const rect = savedRange.getBoundingClientRect();
+      pop.style.top = `${window.scrollY + rect.top - 38}px`;
+      pop.style.left = `${window.scrollX + rect.left + rect.width / 2 - 40}px`;
+      pop.style.display = 'flex';
+    };
+
+    container.addEventListener('mouseup', checkSelection);
+    container.addEventListener('touchend', checkSelection);
+
+    document.getElementById('btnDoFtHighlight').onclick = () => {
+      if (!savedRange) return;
+      const span = document.createElement('mark');
+      span.style.cssText = 'background:#FEF08A; color:inherit; padding:1px 2px; border-radius:3px; cursor:pointer;';
+      span.className = 'ielts-user-highlight';
+      span.title = 'Bấm để xóa highlight';
+      span.onclick = (e) => {
+        e.stopPropagation();
+        const p = span.parentNode;
+        while (span.firstChild) p.insertBefore(span.firstChild, span);
+        p.removeChild(span);
+      };
+      try {
+        savedRange.surroundContents(span);
+      } catch (err) {
+        document.execCommand('hiliteColor', false, '#FEF08A');
+      }
+      pop.style.display = 'none';
+      window.getSelection().removeAllRanges();
+    };
+
+    document.getElementById('btnClearFtHighlight').onclick = () => {
+      document.execCommand('removeFormat', false, null);
+      pop.style.display = 'none';
+      window.getSelection().removeAllRanges();
+    };
   }
 }
 
