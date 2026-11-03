@@ -1,0 +1,47 @@
+{
+  "testId": "test_01",
+  "set": 1,
+  "title": "Listening Diagnostic Test 1 - Set 1 (A2 & B2)",
+  "parts": [
+    {
+      "partNum": 1,
+      "title": "Audio 1 (Level A2): Hotel Reservation (Đặt phòng khách sạn)",
+      "audioUrl": "https://archive.org/download/lisb2-3/lisa2-1.mp3",
+      "startTime": 0,
+      "answers": {
+        "lis_s1_01": "A",
+        "lis_s1_02": "B",
+        "lis_s1_03": "A",
+        "lis_s1_04": "B",
+        "lis_s1_05": "B"
+      },
+      "questions": {
+        "lis_s1_01": { "num": 1, "type": "choice", "q": "1. What is the guest's surname?", "options": ["A. Berardelli", "B. Bernard", "C. Baradelli"], "answer": "A" },
+        "lis_s1_02": { "num": 2, "type": "choice", "q": "2. What type of room was booked for one night?", "options": ["A. Double room", "B. Single room", "C. Suite room"], "answer": "B" },
+        "lis_s1_03": { "num": 3, "type": "choice", "q": "3. What number should the guest dial for the reception desk?", "options": ["A. Dial 0", "B. Dial 9", "C. Dial 1"], "answer": "A" },
+        "lis_s1_04": { "num": 4, "type": "choice", "q": "4. What is the latest luggage checkout time at reception?", "options": ["A. 10 o'clock", "B. 12 o'clock", "C. 2 o'clock"], "answer": "B" },
+        "lis_s1_05": { "num": 5, "type": "choice", "q": "5. What time was the morning wake-up call confirmed?", "options": ["A. 7:00 a.m.", "B. 7:30 a.m.", "C. 8:00 a.m."], "answer": "B" }
+      }
+    },
+    {
+      "partNum": 2,
+      "title": "Audio 2 (Level B2): Working in the Film Industry (Ngành điện ảnh)",
+      "audioUrl": "https://archive.org/download/lisb2-3/lisb2-1.mp3",
+      "startTime": 0,
+      "answers": {
+        "lis_s1_06": "B",
+        "lis_s1_07": "B",
+        "lis_s1_08": "B",
+        "lis_s1_09": "A",
+        "lis_s1_10": "B"
+      },
+      "questions": {
+        "lis_s1_06": { "num": 6, "type": "choice", "q": "6. How long has the speaker worked in the film industry?", "options": ["A. 3 years", "B. 8 years", "C. 10 years"], "answer": "B" },
+        "lis_s1_07": { "num": 7, "type": "choice", "q": "7. What do people in junior roles spend most of their time doing on set?", "options": ["A. Writing script ideas", "B. Standing and waiting", "C. Talking with directors"], "answer": "B" },
+        "lis_s1_08": { "num": 8, "type": "choice", "q": "8. Why have many talented individuals left the film business?", "options": ["A. Low salaries", "B. Too much drama and stress", "C. Strict office hours"], "answer": "B" },
+        "lis_s1_09": { "num": 9, "type": "choice", "q": "9. How long does a close-knit film crew typically work together?", "options": ["A. Up to 3 months", "B. Exactly 6 months", "C. Over a year"], "answer": "A" },
+        "lis_s1_10": { "num": 10, "type": "choice", "q": "10. What unique language feature must new workers quickly learn on set?", "options": ["A. Formal grammar", "B. Slang words and jargon", "C. Foreign accents"], "answer": "B" }
+      }
+    }
+  ]
+}
