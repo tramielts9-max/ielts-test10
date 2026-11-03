@@ -2,6 +2,9 @@
  * grammar/js/lesson-renderer-g.js
  * BỘ RENDER BÀI HỌC, MỤC LỤC NHẢY NHANH, CHẤM ĐIỂM TỪNG PHẦN & TỰ ĐỘNG LƯU
  * BẢN FULL ĐẦY ĐỦ 100% - KHÔNG CẮT BỚT BẤT KỲ DÒNG NÀO
+ * - Cô lập phạm vi đọc dữ liệu DOM theo từng Card nhóm (Chống trùng ID câu hỏi 100%)
+ * - Hỗ trợ câu hỏi có nhiều chỗ trống [blank] tự động tạo đủ ô input
+ * - Khôi phục và tự động lưu trạng thái làm bài hoàn hảo vào LocalStorage
  */
 
 import { ExerciseEngine } from './exercise-engine-g.js';
@@ -21,7 +24,7 @@ export class LessonRenderer {
     this.renderHero();
     this.renderTabs();
     this.renderTheory();
-    this.renderTheoryRecall(); // TAB 2: KHẢO LÝ THUYẾT TỰ LUẬN (GIỮ NGUYÊN GỐC 100%)
+    this.renderTheoryRecall(); // TAB 2: KHẢO LÝ THUYẾT TỰ LUẬN
     this.renderExercises();
     this.renderBottomBar();
 
@@ -305,7 +308,7 @@ C. Dấu hiệu nhận biết (Signal Words):
   }
 
   // =========================================================================
-  // TAB 3: BÀI TẬP ÁP DỤNG (CÓ MỤC LỤC NHẢY NHANH + CHẤM RIÊNG TỪNG PHẦN)
+  // TAB 3: BÀI TẬP ÁP DỤNG (MỤC LỤC NHẢY NHANH + CHẤM ĐIỂM CÔ LẬP DOM)
   // =========================================================================
   renderExercises() {
     const box = document.createElement('div');
@@ -341,10 +344,10 @@ C. Dấu hiệu nhận biết (Signal Words):
       </div>
     `;
 
-    // 2. DỰNG TỪNG NHÓM BÀI TẬP VỚI 2 NÚT RIÊNG BIỆT
+    // 2. DỰNG TỪNG NHÓM BÀI TẬP
     this.exerciseData.exercise_groups.forEach((group, gIdx) => {
       html += `
-        <div class="section-card-g" id="group_card_${gIdx}">
+        <div class="section-card-g" id="group_card_${gIdx}" data-gidx="${gIdx}">
           <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
             <h3 class="section-title-g">
               <span style="background:var(--primary-color,#8B1518); color:white; padding:2px 8px; border-radius:8px; font-size:14px;">Bài #${gIdx + 1}</span>
@@ -361,19 +364,27 @@ C. Dấu hiệu nhận biết (Signal Words):
         let questionHtml = '';
 
         if (q.type === 'blank') {
+          // Xử lý thông minh: Nếu có nhiều chỗ trống [blank] trong cùng 1 câu
           const parts = q.prompt.split('[blank]');
-          questionHtml = `
-            <span>${parts[0]}</span>
-            <input type="text" class="input-blank-g" data-qid="${q.id}" data-gidx="${gIdx}" autocomplete="off" placeholder="Điền từ...">
-            <span>${parts[1] || ''}</span>
-          `;
+          if (parts.length > 2) {
+            questionHtml = parts.reduce((acc, part, pIdx) => {
+              if (pIdx === parts.length - 1) return acc + `<span>${part}</span>`;
+              return acc + `<span>${part}</span><input type="text" class="input-blank-g" data-qid="${q.id}" data-bidx="${pIdx}" data-gidx="${gIdx}" autocomplete="off" placeholder="...">`;
+            }, '');
+          } else {
+            questionHtml = `
+              <span>${parts[0]}</span>
+              <input type="text" class="input-blank-g" data-qid="${q.id}" data-bidx="0" data-gidx="${gIdx}" autocomplete="off" placeholder="Điền từ...">
+              <span>${parts[1] || ''}</span>
+            `;
+          }
         } else if (q.type === 'choice') {
           questionHtml = `
             <div style="width: 100%;">
               <div style="margin-bottom:8px;">${q.prompt}</div>
               ${q.options.map((opt, oIdx) => `
                 <label class="choice-label-g">
-                  <input type="radio" name="${q.id}" value="${oIdx}" data-gidx="${gIdx}"> ${opt}
+                  <input type="radio" name="g_${gIdx}_${q.id}" value="${oIdx}" data-qid="${q.id}" data-gidx="${gIdx}"> ${opt}
                 </label>
               `).join('')}
             </div>
@@ -384,24 +395,24 @@ C. Dấu hiệu nhận biết (Signal Words):
               <div style="margin-bottom: 6px; color:#475569;">${q.prompt}</div>
               <div style="display:flex; align-items:center; gap:8px;">
                 <span>${q.targetStart || ''}</span>
-                <input type="text" class="input-blank-g" style="flex:1;" data-qid="${q.id}" data-gidx="${gIdx}" placeholder="...">
+                <input type="text" class="input-blank-g" style="flex:1;" data-qid="${q.id}" data-bidx="0" data-gidx="${gIdx}" placeholder="...">
               </div>
             </div>
           `;
         }
 
         html += `
-          <div class="q-row-g" id="row_${q.id}">
+          <div class="q-row-g" id="row_g_${gIdx}_${q.id}">
             <div class="q-text-g">
               <span style="color:var(--primary-color);">#${qIdx + 1}.</span>
               ${questionHtml}
             </div>
-            <div class="feedback-box-g" id="fb_${q.id}"></div>
+            <div class="feedback-box-g" id="fb_g_${gIdx}_${q.id}"></div>
           </div>
         `;
       });
 
-      // CỤM NÚT CHẤM RIÊNG & LÀM LẠI CHO PHẦN BÀI NÀY
+      // Cụm nút Chấm điểm & Làm lại của từng phần
       html += `
           <div class="group-action-footer-g">
             <button type="button" class="btn-group-action btn-reset-part" onclick="window.lessonRendererInstance.resetGroup(${gIdx})">
@@ -433,39 +444,49 @@ C. Dấu hiệu nhận biết (Signal Words):
   }
 
   // =========================================================================
-  // CHẤM ĐIỂM CHO RIÊNG 1 NHÓM BÀI TẬP (GROUP)
+  // CHẤM ĐIỂM CHO RIÊNG 1 NHÓM BÀI TẬP (GROUP) - CÔ LẬP TRUY VẤN THEO CARD
   // =========================================================================
   gradeGroup(gIdx) {
     const group = this.exerciseData.exercise_groups[gIdx];
-    if (!group) return;
+    const card = document.getElementById(`group_card_${gIdx}`);
+    if (!group || !card) return;
 
     let groupCorrect = 0;
     const totalInGroup = group.questions.length;
 
     group.questions.forEach(q => {
       let userVal = '';
+
       if (q.type === 'blank' || q.type === 'rewrite') {
-        const input = document.querySelector(`input[data-qid="${q.id}"]`);
-        userVal = input ? input.value : '';
+        // Thu thập toàn bộ ô input thuộc câu hỏi này trong card hiện tại
+        const inputs = Array.from(card.querySelectorAll(`input[data-qid="${q.id}"]`));
+        if (inputs.length > 1) {
+          // Trường hợp nhiều ô trống trong một câu
+          userVal = inputs.map(inp => inp.value.trim());
+        } else if (inputs.length === 1) {
+          userVal = inputs[0].value.trim();
+        }
       } else if (q.type === 'choice') {
-        const checked = document.querySelector(`input[name="${q.id}"]:checked`);
+        const checked = card.querySelector(`input[data-qid="${q.id}"]:checked`);
         userVal = checked ? checked.value : '-1';
       }
 
       const result = ExerciseEngine.gradeQuestion(q, userVal);
-      const row = document.getElementById(`row_${q.id}`);
-      const fb = document.getElementById(`fb_${q.id}`);
+      const row = document.getElementById(`row_g_${gIdx}_${q.id}`);
+      const fb = document.getElementById(`fb_g_${gIdx}_${q.id}`);
 
-      fb.classList.add('show');
-      if (result.isCorrect) {
-        groupCorrect++;
-        row.className = 'q-row-g is-correct';
-        fb.className = 'feedback-box-g show correct';
-        fb.innerHTML = `✅ <b>Chính xác!</b> ${q.explanation || ''}`;
-      } else {
-        row.className = 'q-row-g is-wrong';
-        fb.className = 'feedback-box-g show wrong';
-        fb.innerHTML = `❌ <b>Chưa đúng!</b> Đáp án: <b>${result.correctDisplay}</b>. <br>💡 <i>${q.explanation || ''}</i>`;
+      if (fb && row) {
+        fb.classList.add('show');
+        if (result.isCorrect) {
+          groupCorrect++;
+          row.className = 'q-row-g is-correct';
+          fb.className = 'feedback-box-g show correct';
+          fb.innerHTML = `✅ <b>Chính xác!</b> ${q.explanation || ''}`;
+        } else {
+          row.className = 'q-row-g is-wrong';
+          fb.className = 'feedback-box-g show wrong';
+          fb.innerHTML = `❌ <b>Chưa đúng!</b> Đáp án: <b>${result.correctDisplay}</b>. <br>💡 <i>${q.explanation || ''}</i>`;
+        }
       }
     });
 
@@ -496,7 +517,6 @@ C. Dấu hiệu nhận biết (Signal Words):
     const completedGroupsCount = Object.values(this.groupResults).filter(g => g.completed).length;
 
     if (isFinalGroupGraded && completedGroupsCount === totalGroups) {
-      // Đã làm trọn vẹn đến bài cuối cùng -> Ghi nhận hoàn thành lên Lịch sử chung trang chủ!
       let totalCorrectAll = 0;
       Object.values(this.groupResults).forEach(g => totalCorrectAll += g.correct);
 
@@ -516,26 +536,28 @@ C. Dấu hiệu nhận biết (Signal Words):
   // =========================================================================
   resetGroup(gIdx) {
     const group = this.exerciseData.exercise_groups[gIdx];
-    if (!group) return;
+    const card = document.getElementById(`group_card_${gIdx}`);
+    if (!group || !card) return;
 
     if (!confirm(`Em có chắc muốn xóa đáp án để làm lại Bài #${gIdx + 1} không?`)) return;
 
     group.questions.forEach(q => {
-      const row = document.getElementById(`row_${q.id}`);
-      const fb = document.getElementById(`fb_${q.id}`);
+      const row = document.getElementById(`row_g_${gIdx}_${q.id}`);
+      const fb = document.getElementById(`fb_g_${gIdx}_${q.id}`);
       if (row) row.className = 'q-row-g';
       if (fb) {
         fb.className = 'feedback-box-g';
         fb.innerHTML = '';
       }
 
-      if (q.type === 'blank' || q.type === 'rewrite') {
-        const input = document.querySelector(`input[data-qid="${q.id}"]`);
-        if (input) input.value = '';
-      } else if (q.type === 'choice') {
-        const checked = document.querySelector(`input[name="${q.id}"]:checked`);
-        if (checked) checked.checked = false;
-      }
+      // Xóa giá trị các ô input trong card của nhóm này
+      card.querySelectorAll(`input[data-qid="${q.id}"]`).forEach(inp => {
+        if (inp.type === 'radio') {
+          inp.checked = false;
+        } else {
+          inp.value = '';
+        }
+      });
     });
 
     delete this.groupResults[gIdx];
@@ -563,7 +585,7 @@ C. Dấu hiệu nhận biết (Signal Words):
   }
 
   // =========================================================================
-  // TỰ ĐỘNG LƯU VÀ KHÔI PHỤC BÀI LÀM CỦA HỌC SINH VÀO LOCALSTORAGE
+  // TỰ ĐỘNG LƯU VÀ KHÔI PHỤC BÀI LÀM VÀO LOCALSTORAGE
   // =========================================================================
   autoSaveCurrentInputs() {
     const inputsData = {};
@@ -571,11 +593,21 @@ C. Dấu hiệu nhận biết (Signal Words):
 
     document.querySelectorAll('#tabExerciseContent input.input-blank-g').forEach(inp => {
       const qid = inp.getAttribute('data-qid');
-      if (qid) inputsData[qid] = inp.value;
+      const gidx = inp.getAttribute('data-gidx');
+      const bidx = inp.getAttribute('data-bidx') || '0';
+      if (qid && gidx) {
+        const key = `${gidx}_${qid}_${bidx}`;
+        inputsData[key] = inp.value;
+      }
     });
 
     document.querySelectorAll('#tabExerciseContent input[type="radio"]:checked').forEach(rb => {
-      radiosData[rb.name] = rb.value;
+      const qid = rb.getAttribute('data-qid');
+      const gidx = rb.getAttribute('data-gidx');
+      if (qid && gidx) {
+        const key = `${gidx}_${qid}`;
+        radiosData[key] = rb.value;
+      }
     });
 
     grammarState.saveTopicDetailState(this.topicId, {
@@ -590,15 +622,17 @@ C. Dấu hiệu nhận biết (Signal Words):
     if (!saved) return;
 
     if (saved.inputs) {
-      Object.entries(saved.inputs).forEach(([qid, val]) => {
-        const el = document.querySelector(`input[data-qid="${qid}"]`);
+      Object.entries(saved.inputs).forEach(([key, val]) => {
+        const [gidx, qid, bidx] = key.split('_');
+        const el = document.querySelector(`input.input-blank-g[data-gidx="${gidx}"][data-qid="${qid}"][data-bidx="${bidx}"]`);
         if (el) el.value = val;
       });
     }
 
     if (saved.radios) {
-      Object.entries(saved.radios).forEach(([name, val]) => {
-        const el = document.querySelector(`input[name="${name}"][value="${val}"]`);
+      Object.entries(saved.radios).forEach(([key, val]) => {
+        const [gidx, qid] = key.split('_');
+        const el = document.querySelector(`input[type="radio"][data-gidx="${gidx}"][data-qid="${qid}"][value="${val}"]`);
         if (el) el.checked = true;
       });
     }
