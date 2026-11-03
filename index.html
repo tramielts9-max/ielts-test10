@@ -94,6 +94,7 @@
     .btn-3d-red { background: var(--tram-red); color: #FFFFFF !important; border-bottom: 5px solid var(--tram-red-shadow); }
     .btn-3d-red:hover { background: var(--tram-red-hover); }
     .btn-3d-blue { background: #0284C7; color: #FFFFFF !important; border-bottom: 5px solid #0369A1; }
+    .btn-3d-green { background: #10B981; color: #FFFFFF !important; border-bottom: 5px solid #047857; }
     .btn-3d-white { background: #FFFFFF; color: var(--text-main) !important; border: 2px solid var(--duo-border); border-bottom: 5px solid var(--duo-shadow); }
 
     /* KHUNG LOGIN */
@@ -265,7 +266,12 @@
         </div>
       </div>
 
-      <div style="display: flex; align-items: center; gap: 10px;">
+      <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+        <!-- NÚT 1 BẤM LẤY BÁO CÁO PHỤ HUYNH NGAY TRÊN THANH USER -->
+        <button type="button" class="btn-3d btn-3d-blue" onclick="window.openDailyParentReportModal()" style="padding: 9px 18px; font-size: 13px;">
+          <i class="fa-solid fa-paper-plane"></i> 📲 Báo Cáo Phụ Huynh (Zalo)
+        </button>
+
         <span id="roleBadge" class="duo-pill pill-red">HỌC SINH</span>
         <button type="button" class="btn-3d btn-3d-white" onclick="handleStudentLogout()" style="padding: 8px 16px; font-size: 13px;">
           🚪 Đổi nick
@@ -363,16 +369,16 @@
       <!-- 1. KHỐI LỘ TRÌNH TỰ ĐỘNG CỦA HỆ THỐNG -->
       <div id="roadmapSectionMount"></div>
 
-<!-- 2. KHUNG BÀI TẬP ĐÃ LÀM HÔM NAY & LỊCH CHUYÊN CẦN (KÈM LỊCH HỌC) -->
+      <!-- 2. KHUNG BÀI TẬP ĐÃ LÀM HÔM NAY & LỊCH CHUYÊN CẦN (KÈM LỊCH HỌC) -->
       <div class="history-section">
         <div class="history-header-bar">
           <h3>
             <i class="fa-solid fa-calendar-check"></i> BÀI TẬP ĐÃ NỘP HÔM NAY & LỊCH CHUYÊN CẦN
           </h3>
           <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-            <!-- NÚT BÁO CÁO PHỤ HUYNH QUA ZALO THẦN THÁNH -->
-            <button type="button" id="btnSendDailyParentReport" onclick="window.openDailyReportModalFromIndex()" class="btn-3d" style="background: #10B981; color: white !important; border-bottom: 4px solid #059669; padding: 7px 14px; font-size: 13px; text-transform: none;">
-              <i class="fa-solid fa-paper-plane"></i> 📲 Gửi Báo Cáo Phụ Huynh
+            <!-- NÚT 2 BẤM LẤY BÁO CÁO PHỤ HUYNH NGAY KHUNG BÀI HÔM NAY -->
+            <button type="button" class="btn-3d btn-3d-green" onclick="window.openDailyParentReportModal()" style="padding: 7px 14px; font-size: 12.5px;">
+              <i class="fa-solid fa-paper-plane"></i> 📢 Gửi Báo Cáo Cho Bố Mẹ
             </button>
             <span id="totalAttemptsBadge" class="duo-pill pill-red">
               0 bài hôm nay
@@ -537,6 +543,46 @@
 </div>
 
 <!-- =========================================================================
+     MODAL GỬI BÁO CÁO PHỤ HUYNH TỪ TRANG CHỦ (TỔNG KẾT NGÀY & TỪNG BÀI)
+     ========================================================================= -->
+<div id="indexParentReportModal" style="display:none; position:fixed; inset:0; z-index:999999; background:rgba(15, 23, 42, 0.75); backdrop-filter:blur(6px); align-items:center; justify-content:center; padding:16px; font-family:'Plus Jakarta Sans', system-ui, sans-serif;">
+  <div style="background:#FFFFFF; border:3px solid #E8E2D8; border-bottom:7px solid #D3CBC0; border-radius:26px; max-width:480px; width:100%; padding:26px 22px; position:relative; box-shadow:0 25px 50px rgba(0,0,0,0.3);">
+    
+    <button type="button" onclick="window.closeDailyParentReportModal()" style="position:absolute; top:16px; right:16px; background:#F1ECE6; border:none; width:34px; height:34px; border-radius:50%; font-weight:900; color:#7E7672; cursor:pointer; font-size:16px;">✕</button>
+
+    <div style="text-align:center; margin-bottom:16px;">
+      <div style="width:56px; height:56px; border-radius:50%; background:#F0FDF4; border:2.5px solid #BBF7D0; display:flex; align-items:center; justify-content:center; margin:0 auto 10px auto; font-size:26px;">
+        📲
+      </div>
+      <h3 style="margin:0; font-size:19px; font-weight:900; color:var(--tram-red);">BÁO CÁO KẾT QUẢ CHO PHỤ HUYNH</h3>
+      <p style="margin:4px 0 0 0; font-size:13px; color:#64748B; font-weight:700;">Gửi nhanh kết quả học tập hôm nay qua Zalo cho Ba/Mẹ</p>
+    </div>
+
+    <div style="background:#F8FAFC; border:2px solid #E2E8F0; border-radius:14px; padding:12px; margin-bottom:14px;">
+      <div style="font-size:11.5px; font-weight:800; color:#475569; text-transform:uppercase; margin-bottom:6px;">Nội dung tin nhắn mẫu (kèm link mở thẳng):</div>
+      <textarea id="indexShareMsgTextarea" readonly style="width:100%; height:110px; border:1px solid #CBD5E1; border-radius:10px; padding:10px; font-size:13px; font-family:inherit; color:#1E293B; line-height:1.5; resize:none; box-sizing:border-box; background:#FFFFFF; outline:none;"></textarea>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:10px;">
+      <button type="button" id="btnIndexCopyMsg" onclick="window.copyIndexShareMessage()" style="background:#0284C7; color:#FFFFFF; border:none; padding:13px 18px; border-radius:14px; font-weight:900; font-size:14px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; border-bottom:4px solid #0369A1;">
+        <i class="fa-solid fa-copy"></i> Sao Chép Tin Nhắn & Link Báo Cáo
+      </button>
+
+      <a id="btnIndexOpenZalo" href="https://zalo.me" target="_blank" style="background:#0068FF; color:#FFFFFF; text-decoration:none; padding:12px 18px; border-radius:14px; font-weight:900; font-size:14px; display:flex; align-items:center; justify-content:center; gap:8px; border-bottom:4px solid #004EC4;">
+        <i class="fa-solid fa-comment-dots"></i> Mở Zalo Để Dán Tin Nhắn
+      </a>
+    </div>
+
+    <div style="margin-top:12px; text-align:center;">
+      <a id="previewDailyReportLink" href="#" target="_blank" style="font-size:12px; font-weight:800; color:#0284C7; text-decoration:underline;">
+        👁️ Bấm vào đây để tự xem trước bảng báo cáo hôm nay
+      </a>
+    </div>
+
+  </div>
+</div>
+
+<!-- =========================================================================
      MODAL KÍCH HOẠT QUYỀN HỌC VIÊN QUA ZALO (CONVERSION GATE MODAL)
      ========================================================================= -->
 <div id="zaloConversionModal" style="display:none; position:fixed; inset:0; z-index:99999; background:rgba(15, 23, 42, 0.75); backdrop-filter:blur(6px); align-items:center; justify-content:center; padding:16px;">
@@ -611,6 +657,86 @@
   let rawAdminAttempts = [];
   let studentsMap = {};
   let systemSettings = { modules: {} };
+
+  // =========================================================================
+  // LOGIC BẬT MODAL BÁO CÁO PHỤ HUYNH CHO HỌC SINH TẠI TRANG CHỦ
+  // =========================================================================
+  window.openDailyParentReportModal = () => {
+    const user = stateManager.getUser();
+    if (!user.email) {
+      alert("⚠️ Em vui lòng đăng nhập trước khi tạo báo cáo nhé!");
+      return;
+    }
+
+    const now = new Date();
+    const todayIso = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
+    const todayVn = now.toLocaleDateString('vi-VN');
+
+    // Tạo đường dẫn chuẩn dẫn tới parent-report.html
+    const basePath = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
+    const dailyUrl = `${window.location.origin}${basePath}parent-report.html?mode=parent&email=${encodeURIComponent(user.email)}&date=${todayIso}`;
+
+    // Đếm số bài đã nộp hôm nay từ localStorage
+    let countToday = 0;
+    try {
+      const history = JSON.parse(localStorage.getItem('ielts_local_history') || '[]');
+      countToday = history.filter(h => (h.timestamp || h.date || '').includes(todayIso) || (h.timestamp || '').includes(todayVn)).length;
+    } catch(e) {}
+
+    const countText = countToday > 0 ? `hoàn thành ${countToday} bài tập` : `hoàn thành các bài tập`;
+    const message = `Dạ kính gửi Ba/Mẹ, hôm nay (${todayVn}) con (${user.name || 'Học viên'}) đã ${countText} theo lịch học trên Trạm IELTS.\n\nKính mời Ba/Mẹ bấm vào link sau để xem chi tiết bài làm và bảng điểm hôm nay của con:\n${dailyUrl}`;
+
+    const modal = document.getElementById('indexParentReportModal');
+    const textarea = document.getElementById('indexShareMsgTextarea');
+    const previewLink = document.getElementById('previewDailyReportLink');
+
+    if (textarea) textarea.value = message;
+    if (previewLink) previewLink.href = dailyUrl;
+    if (modal) modal.style.display = 'flex';
+  };
+
+  window.closeDailyParentReportModal = () => {
+    const modal = document.getElementById('indexParentReportModal');
+    if (modal) modal.style.display = 'none';
+  };
+
+  window.copyIndexShareMessage = () => {
+    const textarea = document.getElementById('indexShareMsgTextarea');
+    const btn = document.getElementById('btnIndexCopyMsg');
+    if (!textarea) return;
+
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(textarea.value).then(() => {
+        showCopyFeedback(btn);
+      }).catch(() => {
+        fallbackCopyTextarea(textarea, btn);
+      });
+    } else {
+      fallbackCopyTextarea(textarea, btn);
+    }
+  };
+
+  function fallbackCopyTextarea(ta, btn) {
+    try {
+      ta.select();
+      ta.setSelectionRange(0, 99999);
+      document.execCommand('copy');
+      showCopyFeedback(btn);
+    } catch(err) {
+      alert("⚠️ Em hãy chạm giữ vào khung văn bản để chọn 'Sao chép' nhé!");
+    }
+  }
+
+  function showCopyFeedback(btn) {
+    if (!btn) return;
+    const originalText = btn.innerHTML;
+    btn.innerHTML = `<i class="fa-solid fa-check"></i> ĐÃ SAO CHÉP! HÃY DÁN VÀO ZALO`;
+    btn.style.background = "#16A34A";
+    setTimeout(() => {
+      btn.innerHTML = originalText;
+      btn.style.background = "#0284C7";
+    }, 2500);
+  }
 
   // 1. CƠ CHẾ SINH MÃ HỌC VIÊN TR-XXXX & KIỂM TRA QUYỀN
   function getOrCreateStudentId() {
@@ -1176,99 +1302,6 @@
   }
 
   checkAuthStatus();
-  // HÀM MỞ POPUP BÁO CÁO PHỤ HUYNH TRỰC TIẾP TỪ TRANG CHỦ
-  window.openDailyReportModalFromIndex = () => {
-    const user = stateManager.getUser();
-    if (!user.email) {
-      alert("⚠️ Em cần đăng nhập email trước khi lấy link báo cáo nhé!");
-      return;
-    }
-
-    const todayStr = new Date().toISOString().split('T')[0];
-    const todayVn = new Date().toLocaleDateString('vi-VN');
-    
-    // Tạo link dẫn thẳng đến trang parent-report.html
-    const origin = window.location.origin;
-    const pathName = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'));
-    const dailyReportUrl = `${origin}${pathName}/parent-report.html?mode=parent&email=${encodeURIComponent(user.email)}&date=${todayStr}`;
-
-    const messageText = `Dạ kính gửi Ba/Mẹ, hôm nay (${todayVn}) con (${user.name || 'Học viên'}) đã hoàn thành bài tập theo lịch học trên Trạm IELTS.\nKính mời Ba/Mẹ bấm vào đường link sau để xem bảng tổng hợp kết quả học tập hôm nay của con:\n${dailyReportUrl}`;
-
-    // Xóa modal cũ nếu có
-    document.getElementById('dailyShareModal')?.remove();
-
-    const modalHtml = `
-      <div id="dailyShareModal" style="position:fixed; inset:0; z-index:999999; background:rgba(15, 23, 42, 0.75); backdrop-filter:blur(6px); display:flex; align-items:center; justify-content:center; padding:16px; font-family:'Plus Jakarta Sans', system-ui, sans-serif;">
-        <div style="background:#FFFFFF; border-radius:24px; max-width:480px; width:100%; padding:26px 22px; box-shadow:0 25px 50px rgba(0,0,0,0.3); border:2px solid #E2E8F0; position:relative;">
-          
-          <button type="button" onclick="document.getElementById('dailyShareModal').remove()" style="position:absolute; top:16px; right:16px; background:#F1F5F9; border:none; width:34px; height:34px; border-radius:50%; font-weight:900; color:#64748B; cursor:pointer; font-size:16px;">✕</button>
-
-          <div style="text-align:center; margin-bottom:16px;">
-            <div style="font-size:36px; margin-bottom:6px;">📲</div>
-            <h3 style="margin:0; font-size:19px; font-weight:900; color:#0F172A;">Gửi Báo Cáo Ngày Cho Phụ Huynh</h3>
-            <p style="margin:4px 0 0 0; font-size:13px; color:#64748B; font-weight:700;">Học viên: <b style="color:#0284C7;">${user.name || 'Em'}</b> | Ngày: <b>${todayVn}</b></p>
-          </div>
-
-          <div style="margin-bottom:16px;">
-            <label style="font-size:12px; font-weight:800; color:#334155; text-transform:uppercase; margin-bottom:6px; display:block;">Nội dung tin nhắn & Link báo cáo:</label>
-            <textarea id="indexShareMsgArea" readonly style="width:100%; height:120px; border:2px solid #CBD5E1; border-radius:12px; padding:10px; font-size:13px; font-family:inherit; color:#1E293B; line-height:1.5; resize:none; box-sizing:border-box; background:#F8FAFC; outline:none;">${messageText}</textarea>
-          </div>
-
-          <div style="display:flex; flex-direction:column; gap:10px;">
-            <button type="button" id="btnCopyFromIndex" onclick="window.copyDailyMessageFromIndex()" style="background:#10B981; color:#FFFFFF; border:none; padding:12px 18px; border-radius:12px; font-weight:800; font-size:14px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; border-bottom:3px solid #059669;">
-              📋 Sao Chép Tin Nhắn & Link
-            </button>
-
-            <a href="https://zalo.me" target="_blank" style="background:#0068FF; color:#FFFFFF; text-decoration:none; padding:12px 18px; border-radius:12px; font-weight:800; font-size:14px; display:flex; align-items:center; justify-content:center; gap:8px; border-bottom:3px solid #004EC4;">
-              💬 Mở Zalo Để Dán Tin Nhắn
-            </a>
-          </div>
-
-        </div>
-      </div>
-    `;
-
-    document.body.insertAdjacentHTML('beforeend', modalHtml);
-  };
-
-  window.copyDailyMessageFromIndex = () => {
-    const textarea = document.getElementById('indexShareMsgArea');
-    const btn = document.getElementById('btnCopyFromIndex');
-    if (!textarea) return;
-
-    if (navigator.clipboard && window.isSecureContext) {
-      navigator.clipboard.writeText(textarea.value).then(() => {
-        onCopySuccessIndex(btn);
-      }).catch(() => {
-        fallbackCopyIndex(textarea, btn);
-      });
-    } else {
-      fallbackCopyIndex(textarea, btn);
-    }
-  };
-
-  function fallbackCopyIndex(textarea, btn) {
-    try {
-      textarea.select();
-      textarea.setSelectionRange(0, 99999);
-      document.execCommand('copy');
-      onCopySuccessIndex(btn);
-    } catch (e) {
-      alert("⚠️ Em chạm giữ vào khung văn bản để chọn 'Sao chép' nhé!");
-    }
-  }
-
-  function onCopySuccessIndex(btn) {
-    if (btn) {
-      const oldText = btn.innerHTML;
-      btn.innerHTML = "✅ Đã Sao Chép! Hãy Dán Vào Zalo";
-      btn.style.background = "#059669";
-      setTimeout(() => {
-        btn.innerHTML = oldText;
-        btn.style.background = "#10B981";
-      }, 2500);
-    }
-  }
 </script>
 </body>
 </html>
