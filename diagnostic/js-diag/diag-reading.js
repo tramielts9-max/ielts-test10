@@ -1,14 +1,12 @@
 /**
  * diagnostic/js-diag/diag-reading.js
- * BỘ ĐIỀU KHIỂN READING THÍCH ỨNG THÔNG MINH CHO CẢ 3 TEST (TEST 1, TEST 2, TEST 3)
- * HỖ TRỢ CẢ TWO-TIER NỀN TẢNG LẪN CAMBRIDGE CHUẨN + THANH KÉO 3D DUOLINGO
+ * BỘ MÁY READING HYBRID CHO CẢ 3 TEST (TEST 1, 2, 3 & FULL TEST)
+ * BẢN FULL ĐẦY ĐỦ 100% - TÍCH HỢP HIGHLIGHT KHÔNG GIỚI HẠN & RESIZER 3D DUOLINGO
  */
 
 export class DiagReadingEngine {
   constructor(options = {}) {
     this.containerId = options.containerId || 'readingQuestionsMount';
-    this.onStateChange = options.onStateChange || null;
-
     this.testData = null;
     this.mode = "FLAT_CAM"; // 'TWO_TIER' | 'FLAT_CAM' | 'GROUPED_CAM'
     this.title = "";
@@ -26,7 +24,7 @@ export class DiagReadingEngine {
   }
 
   // =========================================================================
-  // 1. NẠP VÀ TỰ ĐỘNG NHẬN DIỆN FORMAT ĐỀ THI
+  // 1. NẠP DỮ LIỆU ĐỀ THI
   // =========================================================================
   async loadTestFromJson(jsonUrl) {
     try {
@@ -43,19 +41,17 @@ export class DiagReadingEngine {
       this.metrics = {};
       this.isReviewMode = false;
 
-      // 1. KIỂM TRA XEM CÓ PHẢI LÀ TWO-TIER (TEST 1)
+      // 1. Two-Tier (Test 1)
       if (data.formatType === "TWO_TIER" || (Array.isArray(data.questions) && data.questions[0]?.tier1Options)) {
         this.mode = "TWO_TIER";
         this.questionsList = data.questions || [];
-      
-      // 2. KIỂM TRA XEM CÓ PHẢI LÀ GROUPED CAM (CÓ THẺ GROUPS)
+      // 2. Grouped Cambridge (Full Test)
       } else if (Array.isArray(data.groups) && data.groups.length > 0) {
         this.mode = "GROUPED_CAM";
         this.groups = data.groups;
         this.questionsMap = data.questions || {};
         this.expectedAnswers = data.answers || {};
-
-      // 3. NẾU LÀ CAMBRIDGE ĐỜI CŨ / DẠNG MẢNG PHẲNG (TEST 2 & TEST 3 CỦA MÀY)
+      // 3. Flat Cambridge (Test 2 & Test 3)
       } else {
         this.mode = "FLAT_CAM";
         this.questionsList = Array.isArray(data.questions) ? data.questions : Object.values(data.questions || {});
@@ -73,7 +69,7 @@ export class DiagReadingEngine {
   }
 
   // =========================================================================
-  // 2. RENDER GIAO DIỆN CHUẨN XÁC THEO TỪNG CHẾ ĐỘ
+  // 2. RENDER GIAO DIỆN
   // =========================================================================
   render() {
     const mount = document.getElementById(this.containerId);
@@ -89,9 +85,10 @@ export class DiagReadingEngine {
 
     this.restoreUserInputsUI();
     this.initDraggableResizer('diagSplitWrap', 'diagLeftPane', 'diagResizerBar', 'diagRightPane');
+    this.initTextHighlighter(mount);
   }
 
-  // --- A. GIAO DIỆN TWO-TIER (DÀNH CHO TEST 1 NỀN TẢNG) ---
+  // --- A. GIAO DIỆN TWO-TIER (TEST 1 NỀN TẢNG) ---
   renderTwoTierView(mount) {
     let qHtml = '';
 
@@ -119,7 +116,6 @@ export class DiagReadingEngine {
             ${q.statement || q.questionText || q.prompt}
           </b>
 
-          <!-- TẦNG 1 -->
           <div style="font-size:12px; font-weight:900; color:#0284C7; margin-bottom:6px; text-transform:uppercase;">
             Tầng 1: Lựa chọn của em
           </div>
@@ -135,10 +131,9 @@ export class DiagReadingEngine {
             }).join('')}
           </div>
 
-          <!-- TẦNG 2 -->
           <div id="tier2_box_${q.id}" style="display:none; margin-top:12px; padding:14px; background:#FFFBEB; border:2px dashed #F59E0B; border-radius:12px;">
             <div style="font-size:12px; font-weight:900; color:#92400E; margin-bottom:8px; text-transform:uppercase;">
-              🔍 Tầng 2: Chọn câu trích dẫn chứng minh căn cứ:
+              🔍 Tầng 2: Chọn câu trích dẫn chứng minh:
             </div>
             <div id="tier2_options_${q.id}" style="display:flex; flex-direction:column; gap:6px;"></div>
           </div>
@@ -150,25 +145,20 @@ export class DiagReadingEngine {
 
     mount.innerHTML = `
       <div id="diagSplitWrap" style="display:flex; height:calc(100vh - 215px); position:relative; user-select:none;">
-        <!-- CỘT TRÁI: HƯỚNG DẪN BÀI THI NỀN TẢNG -->
         <div id="diagLeftPane" style="width:45%; height:100%; overflow-y:auto; background:#FFFFFF; border:2px solid #E8E2D8; border-left:6px solid #8B1518; border-radius:18px; padding:24px 26px; box-sizing:border-box; line-height:1.8; font-size:15px; color:#1E293B;">
           <h3 style="margin:0 0 12px 0; color:#8B1518; font-size:18px;">📖 ${this.testData.passageTitle || 'BÀI ĐỌC KHẢO SÁT NỀN TẢNG'}</h3>
           <div style="background:#FAF7F2; border:1.5px solid #E8E2D8; border-radius:12px; padding:16px; margin-bottom:16px; font-size:14px; color:#475569;">
-            <b>📌 Hướng dẫn cơ chế Two-Tier (Chống đoán mò):</b><br>
-            • <b>Tầng 1:</b> Em chọn đáp án chính xác.<br>
-            • <b>Tầng 2:</b> Hệ thống sẽ tự động mở ra 4 câu trích dẫn. Em phải chọn đúng câu chứa bằng chứng thì mới được tính điểm.
+            <b>📌 Hướng dẫn cơ chế Two-Tier:</b> Chọn đúng phương án Tầng 1 và chọn đúng câu dẫn chứng Tầng 2 để nhận điểm trọn vẹn.
           </div>
           <div style="white-space:pre-wrap;">${this.passageText || 'Đọc kỹ từng đoạn trích dẫn đính kèm trực tiếp tại mỗi câu hỏi bên phải.'}</div>
         </div>
 
-        <!-- THANH KÉO 3D DUOLINGO -->
         <div id="diagResizerBar" style="width:20px; cursor:col-resize; display:flex; align-items:center; justify-content:center; z-index:10; flex-shrink:0;">
-          <div style="width:34px; height:60px; background:#FFFFFF; border:2.5px solid #E8E2D8; border-bottom:5px solid #D3CBC0; border-radius:18px; display:flex; align-items:center; justify-content:center; color:#8B1518; font-size:14px; box-shadow:0 4px 12px rgba(0,0,0,0.08); transition:transform 0.1s ease;">
+          <div style="width:34px; height:60px; background:#FFFFFF; border:2.5px solid #E8E2D8; border-bottom:5px solid #D3CBC0; border-radius:18px; display:flex; align-items:center; justify-content:center; color:#8B1518; font-size:14px; box-shadow:0 4px 12px rgba(0,0,0,0.08);">
             <i class="fa-solid fa-arrows-left-right"></i>
           </div>
         </div>
 
-        <!-- CỘT PHẢI: CÂU HỎI -->
         <div id="diagRightPane" style="flex:1; height:100%; overflow-y:auto; padding-right:4px; box-sizing:border-box;">
           ${qHtml}
         </div>
@@ -176,7 +166,7 @@ export class DiagReadingEngine {
     `;
   }
 
-  // --- B. GIAO DIỆN FLAT CAMBRIDGE (FIX LỖI TRẮNG BÓC Ở TEST 2 & TEST 3) ---
+  // --- B. GIAO DIỆN FLAT CAMBRIDGE (TEST 2 & TEST 3) ---
   renderFlatCamView(mount) {
     let qHtml = '';
 
@@ -188,7 +178,6 @@ export class DiagReadingEngine {
 
       let answerAreaHtml = '';
 
-      // 1. Trắc nghiệm A, B, C, D
       if (q.options && Array.isArray(q.options) && q.options.length > 0) {
         answerAreaHtml = `
           <div style="display:flex; flex-direction:column; gap:6px; margin-top:8px;">
@@ -204,11 +193,10 @@ export class DiagReadingEngine {
             }).join('')}
           </div>
         `;
-      // 2. Điền từ
       } else {
         answerAreaHtml = `
           <div style="margin-top:8px;">
-            <input type="text" id="flat_inp_${qId}" class="diag-input" placeholder="Gõ câu trả lời của em tại đây..." oninput="window.diagReadingEngine.onInputFlatText('${qId}', this.value)" style="width:100%; padding:10px 14px; border:2px solid #CBD5E1; border-radius:10px; font-weight:700;">
+            <input type="text" id="flat_inp_${qId}" class="diag-input" placeholder="Gõ câu trả lời..." oninput="window.diagReadingEngine.onInputFlatText('${qId}', this.value)" style="width:100%; padding:10px 14px; border:2px solid #CBD5E1; border-radius:10px; font-weight:700;">
           </div>
         `;
       }
@@ -217,7 +205,7 @@ export class DiagReadingEngine {
         <div class="q-item-box" id="box_${qId}" style="background:#FFFFFF; border:2px solid #E8E2D8; border-radius:16px; padding:18px; margin-bottom:16px;">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
             <span style="font-size:12px; font-weight:900; color:#8B1518; text-transform:uppercase;">
-              CÂU ${qNum}: ${q.type || 'IELTS Question'}
+              CÂU ${qNum}: ${q.type || 'Cambridge Question'}
             </span>
             <span id="badge_status_${qId}" style="display:none; font-size:11.5px; font-weight:800; padding:2px 8px; border-radius:6px;"></span>
           </div>
@@ -227,14 +215,6 @@ export class DiagReadingEngine {
           </b>
 
           ${answerAreaHtml}
-
-          <!-- Ô ghi chú / bằng chứng câu chữ nếu có -->
-          ${q.explanationRequired !== false ? `
-            <div style="margin-top:12px; padding-top:10px; border-top:1px dashed #E2E8F0;">
-              <input type="text" id="flat_exp_${qId}" class="diag-input" placeholder="Dẫn chứng câu chữ trong bài (hoặc từ khóa)..." oninput="window.diagReadingEngine.onInputFlatExp('${qId}', this.value)" style="padding:6px 10px; font-size:12.5px; background:#FAF7F2; border-color:#E2E8F0;">
-            </div>
-          ` : ''}
-
           <div id="review_feedback_${qId}" style="display:none; margin-top:10px; padding:10px 14px; border-radius:10px; font-size:13px; line-height:1.5;"></div>
         </div>
       `;
@@ -242,20 +222,17 @@ export class DiagReadingEngine {
 
     mount.innerHTML = `
       <div id="diagSplitWrap" style="display:flex; height:calc(100vh - 215px); position:relative; user-select:none;">
-        <!-- CỘT TRÁI: TOÀN BỘ BÀI ĐỌC -->
         <div id="diagLeftPane" style="width:50%; height:100%; overflow-y:auto; background:#FFFFFF; border:2px solid #E8E2D8; border-left:6px solid #8B1518; border-radius:18px; padding:24px 26px; box-sizing:border-box; line-height:1.8; font-size:15px; color:#1E293B;">
           <h3 style="margin:0 0 12px 0; color:#8B1518; font-size:18px;">${this.title || 'READING PASSAGE'}</h3>
           <div style="line-height:1.85; font-size:15px;">${this.passageHtml || this.passageText}</div>
         </div>
 
-        <!-- THANH KÉO 3D DUOLINGO -->
         <div id="diagResizerBar" style="width:20px; cursor:col-resize; display:flex; align-items:center; justify-content:center; z-index:10; flex-shrink:0;">
-          <div style="width:34px; height:60px; background:#FFFFFF; border:2.5px solid #E8E2D8; border-bottom:5px solid #D3CBC0; border-radius:18px; display:flex; align-items:center; justify-content:center; color:#8B1518; font-size:14px; box-shadow:0 4px 12px rgba(0,0,0,0.08); transition:transform 0.1s ease;">
+          <div style="width:34px; height:60px; background:#FFFFFF; border:2.5px solid #E8E2D8; border-bottom:5px solid #D3CBC0; border-radius:18px; display:flex; align-items:center; justify-content:center; color:#8B1518; font-size:14px; box-shadow:0 4px 12px rgba(0,0,0,0.08);">
             <i class="fa-solid fa-arrows-left-right"></i>
           </div>
         </div>
 
-        <!-- CỘT PHẢI: TOÀN BỘ CÂU HỎI -->
         <div id="diagRightPane" style="flex:1; height:100%; overflow-y:auto; padding-right:4px; box-sizing:border-box;">
           ${qHtml}
         </div>
@@ -263,7 +240,7 @@ export class DiagReadingEngine {
     `;
   }
 
-  // --- C. GIAO DIỆN GROUPED CAMBRIDGE (CHO ĐỀ CÓ GROUPS) ---
+  // --- C. GIAO DIỆN GROUPED CAMBRIDGE (FULL TEST) ---
   renderGroupedCamView(mount) {
     let qContentHtml = '';
 
@@ -345,7 +322,7 @@ export class DiagReadingEngine {
   }
 
   // =========================================================================
-  // 3. THANH KÉO CO GIÃN RESIZER 3D DUOLINGO
+  // 3. RESIZER 3D DUOLINGO
   // =========================================================================
   initDraggableResizer(wrapId, leftId, resizerId, rightId) {
     const wrap = document.getElementById(wrapId);
@@ -403,8 +380,12 @@ export class DiagReadingEngine {
   }
 
   // =========================================================================
-  // 4. TIỆN ÍCH LƯU TRỮ VÀ XỬ LÝ SỰ KIỆN
+  // 4. TIỆN ÍCH LƯU ĐÁP ÁN & TELEMETRY
   // =========================================================================
+  initQuestionMetric(qId, timestamp) {
+    if (!this.metrics[qId]) this.metrics[qId] = { renderTime: timestamp };
+  }
+
   onSelectTier1(qId, selectedLetter) {
     if (!this.userAnswers[qId]) this.userAnswers[qId] = {};
     this.userAnswers[qId].t1Val = selectedLetter;
@@ -441,21 +422,12 @@ export class DiagReadingEngine {
     this.userAnswers[qId].answer = text.trim();
   }
 
-  onInputFlatExp(qId, text) {
-    if (!this.userAnswers[qId]) this.userAnswers[qId] = {};
-    this.userAnswers[qId].exp = text.trim();
-  }
-
   onInputAnswer(qId, val) {
     this.userAnswers[qId] = String(val).trim();
   }
 
-  initQuestionMetric(qId, timestamp) {
-    if (!this.metrics[qId]) this.metrics[qId] = { renderTime: timestamp };
-  }
-
   // =========================================================================
-  // 5. BỘ CHẤM ĐIỂM CHUẨN XÁC THEO TỪNG THỂ LOẠI
+  // 5. CHẤM ĐIỂM CHUẨN XÁC
   // =========================================================================
   evaluate() {
     let score = 0;
@@ -490,16 +462,16 @@ export class DiagReadingEngine {
 
       return {
         title: this.title,
-        score: score,
-        total: total,
+        score,
+        total,
         scorePercent: Math.round((score / (total || 1)) * 100),
-        details: details,
-        wrongList: wrongList,
+        details,
+        wrongList,
         answersSnapshot: this.userAnswers
       };
     }
 
-    // Chấm Flat Cambridge (Test 2 & Test 3)
+    // Chấm Flat Cambridge
     if (this.mode === "FLAT_CAM") {
       const total = this.questionsList.length;
       this.questionsList.forEach((q, idx) => {
@@ -524,16 +496,16 @@ export class DiagReadingEngine {
 
       return {
         title: this.title,
-        score: score,
-        total: total,
+        score,
+        total,
         scorePercent: Math.round((score / (total || 1)) * 100),
-        details: details,
-        wrongList: wrongList,
+        details,
+        wrongList,
         answersSnapshot: this.userAnswers
       };
     }
 
-    // Chấm Grouped Cam
+    // Chấm Grouped Cambridge
     const qKeys = Object.keys(this.expectedAnswers);
     const total = qKeys.length;
     qKeys.forEach((qId, idx) => {
@@ -557,11 +529,11 @@ export class DiagReadingEngine {
 
     return {
       title: this.title,
-      score: score,
-      total: total,
+      score,
+      total,
       scorePercent: Math.round((score / (total || 1)) * 100),
-      details: details,
-      wrongList: wrongList,
+      details,
+      wrongList,
       answersSnapshot: this.userAnswers
     };
   }
@@ -583,7 +555,7 @@ export class DiagReadingEngine {
   }
 
   // =========================================================================
-  // 6. KHÔI PHỤC VÀ REVIEW MODE
+  // 6. REVIEW MODE
   // =========================================================================
   renderReviewMode(evalResult) {
     this.isReviewMode = true;
@@ -631,6 +603,80 @@ export class DiagReadingEngine {
         if (textInp) textInp.value = val;
       }
     });
+  }
+
+  // =========================================================================
+  // 7. HIGHLIGHT KHÔNG GIỚI HẠN (IELTS CBT TEXT HIGHLIGHTER)
+  // =========================================================================
+  initTextHighlighter(container) {
+    if (!container || container._hasHighlighter) return;
+    container._hasHighlighter = true;
+
+    let pop = document.getElementById('ielts_reading_highlighter_pop');
+    if (!pop) {
+      pop = document.createElement('div');
+      pop.id = 'ielts_reading_highlighter_pop';
+      pop.style.cssText = `
+        position: absolute; display: none; z-index: 99999;
+        background: #1E293B; border-radius: 8px; padding: 4px 6px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.25); gap: 4px; align-items: center;
+      `;
+      pop.innerHTML = `
+        <button type="button" id="btnDoReadingHighlight" style="background:#FEF08A; color:#854D0E; border:none; border-radius:5px; padding:4px 8px; font-weight:800; font-size:12px; cursor:pointer;">
+          🖍 Tô vàng
+        </button>
+        <button type="button" id="btnClearReadingHighlight" style="background:#475569; color:white; border:none; border-radius:5px; padding:4px 8px; font-weight:800; font-size:12px; cursor:pointer;">
+          ✕ Xóa
+        </button>
+      `;
+      document.body.appendChild(pop);
+    }
+
+    let savedRange = null;
+
+    const checkSelection = (e) => {
+      const sel = window.getSelection();
+      if (!sel || sel.isCollapsed || !sel.toString().trim()) {
+        if (!pop.contains(e.target)) pop.style.display = 'none';
+        return;
+      }
+
+      savedRange = sel.getRangeAt(0).cloneRange();
+      const rect = savedRange.getBoundingClientRect();
+      pop.style.top = `${window.scrollY + rect.top - 38}px`;
+      pop.style.left = `${window.scrollX + rect.left + rect.width / 2 - 40}px`;
+      pop.style.display = 'flex';
+    };
+
+    container.addEventListener('mouseup', checkSelection);
+    container.addEventListener('touchend', checkSelection);
+
+    document.getElementById('btnDoReadingHighlight').onclick = () => {
+      if (!savedRange) return;
+      const span = document.createElement('mark');
+      span.style.cssText = 'background:#FEF08A; color:inherit; padding:1px 2px; border-radius:3px; cursor:pointer;';
+      span.className = 'ielts-user-highlight';
+      span.title = 'Bấm để xóa highlight';
+      span.onclick = (e) => {
+        e.stopPropagation();
+        const p = span.parentNode;
+        while (span.firstChild) p.insertBefore(span.firstChild, span);
+        p.removeChild(span);
+      };
+      try {
+        savedRange.surroundContents(span);
+      } catch (err) {
+        document.execCommand('hiliteColor', false, '#FEF08A');
+      }
+      pop.style.display = 'none';
+      window.getSelection().removeAllRanges();
+    };
+
+    document.getElementById('btnClearReadingHighlight').onclick = () => {
+      document.execCommand('removeFormat', false, null);
+      pop.style.display = 'none';
+      window.getSelection().removeAllRanges();
+    };
   }
 }
 
