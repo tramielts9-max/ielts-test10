@@ -363,15 +363,21 @@
       <!-- 1. KHỐI LỘ TRÌNH TỰ ĐỘNG CỦA HỆ THỐNG -->
       <div id="roadmapSectionMount"></div>
 
-      <!-- 2. KHUNG BÀI TẬP ĐÃ LÀM HÔM NAY & LỊCH CHUYÊN CẦN (KÈM LỊCH HỌC) -->
+<!-- 2. KHUNG BÀI TẬP ĐÃ LÀM HÔM NAY & LỊCH CHUYÊN CẦN (KÈM LỊCH HỌC) -->
       <div class="history-section">
         <div class="history-header-bar">
           <h3>
             <i class="fa-solid fa-calendar-check"></i> BÀI TẬP ĐÃ NỘP HÔM NAY & LỊCH CHUYÊN CẦN
           </h3>
-          <span id="totalAttemptsBadge" class="duo-pill pill-red">
-            0 bài hôm nay
-          </span>
+          <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+            <!-- NÚT BÁO CÁO PHỤ HUYNH QUA ZALO THẦN THÁNH -->
+            <button type="button" id="btnSendDailyParentReport" onclick="window.openDailyReportModalFromIndex()" class="btn-3d" style="background: #10B981; color: white !important; border-bottom: 4px solid #059669; padding: 7px 14px; font-size: 13px; text-transform: none;">
+              <i class="fa-solid fa-paper-plane"></i> 📲 Gửi Báo Cáo Phụ Huynh
+            </button>
+            <span id="totalAttemptsBadge" class="duo-pill pill-red">
+              0 bài hôm nay
+            </span>
+          </div>
         </div>
         
         <div id="historyResultsList"></div>
@@ -1170,6 +1176,99 @@
   }
 
   checkAuthStatus();
+  // HÀM MỞ POPUP BÁO CÁO PHỤ HUYNH TRỰC TIẾP TỪ TRANG CHỦ
+  window.openDailyReportModalFromIndex = () => {
+    const user = stateManager.getUser();
+    if (!user.email) {
+      alert("⚠️ Em cần đăng nhập email trước khi lấy link báo cáo nhé!");
+      return;
+    }
+
+    const todayStr = new Date().toISOString().split('T')[0];
+    const todayVn = new Date().toLocaleDateString('vi-VN');
+    
+    // Tạo link dẫn thẳng đến trang parent-report.html
+    const origin = window.location.origin;
+    const pathName = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'));
+    const dailyReportUrl = `${origin}${pathName}/parent-report.html?mode=parent&email=${encodeURIComponent(user.email)}&date=${todayStr}`;
+
+    const messageText = `Dạ kính gửi Ba/Mẹ, hôm nay (${todayVn}) con (${user.name || 'Học viên'}) đã hoàn thành bài tập theo lịch học trên Trạm IELTS.\nKính mời Ba/Mẹ bấm vào đường link sau để xem bảng tổng hợp kết quả học tập hôm nay của con:\n${dailyReportUrl}`;
+
+    // Xóa modal cũ nếu có
+    document.getElementById('dailyShareModal')?.remove();
+
+    const modalHtml = `
+      <div id="dailyShareModal" style="position:fixed; inset:0; z-index:999999; background:rgba(15, 23, 42, 0.75); backdrop-filter:blur(6px); display:flex; align-items:center; justify-content:center; padding:16px; font-family:'Plus Jakarta Sans', system-ui, sans-serif;">
+        <div style="background:#FFFFFF; border-radius:24px; max-width:480px; width:100%; padding:26px 22px; box-shadow:0 25px 50px rgba(0,0,0,0.3); border:2px solid #E2E8F0; position:relative;">
+          
+          <button type="button" onclick="document.getElementById('dailyShareModal').remove()" style="position:absolute; top:16px; right:16px; background:#F1F5F9; border:none; width:34px; height:34px; border-radius:50%; font-weight:900; color:#64748B; cursor:pointer; font-size:16px;">✕</button>
+
+          <div style="text-align:center; margin-bottom:16px;">
+            <div style="font-size:36px; margin-bottom:6px;">📲</div>
+            <h3 style="margin:0; font-size:19px; font-weight:900; color:#0F172A;">Gửi Báo Cáo Ngày Cho Phụ Huynh</h3>
+            <p style="margin:4px 0 0 0; font-size:13px; color:#64748B; font-weight:700;">Học viên: <b style="color:#0284C7;">${user.name || 'Em'}</b> | Ngày: <b>${todayVn}</b></p>
+          </div>
+
+          <div style="margin-bottom:16px;">
+            <label style="font-size:12px; font-weight:800; color:#334155; text-transform:uppercase; margin-bottom:6px; display:block;">Nội dung tin nhắn & Link báo cáo:</label>
+            <textarea id="indexShareMsgArea" readonly style="width:100%; height:120px; border:2px solid #CBD5E1; border-radius:12px; padding:10px; font-size:13px; font-family:inherit; color:#1E293B; line-height:1.5; resize:none; box-sizing:border-box; background:#F8FAFC; outline:none;">${messageText}</textarea>
+          </div>
+
+          <div style="display:flex; flex-direction:column; gap:10px;">
+            <button type="button" id="btnCopyFromIndex" onclick="window.copyDailyMessageFromIndex()" style="background:#10B981; color:#FFFFFF; border:none; padding:12px 18px; border-radius:12px; font-weight:800; font-size:14px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; border-bottom:3px solid #059669;">
+              📋 Sao Chép Tin Nhắn & Link
+            </button>
+
+            <a href="https://zalo.me" target="_blank" style="background:#0068FF; color:#FFFFFF; text-decoration:none; padding:12px 18px; border-radius:12px; font-weight:800; font-size:14px; display:flex; align-items:center; justify-content:center; gap:8px; border-bottom:3px solid #004EC4;">
+              💬 Mở Zalo Để Dán Tin Nhắn
+            </a>
+          </div>
+
+        </div>
+      </div>
+    `;
+
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+  };
+
+  window.copyDailyMessageFromIndex = () => {
+    const textarea = document.getElementById('indexShareMsgArea');
+    const btn = document.getElementById('btnCopyFromIndex');
+    if (!textarea) return;
+
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(textarea.value).then(() => {
+        onCopySuccessIndex(btn);
+      }).catch(() => {
+        fallbackCopyIndex(textarea, btn);
+      });
+    } else {
+      fallbackCopyIndex(textarea, btn);
+    }
+  };
+
+  function fallbackCopyIndex(textarea, btn) {
+    try {
+      textarea.select();
+      textarea.setSelectionRange(0, 99999);
+      document.execCommand('copy');
+      onCopySuccessIndex(btn);
+    } catch (e) {
+      alert("⚠️ Em chạm giữ vào khung văn bản để chọn 'Sao chép' nhé!");
+    }
+  }
+
+  function onCopySuccessIndex(btn) {
+    if (btn) {
+      const oldText = btn.innerHTML;
+      btn.innerHTML = "✅ Đã Sao Chép! Hãy Dán Vào Zalo";
+      btn.style.background = "#059669";
+      setTimeout(() => {
+        btn.innerHTML = oldText;
+        btn.style.background = "#10B981";
+      }, 2500);
+    }
+  }
 </script>
 </body>
 </html>
