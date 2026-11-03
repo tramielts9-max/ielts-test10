@@ -1,5 +1,6 @@
 /**
  * js/app.js - Điểm khởi động tập trung cho mọi bài Test
+ * BẢN HOÀN THIỆN ĐẦY ĐỦ: TÍCH HỢP MODAL BÁO CÁO PHỤ HUYNH QUA ZALO (BÀI LẺ & CẢ NGÀY)
  */
 import { CONFIG } from './config.js';
 import { stateManager } from './state.js';
@@ -89,8 +90,26 @@ async function initApp() {
     document.getElementById('passageBox')?.classList.add('submitted');
 
     collectAndSaveState(true, scoreStr);
-    await evaluator.submitToCloud(evaluation, studentName, studentEmail, timer.formatTime(timer.seconds));
-    alert(`🎉 Hoàn thành! Điểm của em: ${scoreStr}. Bài làm đã được lưu an toàn lên Google Drive.`);
+    
+    // Gửi bài lên Google Drive và nhận phản hồi
+    let cloudResult = null;
+    try {
+      cloudResult = await evaluator.submitToCloud(evaluation, studentName, studentEmail, timer.formatTime(timer.seconds));
+    } catch (err) {
+      console.warn("Lỗi lưu Cloud:", err);
+    }
+
+    // Lấy attemptId để tạo link bài lẻ
+    const attemptId = (cloudResult && cloudResult.attemptId) ? cloudResult.attemptId : (evaluation.attemptId || `att_${Date.now()}`);
+    
+    // Bật Modal Báo Cáo Phụ Huynh (2 lựa chọn: Bài này HOẶC Cả ngày)
+    showParentShareModal({
+      studentName: studentName,
+      studentEmail: studentEmail,
+      scoreStr: scoreStr,
+      attemptId: attemptId,
+      testTitle: document.title || "Bài luyện tập IELTS"
+    });
   };
 
   function collectAndSaveState(isSubmitted = false, scoreStr = '') {
@@ -118,11 +137,12 @@ async function initApp() {
   document.addEventListener('change', () => collectAndSaveState());
 
   // ==========================================================================
-  // KIỂM TRA CHẾ ĐỘ XEM LẠI BÀI TỪ GOOGLE DRIVE (REVIEW MODE)
+  // KIỂM TRA CHẾ ĐỘ XEM LẠI BÀI TỪ GOOGLE DRIVE (REVIEW MODE CHO HỌC SINH HOẶC PHỤ HUYNH)
   // ==========================================================================
   const urlParams = new URLSearchParams(window.location.search);
   const attemptId = urlParams.get('attemptId');
   const emailParam = urlParams.get('email');
+  const isParentMode = urlParams.get('mode') === 'parent';
 
   if (attemptId && emailParam && CONFIG.DRIVE_STORAGE_URL) {
     try {
@@ -133,60 +153,81 @@ async function initApp() {
       });
       const data = await res.json();
       if (data?.attempt) {
-        restoreReviewMode(data.attempt, timer, evaluator);
-        return; // Đã vào Review Mode thì không khôi phục LocalStorage nữa
+        restoreReviewMode(data.attempt, timer, evaluator, isParentMode);
+        return;
       }
     } catch (e) {
       console.warn("Không thể tải bài làm từ Cloud:", e);
     }
   }
 
-  // Khôi phục bài đang làm dở từ LocalStorage
-  const saved = stateManager.getSavedProgress();
-  if (saved) {
-    if (saved.seconds) timer.setTime(saved.seconds);
-    if (saved.inputs) Object.entries(saved.inputs).forEach(([id, val]) => { const el = document.getElementById(id); if (el) el.value = val; });
-    if (saved.radios) Object.entries(saved.radios).forEach(([name, val]) => { const el = document.querySelector(`input[name="${name}"][value="${val}"]`); if (el) el.checked = true; });
-    if (saved.thoughts) Object.entries(saved.thoughts).forEach(([id, val]) => { const el = document.getElementById(id); if (el) el.value = val; });
-    if (saved.aiResponses) Object.entries(saved.aiResponses).forEach(([id, val]) => {
-      const el = document.getElementById(id);
-      if (el) { el.style.display = 'block'; el.innerHTML = val; }
-    });
+  // Khôi phục bài đang làm dở từ LocalStorage (Chỉ khi không ở chế độ phụ huynh)
+  if (!isParentMode) {
+    const saved = stateManager.getSavedProgress();
+    if (saved) {
+      if (saved.seconds) timer.setTime(saved.seconds);
+      if (saved.inputs) Object.entries(saved.inputs).forEach(([id, val]) => { const el = document.getElementById(id); if (el) el.value = val; });
+      if (saved.radios) Object.entries(saved.radios).forEach(([name, val]) => { const el = document.querySelector(`input[name="${name}"][value="${val}"]`); if (el) el.checked = true; });
+      if (saved.thoughts) Object.entries(saved.thoughts).forEach(([id, val]) => { const el = document.getElementById(id); if (el) el.value = val; });
+      if (saved.aiResponses) Object.entries(saved.aiResponses).forEach(([id, val]) => {
+        const el = document.getElementById(id);
+        if (el) { el.style.display = 'block'; el.innerHTML = val; }
+      });
 
-    if (saved.isSubmitted) {
-      evaluator.evaluate();
-      document.body.classList.add('submitted-mode');
-      document.getElementById('passageBox')?.classList.add('submitted');
-      const scoreBadge = document.getElementById('scoreBadge');
-      const scoreText = document.getElementById('scoreText');
-      if (scoreBadge) scoreBadge.style.display = 'block';
-      if (scoreText) scoreText.innerText = saved.scoreText;
-      evaluator.renderPostSubmissionControls();
+      if (saved.isSubmitted) {
+        evaluator.evaluate();
+        document.body.classList.add('submitted-mode');
+        document.getElementById('passageBox')?.classList.add('submitted');
+        const scoreBadge = document.getElementById('scoreBadge');
+        const scoreText = document.getElementById('scoreText');
+        if (scoreBadge) scoreBadge.style.display = 'block';
+        if (scoreText) scoreText.innerText = saved.scoreText;
+        evaluator.renderPostSubmissionControls();
+      }
     }
   }
 }
 
-function restoreReviewMode(attempt, timer, evaluator) {
+// HÀM KHÔI PHỤC BÀI LÀM ĐÃ NỘP (CÓ TÙY BIẾN CHO PHỤ HUYNH)
+function restoreReviewMode(attempt, timer, evaluator, isParentMode = false) {
   stateManager.isReviewMode = true;
   timer.stop();
 
-  // 1. Thêm banner xem lại bài
+  // 1. Thêm Banner thông báo
   const banner = document.createElement('div');
-  banner.style.cssText = "background: #fef3c7; color: #92400e; border: 1.5px solid #f59e0b; padding: 10px 16px; font-weight: 700; font-size: 14px; text-align: center; border-radius: 8px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;";
-  banner.innerHTML = `
-    <span>📜 ĐANG XEM LẠI BÀI (${attempt.timestamp}) — Điểm số: <b>${attempt.score}</b> (Học viên: ${attempt.studentName})</span>
-    <div style="display:flex; gap:8px;">
-      <button type="button" id="btnExitReview" style="background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-weight: bold; cursor: pointer;">🔄 Làm lại bài này</button>
-      <a href="index.html" style="background: #b45309; color: white; padding: 6px 12px; text-decoration: none; border-radius: 6px; font-weight: bold;">🔙 Về Trang chủ</a>
-    </div>
-  `;
+  if (isParentMode) {
+    // Banner Xanh Lịch sự dành riêng cho Phụ Huynh
+    banner.style.cssText = "background: #ECFDF5; color: #065F46; border: 2px solid #10B981; padding: 12px 18px; font-weight: 700; font-size: 14.5px; text-align: center; border-radius: 12px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15); font-family: system-ui, sans-serif;";
+    banner.innerHTML = `
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <span style="font-size: 20px;">📋</span>
+        <span>BÁO CÁO PHỤ HUYNH — Học viên: <b>${attempt.studentName || 'Học viên'}</b> | Điểm số: <b style="color: #047857; font-size: 16px;">${attempt.score}</b> (${attempt.timestamp || 'Gần đây'})</span>
+      </div>
+      <div>
+        <a href="../parent-report.html?email=${encodeURIComponent(attempt.studentEmail || '')}&mode=parent" style="background: #10B981; color: white; padding: 7px 14px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 13px; display: inline-block;">📅 Xem Báo Cáo Cả Ngày</a>
+      </div>
+    `;
+  } else {
+    // Banner Vàng cho Học sinh xem lại
+    banner.style.cssText = "background: #fef3c7; color: #92400e; border: 1.5px solid #f59e0b; padding: 10px 16px; font-weight: 700; font-size: 14px; text-align: center; border-radius: 8px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;";
+    banner.innerHTML = `
+      <span>📜 ĐANG XEM LẠI BÀI (${attempt.timestamp}) — Điểm số: <b>${attempt.score}</b> (Học viên: ${attempt.studentName})</span>
+      <div style="display:flex; gap:8px;">
+        <button type="button" id="btnExitReview" style="background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-weight: bold; cursor: pointer;">🔄 Làm lại bài này</button>
+        <a href="index.html" style="background: #b45309; color: white; padding: 6px 12px; text-decoration: none; border-radius: 6px; font-weight: bold;">🔙 Về Trang chủ</a>
+      </div>
+    `;
+  }
+  
   document.body.insertBefore(banner, document.body.firstChild);
 
-  document.getElementById('btnExitReview')?.addEventListener('click', () => {
-    stateManager.clearProgress();
-    const cleanUrl = window.location.pathname + `?test=` + (new URLSearchParams(window.location.search).get('test') || '');
-    window.location.href = cleanUrl;
-  });
+  if (!isParentMode) {
+    document.getElementById('btnExitReview')?.addEventListener('click', () => {
+      stateManager.clearProgress();
+      const cleanUrl = window.location.pathname + `?test=` + (new URLSearchParams(window.location.search).get('test') || '');
+      window.location.href = cleanUrl;
+    });
+  }
 
   // 2. Điền lại toàn bộ dữ liệu & VÔ HIỆU HÓA chỉnh sửa
   if (attempt.inputs) {
@@ -227,6 +268,158 @@ function restoreReviewMode(attempt, timer, evaluator) {
 
   // Ẩn nút nộp bài
   document.querySelector('.btn-submit')?.remove();
+}
+
+// ==========================================================================
+// MODAL BÁO CÁO PHỤ HUYNH THÔNG MINH (CHỌN GỬI BÀI LẺ HOẶC CẢ NGÀY)
+// ==========================================================================
+function showParentShareModal(info) {
+  // Xóa modal cũ nếu đã tồn tại
+  document.getElementById('parentShareModal')?.remove();
+
+  const todayStr = new Date().toISOString().split('T')[0];
+  const currentOrigin = window.location.origin + window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'));
+  
+  // 1. Link xem riêng bài vừa làm
+  const singleAttemptUrl = `${window.location.origin}${window.location.pathname}?mode=parent&email=${encodeURIComponent(info.studentEmail)}&attemptId=${encodeURIComponent(info.attemptId)}`;
+  
+  // 2. Link xem bảng tổng kết cả ngày (tìm file parent-report.html ở thư mục gốc)
+  const rootPath = window.location.pathname.includes('/') ? window.location.pathname.split('/')[1] : '';
+  const dailyReportUrl = `${window.location.origin}/${rootPath ? rootPath + '/' : ''}parent-report.html?mode=parent&email=${encodeURIComponent(info.studentEmail)}&date=${todayStr}`;
+
+  // Nội dung soạn sẵn cho 2 kịch bản
+  const textSingle = `Dạ Ba/Mẹ, hôm nay con (${info.studentName}) vừa hoàn thành bài tập [${info.testTitle}] trên Trạm IELTS, kết quả đạt: ${info.scoreStr}.\nBa/Mẹ bấm vào link này xem chi tiết bài làm của con nhé:\n${singleAttemptUrl}`;
+  const textDaily = `Dạ kính gửi Ba/Mẹ, hôm nay (${new Date().toLocaleDateString('vi-VN')}) con (${info.studentName}) đã hoàn thành bài tập theo lịch học Trạm IELTS.\nKính mời Ba/Mẹ bấm vào link sau để xem Bảng tổng kết kết quả học tập hôm nay của con:\n${dailyReportUrl}`;
+
+  const modalHtml = `
+    <div id="parentShareModal" style="position:fixed; inset:0; z-index:999999; background:rgba(15, 23, 42, 0.75); backdrop-filter:blur(6px); display:flex; align-items:center; justify-content:center; padding:16px; font-family:'Plus Jakarta Sans', system-ui, sans-serif;">
+      <div style="background:#FFFFFF; border-radius:24px; max-width:480px; width:100%; padding:26px 22px; box-shadow:0 25px 50px rgba(0,0,0,0.3); border:2px solid #E2E8F0; position:relative;">
+        
+        <button type="button" onclick="document.getElementById('parentShareModal').remove()" style="position:absolute; top:16px; right:16px; background:#F1F5F9; border:none; width:34px; height:34px; border-radius:50%; font-weight:900; color:#64748B; cursor:pointer; font-size:16px;">✕</button>
+
+        <div style="text-align:center; margin-bottom:16px;">
+          <div style="font-size:38px; margin-bottom:6px;">🎉</div>
+          <h3 style="margin:0; font-size:20px; font-weight:900; color:#0F172A;">Nộp Bài Thành Công!</h3>
+          <p style="margin:4px 0 0 0; font-size:14px; color:#475569; font-weight:600;">Kết quả của em: <b style="color:#0284C7; font-size:17px;">${info.scoreStr}</b></p>
+        </div>
+
+        <!-- TAB CHỌN CHẾ ĐỘ BÁO CÁO -->
+        <div style="display:flex; background:#F1F5F9; border-radius:12px; padding:4px; margin-bottom:14px;">
+          <button type="button" id="tabDailyBtn" onclick="window.switchShareTab('daily')" style="flex:1; padding:9px; border:none; border-radius:10px; font-weight:800; font-size:13px; cursor:pointer; background:#FFFFFF; color:#0F172A; box-shadow:0 2px 6px rgba(0,0,0,0.06);">
+            📅 Báo Cáo Cả Ngày
+          </button>
+          <button type="button" id="tabSingleBtn" onclick="window.switchShareTab('single')" style="flex:1; padding:9px; border:none; border-radius:10px; font-weight:800; font-size:13px; cursor:pointer; background:transparent; color:#64748B;">
+            📌 Báo Cáo Bài Này
+          </button>
+        </div>
+
+        <!-- KHUNG NỘI DUNG TIN NHẮN TỰ ĐỘNG -->
+        <div style="margin-bottom:16px;">
+          <label style="font-size:12px; font-weight:800; color:#334155; text-transform:uppercase; margin-bottom:6px; display:block;">Nội dung tin nhắn gửi Phụ Huynh:</label>
+          <textarea id="shareMsgArea" readonly style="width:100%; height:110px; border:2px solid #CBD5E1; border-radius:12px; padding:10px; font-size:13px; font-family:inherit; color:#1E293B; line-height:1.5; resize:none; box-sizing:border-box; background:#F8FAFC; outline:none;"></textarea>
+        </div>
+
+        <!-- CÁC NÚT HÀNH ĐỘNG -->
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <button type="button" id="btnCopyShare" onclick="window.copyShareMessage()" style="background:#0284C7; color:#FFFFFF; border:none; padding:12px 18px; border-radius:12px; font-weight:800; font-size:14px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; border-bottom:3px solid #0369A1;">
+            📋 Sao Chép Tin Nhắn & Link
+          </button>
+
+          <a id="btnDirectZalo" href="https://zalo.me" target="_blank" style="background:#0068FF; color:#FFFFFF; text-decoration:none; padding:12px 18px; border-radius:12px; font-weight:800; font-size:14px; display:flex; align-items:center; justify-content:center; gap:8px; border-bottom:3px solid #004EC4;">
+            💬 Mở Zalo Để Dán Tin Nhắn
+          </a>
+        </div>
+
+      </div>
+    </div>
+  `;
+
+  document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+  // Lưu biến toàn cục tạm thời để xử lý sự kiện nút bấm trong modal
+  window.__shareState = {
+    currentMode: 'daily',
+    textDaily: textDaily,
+    textSingle: textSingle
+  };
+
+  // Mặc định hiển thị tab Báo Cáo Cả Ngày
+  const msgArea = document.getElementById('shareMsgArea');
+  if (msgArea) msgArea.value = textDaily;
+}
+
+// HÀM CHUYỂN ĐỔI TAB GỬI BÁO CÁO
+window.switchShareTab = function(mode) {
+  const tabDaily = document.getElementById('tabDailyBtn');
+  const tabSingle = document.getElementById('tabSingleBtn');
+  const msgArea = document.getElementById('shareMsgArea');
+  if (!window.__shareState || !msgArea) return;
+
+  window.__shareState.currentMode = mode;
+
+  if (mode === 'daily') {
+    tabDaily.style.background = '#FFFFFF';
+    tabDaily.style.color = '#0F172A';
+    tabDaily.style.boxShadow = '0 2px 6px rgba(0,0,0,0.06)';
+
+    tabSingle.style.background = 'transparent';
+    tabSingle.style.color = '#64748B';
+    tabSingle.style.boxShadow = 'none';
+
+    msgArea.value = window.__shareState.textDaily;
+  } else {
+    tabSingle.style.background = '#FFFFFF';
+    tabSingle.style.color = '#0F172A';
+    tabSingle.style.boxShadow = '0 2px 6px rgba(0,0,0,0.06)';
+
+    tabDaily.style.background = 'transparent';
+    tabDaily.style.color = '#64748B';
+    tabDaily.style.boxShadow = 'none';
+
+    msgArea.value = window.__shareState.textSingle;
+  }
+};
+
+// HÀM SAO CHÉP NỘI DUNG CHỐNG MỌI LỖI TRÊN ĐIỆN THOẠI
+window.copyShareMessage = function() {
+  const msgArea = document.getElementById('shareMsgArea');
+  const copyBtn = document.getElementById('btnCopyShare');
+  if (!msgArea) return;
+
+  const textToCopy = msgArea.value;
+
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(textToCopy).then(() => {
+      onCopySuccess(copyBtn);
+    }).catch(() => {
+      fallbackCopy(msgArea, copyBtn);
+    });
+  } else {
+    fallbackCopy(msgArea, copyBtn);
+  }
+};
+
+function fallbackCopy(textareaEl, copyBtn) {
+  try {
+    textareaEl.select();
+    textareaEl.setSelectionRange(0, 99999);
+    document.execCommand('copy');
+    onCopySuccess(copyBtn);
+  } catch (err) {
+    alert("⚠️ Em hãy chạm giữ vào khung văn bản để chọn 'Sao chép' nhé!");
+  }
+}
+
+function onCopySuccess(copyBtn) {
+  if (copyBtn) {
+    const originalText = copyBtn.innerHTML;
+    copyBtn.innerHTML = "✅ Đã Sao Chép! Hãy Dán Vào Zalo";
+    copyBtn.style.background = "#16A34A";
+    setTimeout(() => {
+      copyBtn.innerHTML = originalText;
+      copyBtn.style.background = "#0284C7";
+    }, 2500);
+  }
 }
 
 if (document.readyState === 'loading') {
