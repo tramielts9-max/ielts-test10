@@ -1,6 +1,6 @@
 /* ==========================================================================
    css/calendar.css - GIAO DIỆN GOOGLE CALENDAR THU NHỎ CHO ADMIN & GIÁO VIÊN
-   PHONG CÁCH: DUOLINGO X MODERN CALENDAR (TRỰC QUAN, SẮC NÉT, DỄ DÙNG)
+   PHONG CÁCH: DUOLINGO X MODERN CALENDAR (HỌC NHÓM 2+ BẠN & QUẢN LÝ HỌC PHÍ)
    ========================================================================== */
 
 /* 1. KHUNG CHỨA TOÀN BỘ BỘ LỊCH */
@@ -175,7 +175,7 @@
 .cal-day-col {
   border-right: 1px solid #F1ECE6;
   position: relative;
-  min-height: 832px; /* 16 tiếng x 52px */
+  min-height: 832px;
   background: #FFFFFF;
 }
 
@@ -200,7 +200,7 @@
   left: 3px;
   right: 3px;
   border-radius: 8px;
-  padding: 4px 6px;
+  padding: 5px 8px;
   font-size: 11.5px;
   font-weight: 800;
   overflow: hidden;
@@ -209,7 +209,7 @@
   transition: transform 0.08s ease, box-shadow 0.08s ease;
   z-index: 5;
   box-sizing: border-box;
-  line-height: 1.3;
+  line-height: 1.35;
 }
 
 .cal-event-card:hover {
@@ -237,6 +237,13 @@
   border: 1.5px solid #7DD3FC;
   border-left: 4px solid #0284C7;
   color: #0369A1;
+}
+
+.cal-ev-group {
+  background: #F3E8FF;
+  border: 1.5px solid #D8B4FE;
+  border-left: 4px solid #9333EA;
+  color: #6B21A8;
 }
 
 .cal-ev-requested {
@@ -308,6 +315,12 @@
   color: #0369A1;
 }
 
+.cal-month-event-item.is-group {
+  border-color: #D8B4FE;
+  border-left-color: #9333EA;
+  color: #6B21A8;
+}
+
 .cal-month-event-item.is-requested {
   border-color: #FCA5A5;
   border-left-color: #DC2626;
@@ -315,7 +328,7 @@
   color: #991B1B;
 }
 
-/* 7. MODAL TẠO & SỬA BUỔI HỌC */
+/* 7. MODAL TẠO & SỬA BUỔI HỌC (HỌC NHÓM & HỌC PHÍ) */
 .cal-modal-backdrop {
   position: fixed;
   inset: 0;
@@ -333,12 +346,14 @@
   border: 3px solid #E8E2D8;
   border-bottom: 7px solid #D3CBC0;
   border-radius: 24px;
-  max-width: 500px;
+  max-width: 520px;
   width: 100%;
   padding: 24px;
   position: relative;
   box-shadow: 0 20px 40px rgba(0,0,0,0.3);
   font-family: inherit;
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
 .cal-form-group {
@@ -369,4 +384,63 @@
 .cal-form-input:focus, .cal-form-select:focus, .cal-form-textarea:focus {
   border-color: #8B1518;
   background: #FFFFFF;
+}
+
+/* DANH SÁCH CHECKBOX CHỌN NHIỀU HỌC SINH */
+.cal-student-checklist {
+  max-height: 140px;
+  overflow-y: auto;
+  border: 2px solid #E8E2D8;
+  border-radius: 12px;
+  padding: 6px 10px;
+  background: #FAF7F2;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cal-student-check-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #1E293B;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 6px;
+  transition: background 0.1s;
+}
+
+.cal-student-check-item:hover {
+  background: #F1ECE6;
+}
+
+.cal-student-check-item input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: #8B1518;
+  cursor: pointer;
+}
+
+/* BẢNG QUẢN LÝ HỌC PHÍ */
+.cal-tuition-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  margin-top: 10px;
+}
+
+.cal-tuition-table th, .cal-tuition-table td {
+  padding: 10px 8px;
+  border-bottom: 1px solid #E8E2D8;
+  text-align: left;
+}
+
+.cal-tuition-table th {
+  background: #FAF7F2;
+  font-weight: 900;
+  color: #78716C;
+  font-size: 12px;
+  text-transform: uppercase;
 }
