@@ -1,0 +1,47 @@
+{
+  "testId": "test_01",
+  "set": 3,
+  "title": "Listening Diagnostic Test 1 - Set 3 (A2 & B2)",
+  "parts": [
+    {
+      "partNum": 1,
+      "title": "Audio 1 (Level A2): Clothes Shopping (Mua sắm quần áo)",
+      "audioUrl": "https://archive.org/download/lisb2-3/lisa2-3.mp3",
+      "startTime": 0,
+      "answers": {
+        "lis_s3_01": "B",
+        "lis_s3_02": "B",
+        "lis_s3_03": "A",
+        "lis_s3_04": "B",
+        "lis_s3_05": "B"
+      },
+      "questions": {
+        "lis_s3_01": { "num": 1, "type": "choice", "q": "1. Which jacket colour was finally chosen?", "options": ["A. Blue", "B. Black", "C. Grey"], "answer": "B" },
+        "lis_s3_02": { "num": 2, "type": "choice", "q": "2. What discount percentage applies to the second item?", "options": ["A. 10%", "B. 15%", "C. 20%"], "answer": "B" },
+        "lis_s3_03": { "num": 3, "type": "choice", "q": "3. What colour cardigan was picked?", "options": ["A. Brown", "B. Green", "C. White"], "answer": "A" },
+        "lis_s3_04": { "num": 4, "type": "choice", "q": "4. What was the total price after discount?", "options": ["A. £50", "B. £76", "C. £90"], "answer": "B" },
+        "lis_s3_05": { "num": 5, "type": "choice", "q": "5. How much change did the customer receive back?", "options": ["A. £14", "B. £24", "C. £30"], "answer": "B" }
+      }
+    },
+    {
+      "partNum": 2,
+      "title": "Audio 2 (Level B2): News & Media (Tin tức & Truyền thông)",
+      "audioUrl": "https://archive.org/download/lisb2-3/lisb2-3.mp3",
+      "startTime": 0,
+      "answers": {
+        "lis_s3_06": "A",
+        "lis_s3_07": "B",
+        "lis_s3_08": "B",
+        "lis_s3_09": "B",
+        "lis_s3_10": "A"
+      },
+      "questions": {
+        "lis_s3_06": { "num": 6, "type": "choice", "q": "6. Where does the speaker primarily consume news when traveling?", "options": ["A. On the radio", "B. On television", "C. Social media"], "answer": "A" },
+        "lis_s3_07": { "num": 7, "type": "choice", "q": "7. Why does the speaker avoid watching live television broadcasts?", "options": ["A. Too expensive", "B. Strong dislike of adverts", "C. Broadcasts too late"], "answer": "B" },
+        "lis_s3_08": { "num": 8, "type": "choice", "q": "8. Which historic news event had the strongest emotional impact?", "options": ["A. Moon landing", "B. 9/11 Twin Towers attack", "C. Major earthquake"], "answer": "B" },
+        "lis_s3_09": { "num": 9, "type": "choice", "q": "9. Why do online tabloids publish sensationalist headlines?", "options": ["A. To educate readers", "B. To generate more clicks", "C. To comply with laws"], "answer": "B" },
+        "lis_s3_10": { "num": 10, "type": "choice", "q": "10. Which recent political incident was highlighted as shocking?", "options": ["A. The Capitol attack", "B. Election debates", "C. Economic summit"], "answer": "A" }
+      }
+    }
+  ]
+}
