@@ -2,7 +2,9 @@
  * curriculum-system/ui-system.js
  * GIAO DIỆN LỘ TRÌNH, LỊCH CHUYÊN CẦN & BANNER LỊCH SỬ PASTEL ĐỔI MÀU THEO HỌC PHẦN
  * (BẢN ĐẦY ĐỦ 100% - KHÔNG CẮT BỚT BẤT KỲ TÍNH NĂNG NÀO)
- * TÍCH HỢP TOÀN DIỆN: TẠM KHÓA CẢNH CÁO HỌC VIÊN 1-CLICK & MỞ KHÓA VÀO LẠI TRONG 2 GIÂY
+ * TÍCH HỢP TOÀN DIỆN:
+ *  1. TẠM KHÓA CẢNH CÁO HỌC VIÊN 1-CLICK & MỞ KHÓA VÀO LẠI TRONG 2 GIÂY
+ *  2. HỆ THỐNG LỊCH HỌC TRỰC TIẾP (GOOGLE CALENDAR INTEGRATION): HIỂN THỊ BUỔI HỌC & XIN DỜI LỊCH
  */
 
 import { curriculumEngineSystem } from './engine-system.js';
@@ -29,13 +31,17 @@ class CurriculumUISystem {
     this.calCurrentYear = new Date().getFullYear();
     this.cachedAttempts = [];
     this.cachedEmail = '';
+    this.cachedSchedules = []; // 📅 Lưu trữ danh sách buổi học được đồng bộ từ Cloud
     this.selectedDateStr = this.getFormattedDate(new Date());
     this.isListCollapsed = false;
     this.targetStudentEmail = '';
     this.suppressCloudFetchForEmail = '';
     this.isForceEditing = false;
     this.studentLockCache = {}; // Lưu cache trạng thái khóa của học sinh
+    this.activeRescheduleEventId = null;
+
     this.initSpeechSTT();
+    this.injectRescheduleModal();
   }
 
   initSpeechSTT() {
@@ -128,6 +134,7 @@ class CurriculumUISystem {
 
     await this.fetchStudentRoadmapFromCloud(clean);
     await this.fetchStudentHistoryFromCloud(clean);
+    await this.fetchSchedules(clean);
 
     alert(`🎭 Đã chuyển sang chế độ điều khiển tài khoản học viên: ${clean}`);
     window.location.reload();
@@ -305,6 +312,31 @@ class CurriculumUISystem {
       }
     } catch(e) {}
     return [];
+  }
+
+  // 📅 ĐỒNG BỘ LỊCH HỌC TỪ CLOUD CHO HỌC SINH HIỆN TẠI
+  async fetchSchedules(email) {
+    if (!CLOUD_SCRIPT_URL || !email || email === 'guest') return [];
+    try {
+      const res = await fetch(CLOUD_SCRIPT_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({ action: "get_schedules", userEmail: email })
+      });
+      const data = await res.json();
+      if (data && data.success && Array.isArray(data.events)) {
+        this.cachedSchedules = data.events;
+        localStorage.setItem(`ielts_schedules_${email}`, JSON.stringify(this.cachedSchedules));
+        return this.cachedSchedules;
+      }
+    } catch(e) {
+      // Fallback về bộ nhớ local nếu mất mạng
+      try {
+        const local = localStorage.getItem(`ielts_schedules_${email}`);
+        if (local) this.cachedSchedules = JSON.parse(local);
+      } catch(err) {}
+    }
+    return this.cachedSchedules;
   }
 
   getNodeCompletionInfo(node, specifiedEmail = null) {
@@ -693,6 +725,16 @@ class CurriculumUISystem {
       data = await this.fetchStudentRoadmapFromCloud(email);
     }
 
+    // Tự động kéo lịch học của học sinh về nếu có email
+    if (email && email !== 'guest') {
+      this.fetchSchedules(email).then(() => {
+        // Tự làm mới lịch nếu đã có attempts
+        if (this.cachedAttempts.length > 0) {
+          this.renderTodayHistoryAndCalendar(this.cachedAttempts, email);
+        }
+      });
+    }
+
     const adminBarHtml = this.renderAdminControlBar();
     const floatingBarHtml = this.renderFloatingImpersonationBar();
 
@@ -947,7 +989,7 @@ class CurriculumUISystem {
   }
 
   // =========================================================================
-  // 7. LỊCH CHUYÊN CẦN & BANNER LỊCH SỬ TÔNG MÀU PASTEL CHUẨN MÔN
+  // 7. LỊCH CHUYÊN CẦN & BANNER LỊCH SỬ TÔNG MÀU PASTEL CHUẨN MÔN (KÈM LỊCH HỌC)
   // =========================================================================
   renderTodayHistoryAndCalendar(attempts = [], email = '') {
     this.cachedAttempts = stateManager.sortAttemptsDescending(attempts);
@@ -957,6 +999,11 @@ class CurriculumUISystem {
     if (!container) return;
 
     const selectedAttempts = this.cachedAttempts.filter(att => (att.timestamp || '').includes(this.selectedDateStr));
+
+    // Lọc các buổi học trùng ngày được chọn (Chuyển "DD/MM/YYYY" sang "YYYY-MM-DD")
+    const parts = this.selectedDateStr.split('/');
+    const selectedIsoDate = parts.length === 3 ? `${parts[2]}-${parts[1]}-${parts[0]}` : '';
+    const selectedSchedules = (this.cachedSchedules || []).filter(ev => ev.date === selectedIsoDate);
 
     const todayStr = this.getFormattedDate(new Date());
     const todayAttemptsCount = this.cachedAttempts.filter(att => (att.timestamp || '').includes(todayStr)).length;
@@ -982,7 +1029,7 @@ class CurriculumUISystem {
       <div style="margin-top: 20px; border-top: 2px dashed #E8E2D8; padding-top: 18px;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
           <b style="font-size: 16px; color: #8B1518;">
-            📝 Danh sách nộp bài: ${displayDateLabel} (${selectedAttempts.length} bài)
+            📝 Chi tiết ngày học: ${displayDateLabel}
           </b>
           <button type="button" onclick="window.curriculumUI.toggleListCollapse()" class="cs-cal-btn" style="cursor: pointer; padding: 6px 14px; font-size: 13px;">
             ${this.isListCollapsed ? 'Mở rộng ▼' : 'Thu gọn ▲'}
@@ -992,11 +1039,55 @@ class CurriculumUISystem {
         <div id="csSelectedDateListBody" style="display: ${this.isListCollapsed ? 'none' : 'block'};">
     `;
 
-    if (selectedAttempts.length === 0) {
+    // 📅 1. HIỂN THỊ BUỔI HỌC TRỰC TIẾP VỚI GIÁO VIÊN (NẾU CÓ)
+    if (selectedSchedules.length > 0) {
+      selectedSchedules.forEach(ev => {
+        const isRequested = ev.status === 'reschedule_requested';
+        const isDone = ev.status === 'completed';
+
+        listHtml += `
+          <div style="background: #FFFBEB; border: 2.5px solid #FCD34D; border-bottom: 5px solid #F59E0B; border-radius: 16px; padding: 14px 18px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; box-shadow: 0 4px 12px rgba(217, 119, 6, 0.08);">
+            <div style="flex: 1; min-width: 240px;">
+              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+                <span style="background: #D97706; color: #FFFFFF; font-size: 11px; font-weight: 900; padding: 2px 8px; border-radius: 6px; text-transform: uppercase;">
+                  🏫 LỚP HỌC TRỰC TIẾP
+                </span>
+                ${isRequested ? '<span style="background: #EF4444; color: white; font-size: 11px; font-weight: 900; padding: 2px 8px; border-radius: 6px;">⏳ ĐANG CHỜ THẦY DUYỆT DỜI LỊCH</span>' : ''}
+                ${isDone ? '<span style="background: #16A34A; color: white; font-size: 11px; font-weight: 900; padding: 2px 8px; border-radius: 6px;">✓ ĐÃ HỌC XONG</span>' : ''}
+              </div>
+              <h4 style="margin: 0 0 4px 0; font-size: 16px; font-weight: 900; color: #78350F;">
+                ${ev.title || 'Buổi học IELTS với Thầy'}
+              </h4>
+              <div style="font-size: 13.5px; font-weight: 800; color: #92400E;">
+                ⏱️ Khung giờ: <b>${ev.startTime} - ${ev.endTime}</b>
+                ${ev.meetUrl ? ` • <a href="${ev.meetUrl}" target="_blank" style="color: #0284C7; text-decoration: underline; font-weight: 900;">🔗 Vào phòng học Google Meet</a>` : ''}
+              </div>
+              ${ev.notes ? `<div style="font-size: 12.5px; color: #78350F; margin-top: 4px; font-style: italic;">📌 Ghi chú: ${ev.notes}</div>` : ''}
+              ${isRequested && ev.rescheduleRequest?.reason ? `
+                <div style="font-size: 12px; color: #B91C1C; background: #FEF2F2; padding: 4px 8px; border-radius: 6px; margin-top: 6px; border: 1px solid #FECACA;">
+                  💬 Lý do xin dời: <b>${ev.rescheduleRequest.reason}</b> (${ev.rescheduleRequest.suggestedTime || 'Chưa hẹn giờ'})
+                </div>
+              ` : ''}
+            </div>
+
+            <div>
+              ${!isDone ? `
+                <button type="button" onclick="window.curriculumUI.openRescheduleModal('${ev.id}', '${ev.title.replace(/'/g, "\\'")}', '${this.selectedDateStr} ${ev.startTime}')" class="btn-3d" style="background: #FFFFFF; color: #92400E !important; border: 2px solid #FCD34D; border-bottom: 4px solid #F59E0B; padding: 8px 14px; font-size: 12.5px; border-radius: 12px; cursor: pointer;">
+                  <i class="fa-solid fa-clock-rotate-left"></i> ${isRequested ? 'Sửa yêu cầu dời lịch' : 'Xin dời lịch học'}
+                </button>
+              ` : ''}
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    // 📝 2. HIỂN THỊ DANH SÁCH BÀI TẬP VỀ NHÀ ĐÃ NỘP TRONG NGÀY
+    if (selectedAttempts.length === 0 && selectedSchedules.length === 0) {
       listHtml += `
         <div style="text-align: center; padding: 22px 14px; background: #FAF7F2; border-radius: 16px; border: 2px dashed #E8E2D8;">
           <div style="font-size: 26px; margin-bottom: 4px;">📅</div>
-          <b style="color: #261F1D; font-size: 15px;">Chưa có bài nộp nào trong ngày ${this.selectedDateStr}</b>
+          <b style="color: #261F1D; font-size: 15px;">Chưa có bài nộp hay buổi học nào trong ngày ${this.selectedDateStr}</b>
           <div style="font-size: 13px; color: #756D68; margin-top: 3px; font-weight: 700;">Nhấp vào các ô có màu trên lịch để xem lại bài nhé!</div>
         </div>
       `;
@@ -1043,12 +1134,26 @@ class CurriculumUISystem {
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     const adjustedFirstDay = firstDayIndex === 0 ? 6 : firstDayIndex - 1;
 
+    // Đếm bài tập đã làm theo ngày
     const dateCountMap = {};
     attempts.forEach(att => {
       const m = att.timestamp?.match(/(\d{2}\/\d{2}\/\d{4})/);
       if (m && parseInt(m[2], 10) === (month + 1) && parseInt(m[3], 10) === year) {
         const d = parseInt(m[1], 10);
         dateCountMap[d] = (dateCountMap[d] || 0) + 1;
+      }
+    });
+
+    // 📅 Bản đồ buổi học trực tiếp trong tháng
+    const scheduleDateMap = {};
+    (this.cachedSchedules || []).forEach(ev => {
+      if (ev.date) {
+        const sParts = ev.date.split('-');
+        if (sParts.length === 3 && parseInt(sParts[0], 10) === year && parseInt(sParts[1], 10) === (month + 1)) {
+          const d = parseInt(sParts[2], 10);
+          if (!scheduleDateMap[d]) scheduleDateMap[d] = [];
+          scheduleDateMap[d].push(ev);
+        }
       }
     });
 
@@ -1063,6 +1168,8 @@ class CurriculumUISystem {
 
     for (let day = 1; day <= daysInMonth; day++) {
       const count = dateCountMap[day] || 0;
+      const schedulesOnDay = scheduleDateMap[day] || [];
+      const hasSchedule = schedulesOnDay.length > 0;
       const isFuture = isCurrentMonthNow && (day > todayDateNum);
 
       const dStr = `${String(day).padStart(2, '0')}/${String(month + 1).padStart(2, '0')}/${year}`;
@@ -1085,9 +1192,23 @@ class CurriculumUISystem {
 
       const activeBorder = isSelected ? 'box-shadow: 0 0 0 3.5px #8B1518, 0 4px 12px rgba(0,0,0,0.25); transform: scale(1.08); z-index: 5;' : '';
 
+      // Huy hiệu thể hiện buổi học trực tiếp
+      let scheduleBadgeHtml = '';
+      if (hasSchedule) {
+        const firstEv = schedulesOnDay[0];
+        const isReq = schedulesOnDay.some(s => s.status === 'reschedule_requested');
+        const badgeColor = isReq ? '#EF4444' : '#D97706';
+        scheduleBadgeHtml = `
+          <span style="background:${badgeColor}; color:white; font-size:10px; font-weight:900; padding:1px 4px; border-radius:4px; margin-top:2px; display:inline-block; max-width:95%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+            🔴 ${firstEv.startTime}
+          </span>
+        `;
+      }
+
       gridHtml += `
         <div class="cs-cal-cell ${colorClass}" style="${activeBorder}" onclick="window.curriculumUI.selectCalendarDate(${day}, ${month}, ${year})">
           <span>${day}</span>
+          ${scheduleBadgeHtml}
           ${count > 0 ? `<span class="cs-cal-subtext">${count >= 5 ? '🔥 ' : ''}${count} bài</span>` : ''}
         </div>
       `;
@@ -1117,9 +1238,9 @@ class CurriculumUISystem {
         </div>
 
         <div class="cs-legend-bar">
-          <span style="color: #756D68; font-size: 13.5px; margin-right: 6px;">Mức độ cày:</span>
-          <div class="cs-legend-item"><span class="cs-legend-dot cal-color-zero"></span> <span>0 bài</span></div>
-          <div class="cs-legend-item"><span class="cs-legend-dot cal-color-low"></span> <span>1 bài</span></div>
+          <span style="color: #756D68; font-size: 13.5px; margin-right: 6px;">Ký hiệu:</span>
+          <div class="cs-legend-item"><span style="width:10px; height:10px; background:#D97706; border-radius:50%; display:inline-block;"></span> <span>🔴 Lịch học với Thầy</span></div>
+          <div class="cs-legend-item"><span class="cs-legend-dot cal-color-low"></span> <span>1 bài BTVN</span></div>
           <div class="cs-legend-item"><span class="cs-legend-dot cal-color-mid"></span> <span>2 bài</span></div>
           <div class="cs-legend-item"><span class="cs-legend-dot cal-color-full"></span> <span>3-4 bài</span></div>
           <div class="cs-legend-item"><span class="cs-legend-dot cal-color-over"></span> <span>5+ bài 🔥</span></div>
@@ -1189,6 +1310,134 @@ class CurriculumUISystem {
     if (target.startsWith('runner-listening.html')) target = 'listening/' + target;
     const sep = target.includes('?') ? '&' : '?';
     return `${target}${sep}attemptId=${id}&email=${encodeURIComponent(email)}`;
+  }
+
+  // =========================================================================
+  // 8. MODAL HỌC SINH XIN DỜI LỊCH (STUDENT RESCHEDULE POPUP)
+  // =========================================================================
+  injectRescheduleModal() {
+    if (document.getElementById('studentRescheduleModal')) return;
+
+    const modalHtml = `
+      <div id="studentRescheduleModal" style="display:none; position:fixed; inset:0; z-index:999999; background:rgba(15, 23, 42, 0.75); backdrop-filter:blur(6px); align-items:center; justify-content:center; padding:16px;">
+        <div style="background:#FFFFFF; border:3px solid #E8E2D8; border-bottom:7px solid #D3CBC0; border-radius:26px; max-width:460px; width:100%; padding:26px; position:relative; box-shadow:0 20px 40px rgba(0,0,0,0.3); font-family:'Plus Jakarta Sans', system-ui, sans-serif;">
+          
+          <button type="button" onclick="window.curriculumUI.closeRescheduleModal()" style="position:absolute; top:14px; right:16px; background:#F1ECE6; border:none; width:34px; height:34px; border-radius:50%; font-weight:900; color:#7E7672; cursor:pointer; font-size:16px;">✕</button>
+
+          <div style="width:56px; height:56px; border-radius:50%; background:#FFF4E5; border:3px solid #FCD34D; display:flex; align-items:center; justify-content:center; margin:0 auto 12px auto; font-size:26px;">
+            📅
+          </div>
+
+          <h3 style="margin:0 0 6px 0; color:#8B1518; font-size:19px; font-weight:900; text-align:center;">
+            XIN PHÉP DỜI LỊCH HỌC
+          </h3>
+          <p id="rescheduleEventInfo" style="margin:0 0 16px 0; font-size:13px; font-weight:700; color:#64748B; text-align:center;">
+            Buổi học: Đang tải...
+          </p>
+
+          <div style="margin-bottom:14px;">
+            <label style="font-size:13px; font-weight:800; color:#1e293b; display:block; margin-bottom:5px;">
+              📝 Lý do xin dời lịch: <span style="color:#DC2626;">*</span>
+            </label>
+            <textarea id="rescheduleReasonInput" placeholder="Ví dụ: Em bị trùng lịch thi học kỳ ở trường..." style="width:100%; box-sizing:border-box; padding:10px 14px; border:2px solid #E8E2D8; border-radius:12px; font-family:inherit; font-weight:700; font-size:13.5px; height:70px; outline:none; resize:none;"></textarea>
+          </div>
+
+          <div style="margin-bottom:18px;">
+            <label style="font-size:13px; font-weight:800; color:#1e293b; display:block; margin-bottom:5px;">
+              ⏰ Đề xuất khung giờ muốn học bù (nếu có):
+            </label>
+            <input type="text" id="rescheduleSuggestedTimeInput" placeholder="Ví dụ: Tối mai 19:30 hoặc Chủ nhật..." style="width:100%; box-sizing:border-box; padding:10px 14px; border:2px solid #E8E2D8; border-radius:12px; font-family:inherit; font-weight:700; font-size:13.5px; outline:none;">
+          </div>
+
+          <button type="button" id="btnSubmitReschedule" onclick="window.curriculumUI.submitRescheduleRequest()" style="background:#8B1518; color:#FFFFFF; border:none; padding:13px 20px; border-radius:14px; font-weight:900; font-size:14.5px; width:100%; cursor:pointer; border-bottom:4px solid #5E0C0E;">
+            🚀 Gửi Lời Nhắn Xin Dời Cho Thầy
+          </button>
+        </div>
+      </div>
+    `;
+
+    if (document.body) {
+      document.body.insertAdjacentHTML('beforeend', modalHtml);
+    }
+  }
+
+  openRescheduleModal(eventId, title, currentDateTime) {
+    this.activeRescheduleEventId = eventId;
+    const modal = document.getElementById('studentRescheduleModal');
+    const info = document.getElementById('rescheduleEventInfo');
+    const reasonInput = document.getElementById('rescheduleReasonInput');
+    const timeInput = document.getElementById('rescheduleSuggestedTimeInput');
+
+    if (info) {
+      info.innerHTML = `Buổi học: <b style="color:#1e293b;">${title}</b><br>Thời gian hiện tại: <b style="color:#D97706;">${currentDateTime}</b>`;
+    }
+    if (reasonInput) reasonInput.value = '';
+    if (timeInput) timeInput.value = '';
+    if (modal) modal.style.display = 'flex';
+  }
+
+  closeRescheduleModal() {
+    const modal = document.getElementById('studentRescheduleModal');
+    if (modal) modal.style.display = 'none';
+    this.activeRescheduleEventId = null;
+  }
+
+  async submitRescheduleRequest() {
+    const eventId = this.activeRescheduleEventId;
+    const reason = document.getElementById('rescheduleReasonInput')?.value.trim();
+    const suggestedTime = document.getElementById('rescheduleSuggestedTimeInput')?.value.trim();
+    const email = this.getActiveWorkingEmail();
+
+    if (!reason) {
+      alert("⚠️ Em vui lòng ghi lý do xin dời lịch để Thầy nắm được nhé!");
+      return;
+    }
+
+    const btn = document.getElementById('btnSubmitReschedule');
+    if (btn) {
+      btn.disabled = true;
+      btn.innerText = "⏳ Đang gửi yêu cầu lên máy chủ...";
+    }
+
+    try {
+      if (CLOUD_SCRIPT_URL) {
+        const res = await fetch(CLOUD_SCRIPT_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({
+            action: "student_request_reschedule",
+            studentEmail: email,
+            eventId: eventId,
+            reason: reason,
+            suggestedTime: suggestedTime
+          })
+        });
+        const data = await res.json();
+        if (data && data.success) {
+          alert("🎉 " + data.message);
+        } else {
+          alert("⚠️ " + (data.error || "Gửi yêu cầu dời lịch thành công"));
+        }
+      }
+
+      // Cập nhật ngay trong cache của học sinh để giao diện đổi màu tức thì
+      const ev = (this.cachedSchedules || []).find(e => e.id === eventId);
+      if (ev) {
+        ev.status = 'reschedule_requested';
+        ev.rescheduleRequest = { reason, suggestedTime, requestedAt: new Date().toISOString() };
+      }
+
+      this.closeRescheduleModal();
+      this.renderTodayHistoryAndCalendar(this.cachedAttempts, email);
+
+    } catch (e) {
+      alert("Lỗi kết nối máy chủ: " + e.message);
+    } finally {
+      if (btn) {
+        btn.disabled = false;
+        btn.innerText = "🚀 Gửi Lời Nhắn Xin Dời Cho Thầy";
+      }
+    }
   }
 }
 
