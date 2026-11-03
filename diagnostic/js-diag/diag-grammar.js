@@ -1,9 +1,11 @@
 /**
  * diagnostic/js-diag/diag-grammar.js
  * BỘ ĐIỀU KHIỂN NGỮ PHÁP ĐA NĂNG THÍCH ỨNG 100%
- * TỰ ĐỘNG NHẬN DIỆN:
- * - ĐỀ TEST 1, 2, 3: MẢNG CÂU HỎI TRỌNG TÂM
- * - ĐỀ TEST 4: 100 CÂU CHUYÊN SÂU 5 PHẦN + NÚT CHẤM AI
+ * BẢN FULL ĐẦY ĐỦ 100% - KHÔNG CẮT BỚT BẤT KỲ TÍNH NĂNG NÀO
+ * - TỰ ĐỘNG CHUYỂN ĐỔI: ĐỀ TEST 1, 2, 3 (TRẮC NGHIỆM TRỌNG TÂM) & ĐỀ TEST 4 (100 CÂU 5 PHẦN)
+ * - GIỮ ĐẦY ĐỦ TELEMETRY: ĐO ĐỘ TRỄ PHẢN XẠ TTFI, ĐẾM SỐ LẦN ĐẮN ĐO HESITATION
+ * - TÍCH HỢP NÚT CHẤM AI GEMINI PHÂN TÍCH LỖ HỔNG & ƯỚC LƯỢNG BAND
+ * - XEM LẠI BÀI TOÀN DIỆN KÈM GIẢI THÍCH CHI TIẾT
  */
 
 import { ExerciseEngine } from '../../grammar/js/exercise-engine-g.js';
@@ -26,10 +28,13 @@ export class DiagGrammarEngine {
     this.parts = [];
     this.questions = [];
     this.userAnswers = {};
+    this.metrics = {};
     this.isReviewMode = false;
   }
 
-  // 1. NẠP FILE JSON VÀ TỰ PHÂN LOẠI ĐỊNH DẠNG
+  // =========================================================================
+  // 1. NẠP DỮ LIỆU ĐỀ THI VÀ TỰ PHÂN LOẠI ĐỊNH DẠNG
+  // =========================================================================
   async loadTestFromJson(jsonUrl) {
     try {
       const res = await fetch(`${jsonUrl}?t=${Date.now()}`);
@@ -44,9 +49,10 @@ export class DiagGrammarEngine {
       };
 
       this.userAnswers = {};
+      this.metrics = {};
       this.isReviewMode = false;
 
-      // NẾU CÓ PARTS -> ĐỀ TEST 4 (100 CÂU)
+      // NẾU CÓ PARTS -> ĐỀ TEST 4 (100 CÂU CHUYÊN SÂU 5 PHẦN)
       if (Array.isArray(data.parts) && data.parts.length > 0) {
         this.mode = "PARTS";
         this.parts = data.parts;
@@ -54,7 +60,7 @@ export class DiagGrammarEngine {
         this.parts.forEach(p => {
           (p.questions || []).forEach(q => this.questions.push(q));
         });
-      // NẾU LÀ MẢNG PHẲNG QUESTIONS -> ĐỀ TEST 1, 2, 3
+      // NẾU LÀ MẢNG PHẲNG QUESTIONS -> ĐỀ TEST 1, 2, 3 (TRẮC NGHIỆM TRỌNG TÂM)
       } else if (Array.isArray(data.questions)) {
         this.mode = "FLAT";
         this.questions = data.questions;
@@ -72,7 +78,9 @@ export class DiagGrammarEngine {
     }
   }
 
+  // =========================================================================
   // 2. RENDER GIAO DIỆN
+  // =========================================================================
   render() {
     const mount = document.getElementById(this.containerId);
     if (!mount || this.questions.length === 0) return;
@@ -86,18 +94,23 @@ export class DiagGrammarEngine {
     this.restoreUserInputsUI();
   }
 
-  // RENDER DÀNH CHO TEST 1, 2, 3 (DẠNG TRẮC NGHIỆM TRỌNG TÂM)
+  // GIAO DIỆN TEST 1, 2, 3 (TRẮC NGHIỆM TRỌNG TÂM CÓ TELEMETRY)
   renderFlatView(mount) {
+    const now = Date.now();
     let html = `
       <div style="font-size:14.5px; font-weight:900; color:#059669; margin-bottom:14px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
         <span><i class="fa-solid fa-shapes"></i> ${this.testMeta.title} (${this.questions.length} CÂU)</span>
-        <button type="button" class="btn-3d btn-3d-blue" onclick="window.diagGrammarEngine.startAIGrading()" style="padding:8px 16px; font-size:12.5px; background:#059669; border-bottom-color:#047857;">
-          🤖 AI Chấm & Nhận Xét
-        </button>
+        <div style="display:flex; gap:8px;">
+          <button type="button" class="btn-3d btn-3d-blue" onclick="window.diagGrammarEngine.startAIGrading()" style="padding:8px 16px; font-size:12.5px; background:#059669; border-bottom-color:#047857;">
+            🤖 AI Chấm & Nhận Xét
+          </button>
+        </div>
       </div>
     `;
 
     this.questions.forEach((q, idx) => {
+      this.initQuestionMetric(q.id, now);
+
       html += `
         <div class="q-item-box" id="box_${q.id}" style="background:#FAF7F2; border:2px solid #E8E2D8; border-radius:16px; padding:18px; margin-bottom:14px;">
           <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px; gap:8px;">
@@ -134,8 +147,9 @@ export class DiagGrammarEngine {
     mount.innerHTML = html;
   }
 
-  // RENDER DÀNH CHO TEST 4 (100 CÂU 5 PHẦN)
+  // GIAO DIỆN TEST 4 (100 CÂU 5 PHẦN)
   renderPartsView(mount) {
+    const now = Date.now();
     let html = `
       <div style="background:#ECFDF5; border:2px solid #A7F3D0; border-radius:16px; padding:16px 20px; margin-bottom:20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
         <div>
@@ -156,6 +170,8 @@ export class DiagGrammarEngine {
       `;
 
       (part.questions || []).forEach(q => {
+        this.initQuestionMetric(q.id, now);
+
         if (q.type === 'choice') {
           html += `
             <div class="q-item-box" id="box_${q.id}" style="margin-bottom:12px; background:#FAF7F2;">
@@ -199,9 +215,37 @@ export class DiagGrammarEngine {
     mount.innerHTML = html;
   }
 
+  // =========================================================================
+  // 3. TELEMETRY & TƯƠNG TÁC
+  // =========================================================================
+  initQuestionMetric(qId, timestamp) {
+    if (!this.metrics[qId]) {
+      this.metrics[qId] = {
+        renderTime: timestamp,
+        firstInteractionTime: null,
+        ttfiMs: null,
+        hesitationCount: 0,
+        chosenValues: []
+      };
+    }
+  }
+
   recordChoice(qId, val) {
     if (this.isReviewMode) return;
     this.userAnswers[qId] = String(val).trim();
+
+    const m = this.metrics[qId];
+    if (m) {
+      const now = Date.now();
+      if (!m.firstInteractionTime) {
+        m.firstInteractionTime = now;
+        m.ttfiMs = now - m.renderTime;
+      }
+      if (m.chosenValues.length > 0 && m.chosenValues[m.chosenValues.length - 1] !== val) {
+        m.hesitationCount++;
+      }
+      m.chosenValues.push(val);
+    }
   }
 
   restoreUserInputsUI() {
@@ -213,6 +257,9 @@ export class DiagGrammarEngine {
     });
   }
 
+  // =========================================================================
+  // 4. CHẤM ĐIỂM CHUẨN XÁC
+  // =========================================================================
   evaluate() {
     let score = 0;
     const total = this.questions.length;
@@ -229,8 +276,12 @@ export class DiagGrammarEngine {
       } else {
         const answersList = q.answers || (q.answer ? [q.answer] : []);
         const cleanUser = ExerciseEngine.clean(chosen);
+        const strippedUser = ExerciseEngine.clean(ExerciseEngine.stripTargetStart(chosen, q.targetStart || ""));
+
         for (const ans of answersList) {
-          if (cleanUser === ExerciseEngine.clean(ans)) {
+          const cleanAns = ExerciseEngine.clean(ans);
+          const strippedAns = ExerciseEngine.clean(ExerciseEngine.stripTargetStart(ans, q.targetStart || ""));
+          if (cleanUser === cleanAns || strippedUser === strippedAns || cleanUser === strippedAns || strippedUser === cleanAns) {
             isCorrect = true;
             break;
           }
@@ -266,6 +317,9 @@ export class DiagGrammarEngine {
     };
   }
 
+  // =========================================================================
+  // 5. REVIEW MODE
+  // =========================================================================
   renderReviewMode(evalResult) {
     this.isReviewMode = true;
     this.userAnswers = evalResult.answersSnapshot || this.userAnswers;
@@ -298,6 +352,9 @@ export class DiagGrammarEngine {
     });
   }
 
+  // =========================================================================
+  // 6. CHẤM BẰNG AI GEMINI
+  // =========================================================================
   async startAIGrading() {
     const reportBox = document.getElementById('aiGrammarReportCard');
     const streamEl = document.getElementById('aiGrammarStreamText');
