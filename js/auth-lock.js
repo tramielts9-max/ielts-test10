@@ -2,6 +2,7 @@
  * js/auth-lock.js - HỆ THỐNG PHÂN QUYỀN FREEMIUM & LÁ CHẮN TƯƠNG TÁC TỰ ĐỘNG
  * Trạm IELTS - BẢN MASTER NÂNG CẤP TOÀN DIỆN (CHỐNG CRASH DOM & ĐỒNG BỘ KHÓA CLOUD)
  * BẢO VỆ TOÀN DIỆN: GRAMMAR & VOCAB (LÂU DÀI) + CÁC BÀI PRE VÀ LINK NGOÀI (TẠM THỜI)
+ * ĐÃ TÍCH HỢP: CHẾ ĐỘ XEM BÁO CÁO DÀNH CHO PHỤ HUYNH (BYPASS KHÓA READ-ONLY AN TOÀN)
  * Tương thích kép: Dùng được cho cả import module lẫn thẻ script độc lập
  */
 
@@ -31,7 +32,24 @@ class AuthLockSystem {
     }
   }
 
+  // KIỂM TRA XEM ĐÂY CÓ PHẢI LÀ PHỤ HUYNH ĐANG XEM BÁO CÁO KHÔNG
+  isParentView() {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const isParentMode = params.get('mode') === 'parent';
+      const isParentPage = window.location.pathname.includes('parent-report');
+      return isParentMode || isParentPage;
+    } catch (e) {
+      return false;
+    }
+  }
+
   async init() {
+    // Nếu là Phụ Huynh xem báo cáo: Bỏ qua toàn bộ giao diện khóa và Admin
+    if (this.isParentView()) {
+      return;
+    }
+
     this.initAdminBar();
     this.injectConversionModal();
     this.injectAdminLockoutModal();
@@ -56,6 +74,11 @@ class AuthLockSystem {
 
   // 2. Kiểm tra học sinh có quyền Admin hoặc đã active chưa
   isStudentActive() {
+    // Phụ huynh được cấp quyền xem dữ liệu (Read-Only)
+    if (this.isParentView()) {
+      return true;
+    }
+
     const email = (localStorage.getItem('ielts_student_email') || '').toLowerCase().trim();
     const backupEmail = (localStorage.getItem('ielts_admin_backup_email') || '').toLowerCase().trim();
 
@@ -75,6 +98,11 @@ class AuthLockSystem {
 
   // 3. Kiểm tra xem học sinh có bị Thầy bấm "🚫 Tạm khóa" từ xa trên Cloud không
   async verifyCloudAccess() {
+    if (this.isParentView()) {
+      this.isCloudLocked = false;
+      return;
+    }
+
     const email = (localStorage.getItem('ielts_student_email') || '').toLowerCase().trim();
     if (!email || email === 'guest' || HARDCODED_ADMINS.includes(email) || email.includes('admin')) {
       this.isCloudLocked = false;
@@ -155,14 +183,12 @@ class AuthLockSystem {
       'button[onclick*="viewPastVocabAttempt"]',
 
       // --- IV. PRE-SKILLS & LINK NGOÀI (BẢO VỆ ĐẶC TRỊ TẠM THỜI) ---
-      // Link làm bài bên ngoài & nút nộp Pre-Listening / Pre-Reading
       '.pl-lesson-card a',
       '.pr-lesson-card a',
       'a[href*="elllo.org"]',
       'a[href*="test-english.com"]',
       'button[onclick*="openSubmitModalPL"]',
       'button[onclick*="openSubmitModalPR"]',
-      // Nút thẻ và nút ghi âm Pre-Speaking
       'button[onclick*="startLessonFromPortal"]',
       'button[onclick*="openPastAttemptsFromPortal"]',
       '#btnRecord',
@@ -170,7 +196,6 @@ class AuthLockSystem {
       '#btnComplete',
       'button[onclick*="toggleShadowRecording"]',
       'button[onclick*="stopAndSubmitRecording"]',
-      // Nút Pre-Writing Task 1 & Task 2
       'button[onclick*="startLessonPWT1"]',
       'button[onclick*="openPastAttemptsPWT1"]',
       '#btnGrading',
@@ -183,7 +208,6 @@ class AuthLockSystem {
 
       const target = e.target.closest(interactiveSelectors);
       if (target) {
-        // Chặn đứng hoàn toàn hành vi click, mở link tab mới, focus hoặc gõ chữ
         e.preventDefault();
         e.stopPropagation();
         e.stopImmediatePropagation();
@@ -207,7 +231,6 @@ class AuthLockSystem {
       }
     };
 
-    // Bắt toàn diện sự kiện ở Capture Phase để khóa trước khi code bài tập kịp phản hồi
     document.addEventListener('pointerdown', blockEvent, true);
     document.addEventListener('click', blockEvent, true);
     document.addEventListener('focusin', blockEvent, true);
@@ -317,7 +340,7 @@ class AuthLockSystem {
             </div>
           </div>
 
-          <!-- ẢNH QR ZALO (HỖ TRỢ ĐƯỜNG DẪN ĐA CẤP THƯ MỤC) -->
+          <!-- ẢNH QR ZALO -->
           <div style="margin-bottom:16px;">
             <div style="font-size:12.5px; font-weight:800; color:#334155; margin-bottom:8px;">Quét mã QR Zalo Thầy Phúc để mở quyền:</div>
             <img src="assets/zalo-qr.png" onerror="this.onerror=null; this.src='../assets/zalo-qr.png';" alt="QR Zalo Thầy Phúc" style="width:170px; height:170px; border-radius:14px; border:2px solid #E8E2D8; object-fit:cover; margin:0 auto; display:block;">
@@ -400,6 +423,6 @@ class AuthLockSystem {
   }
 }
 
-// KHỞI TẠO VÀ XUẤT TƯƠNG THÍCH KÉP (DUAL COMPATIBILITY)
+// KHỞI TẠO VÀ XUẤT TƯƠNG THÍCH KÉP
 export const authLockSystem = new AuthLockSystem();
 window.authLockSystem = authLockSystem;
