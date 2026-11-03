@@ -1,0 +1,47 @@
+{
+  "testId": "test_01",
+  "set": 2,
+  "title": "Listening Diagnostic Test 1 - Set 2 (A2 & B2)",
+  "parts": [
+    {
+      "partNum": 1,
+      "title": "Audio 1 (Level A2): Family Life (Đời sống gia đình)",
+      "audioUrl": "https://archive.org/download/lisb2-3/lisa2-2.mp3",
+      "startTime": 0,
+      "answers": {
+        "lis_s2_01": "B",
+        "lis_s2_02": "A",
+        "lis_s2_03": "B",
+        "lis_s2_04": "B",
+        "lis_s2_05": "B"
+      },
+      "questions": {
+        "lis_s2_01": { "num": 1, "type": "choice", "q": "1. How old is Paul currently?", "options": ["A. 18", "B. 21", "C. 25"], "answer": "B" },
+        "lis_s2_02": { "num": 2, "type": "choice", "q": "2. What is Paul's job apprenticeship?", "options": ["A. Engineer on ships", "B. Carpenter", "C. Electrician"], "answer": "A" },
+        "lis_s2_03": { "num": 3, "type": "choice", "q": "3. What did the siblings usually argue about in the past?", "options": ["A. Doing chores", "B. Playing video games", "C. Watching TV"], "answer": "B" },
+        "lis_s2_04": { "num": 4, "type": "choice", "q": "4. What is the father currently building?", "options": ["A. A garden shed", "B. A sailing boat", "C. A wooden table"], "answer": "B" },
+        "lis_s2_05": { "num": 5, "type": "choice", "q": "5. How long has the mother been away from formal work?", "options": ["A. Over 10 years", "B. Over 20 years", "C. Exactly 5 years"], "answer": "B" }
+      }
+    },
+    {
+      "partNum": 2,
+      "title": "Audio 2 (Level B2): Work & Commute (Đi lại & Công việc)",
+      "audioUrl": "https://archive.org/download/lisb2-3/lisb2-2.mp3",
+      "startTime": 0,
+      "answers": {
+        "lis_s2_06": "A",
+        "lis_s2_07": "B",
+        "lis_s2_08": "B",
+        "lis_s2_09": "A",
+        "lis_s2_10": "B"
+      },
+      "questions": {
+        "lis_s2_06": { "num": 6, "type": "choice", "q": "6. What is the speaker's stance regarding their compensation?", "options": ["A. Will not work for low pay", "B. Salary is unimportant", "C. Overtime is required"], "answer": "A" },
+        "lis_s2_07": { "num": 7, "type": "choice", "q": "7. How many paid vacation days does the speaker receive annually?", "options": ["A. 14 days", "B. 21 days", "C. 28 days"], "answer": "B" },
+        "lis_s2_08": { "num": 8, "type": "choice", "q": "8. How long does the daily round-trip car commute take?", "options": ["A. 1 hour", "B. 2 hours", "C. 4 hours"], "answer": "B" },
+        "lis_s2_09": { "num": 9, "type": "choice", "q": "9. How many days each week does the speaker work remotely from home?", "options": ["A. 2 days", "B. 3 days", "C. 5 days"], "answer": "A" },
+        "lis_s2_10": { "num": 10, "type": "choice", "q": "10. What activity helps the speaker relax while stuck in traffic?", "options": ["A. Drinking coffee", "B. Listening to podcasts", "C. Making phone calls"], "answer": "B" }
+      }
+    }
+  ]
+}
