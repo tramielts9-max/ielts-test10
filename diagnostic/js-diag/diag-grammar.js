@@ -1,7 +1,9 @@
 /**
  * diagnostic/js-diag/diag-grammar.js
- * BỘ ĐIỀU KHIỂN NGỮ PHÁP 100 CÂU CHUYÊN SÂU (TEST 4)
- * HỖ TRỢ CHẤM NHANH QUA REGEX + NÚT CHẤM TỔNG BẰNG AI GEMINI STREAMING
+ * BỘ ĐIỀU KHIỂN NGỮ PHÁP ĐA NĂNG THÍCH ỨNG 100%
+ * TỰ ĐỘNG NHẬN DIỆN:
+ * - ĐỀ TEST 1, 2, 3: MẢNG CÂU HỎI TRỌNG TÂM
+ * - ĐỀ TEST 4: 100 CÂU CHUYÊN SÂU 5 PHẦN + NÚT CHẤM AI
  */
 
 import { ExerciseEngine } from '../../grammar/js/exercise-engine-g.js';
@@ -20,12 +22,14 @@ export class DiagGrammarEngine {
   constructor(options = {}) {
     this.containerId = options.containerId || 'grammarQuestionsMount';
     this.testMeta = {};
+    this.mode = "FLAT"; // 'FLAT' (Test 1, 2, 3) hoặc 'PARTS' (Test 4)
     this.parts = [];
-    this.allQuestions = [];
+    this.questions = [];
     this.userAnswers = {};
     this.isReviewMode = false;
   }
 
+  // 1. NẠP FILE JSON VÀ TỰ PHÂN LOẠI ĐỊNH DẠNG
   async loadTestFromJson(jsonUrl) {
     try {
       const res = await fetch(`${jsonUrl}?t=${Date.now()}`);
@@ -33,23 +37,33 @@ export class DiagGrammarEngine {
       const data = await res.json();
 
       this.testMeta = {
-        testId: data.testId || "test_04",
-        title: data.title || "Đề Kiểm Tra Ngữ Pháp Chuyên Sâu (100 Câu)",
-        timeMinutes: data.timeMinutes || 90,
-        totalQuestions: data.totalQuestions || 100
+        testId: data.testId || "test_01",
+        title: data.title || "Bài Kiểm Tra Ngữ Pháp",
+        timeMinutes: data.timeMinutes || 25,
+        totalQuestions: data.totalQuestions || 25
       };
-
-      this.parts = data.parts || [];
-      this.allQuestions = [];
-      this.parts.forEach(p => {
-        (p.questions || []).forEach(q => this.allQuestions.push(q));
-      });
 
       this.userAnswers = {};
       this.isReviewMode = false;
+
+      // NẾU CÓ PARTS -> ĐỀ TEST 4 (100 CÂU)
+      if (Array.isArray(data.parts) && data.parts.length > 0) {
+        this.mode = "PARTS";
+        this.parts = data.parts;
+        this.questions = [];
+        this.parts.forEach(p => {
+          (p.questions || []).forEach(q => this.questions.push(q));
+        });
+      // NẾU LÀ MẢNG PHẲNG QUESTIONS -> ĐỀ TEST 1, 2, 3
+      } else if (Array.isArray(data.questions)) {
+        this.mode = "FLAT";
+        this.questions = data.questions;
+        this.parts = [];
+      }
+
       return true;
     } catch (err) {
-      console.warn("[DiagGrammarEngine] Lỗi:", err);
+      console.warn("[DiagGrammarEngine] Lỗi nạp:", err);
       const mount = document.getElementById(this.containerId);
       if (mount) {
         mount.innerHTML = `<div style="text-align:center; padding:30px; color:#DC2626; font-weight:800;">⚠️ Lỗi nạp Ngữ pháp: ${err.message}</div>`;
@@ -58,15 +72,75 @@ export class DiagGrammarEngine {
     }
   }
 
+  // 2. RENDER GIAO DIỆN
   render() {
     const mount = document.getElementById(this.containerId);
-    if (!mount || this.parts.length === 0) return;
+    if (!mount || this.questions.length === 0) return;
 
+    if (this.mode === "PARTS") {
+      this.renderPartsView(mount);
+    } else {
+      this.renderFlatView(mount);
+    }
+
+    this.restoreUserInputsUI();
+  }
+
+  // RENDER DÀNH CHO TEST 1, 2, 3 (DẠNG TRẮC NGHIỆM TRỌNG TÂM)
+  renderFlatView(mount) {
+    let html = `
+      <div style="font-size:14.5px; font-weight:900; color:#059669; margin-bottom:14px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+        <span><i class="fa-solid fa-shapes"></i> ${this.testMeta.title} (${this.questions.length} CÂU)</span>
+        <button type="button" class="btn-3d btn-3d-blue" onclick="window.diagGrammarEngine.startAIGrading()" style="padding:8px 16px; font-size:12.5px; background:#059669; border-bottom-color:#047857;">
+          🤖 AI Chấm & Nhận Xét
+        </button>
+      </div>
+    `;
+
+    this.questions.forEach((q, idx) => {
+      html += `
+        <div class="q-item-box" id="box_${q.id}" style="background:#FAF7F2; border:2px solid #E8E2D8; border-radius:16px; padding:18px; margin-bottom:14px;">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px; gap:8px;">
+            <b style="font-size:14.5px; color:#1E293B; line-height:1.5;">
+              Câu ${idx + 1}. ${q.prompt || q.question || ''}
+            </b>
+            ${q.topic ? `<span style="font-size:11.5px; background:#DCFCE7; color:#166534; padding:2px 8px; border-radius:6px; font-weight:800; white-space:nowrap;">${q.topic}</span>` : ''}
+          </div>
+
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:8px; margin-top:8px;">
+            ${(q.options || []).map(opt => {
+              const letter = opt.charAt(0);
+              return `
+                <label class="option-label" id="label_${q.id}_${letter}" onclick="window.diagGrammarEngine.recordChoice('${q.id}', '${letter}')">
+                  <input type="radio" name="ans_${q.id}" value="${letter}">
+                  <span>${opt}</span>
+                </label>
+              `;
+            }).join('')}
+          </div>
+
+          <div id="fb_${q.id}" style="display:none; font-size:13px; font-weight:700; margin-top:10px; padding:10px 14px; border-radius:10px; line-height:1.6;"></div>
+        </div>
+      `;
+    });
+
+    html += `
+      <div id="aiGrammarReportCard" style="display:none; background:#FFFFFF; border:3px solid #059669; border-radius:20px; padding:24px; margin-top:20px;">
+        <h3 style="color:#059669; margin:0 0 10px 0; font-size:18px; font-weight:900;">🤖 BÁO CÁO PHÂN TÍCH TỪ AI GEMINI</h3>
+        <div id="aiGrammarStreamText" style="line-height:1.7; font-size:14.5px; color:#1E293B;"></div>
+      </div>
+    `;
+
+    mount.innerHTML = html;
+  }
+
+  // RENDER DÀNH CHO TEST 4 (100 CÂU 5 PHẦN)
+  renderPartsView(mount) {
     let html = `
       <div style="background:#ECFDF5; border:2px solid #A7F3D0; border-radius:16px; padding:16px 20px; margin-bottom:20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
         <div>
           <b style="font-size:16px; color:#065F46;">📚 ${this.testMeta.title}</b>
-          <div style="font-size:13px; color:#047857; margin-top:2px;">Tổng số câu: 100 câu • Thời gian đề xuất: 90 - 120 phút</div>
+          <div style="font-size:13px; color:#047857; margin-top:2px;">100 câu toàn diện 5 chuyên đề</div>
         </div>
         <button type="button" class="btn-3d btn-3d-blue" onclick="window.diagGrammarEngine.startAIGrading()" style="padding:10px 20px; font-size:13.5px; background:#059669; border-bottom-color:#047857;">
           🤖 CHẤM BÀI BẰNG AI GEMINI
@@ -76,39 +150,37 @@ export class DiagGrammarEngine {
 
     this.parts.forEach(part => {
       html += `
-        <div style="background:#FFFFFF; border:2px solid #E8E2D8; border-radius:18px; padding:22px; margin-bottom:22px; box-shadow:0 4px 12px rgba(0,0,0,0.02);">
+        <div style="background:#FFFFFF; border:2px solid #E8E2D8; border-radius:18px; padding:22px; margin-bottom:22px;">
           <div style="font-size:16px; font-weight:900; color:#059669; margin-bottom:4px;">${part.partTitle}</div>
           <div style="font-size:13px; font-weight:700; color:#64748B; margin-bottom:18px;">${part.instruction}</div>
       `;
 
       (part.questions || []).forEach(q => {
-        // A. Trắc nghiệm (Part 4)
         if (q.type === 'choice') {
           html += `
-            <div class="q-item-box" id="gbox_${q.id}" style="margin-bottom:12px; background:#FAF7F2;">
+            <div class="q-item-box" id="box_${q.id}" style="margin-bottom:12px; background:#FAF7F2;">
               <b style="font-size:14px; color:#1E293B; display:block; margin-bottom:8px;">Câu ${q.num}. ${q.prompt}</b>
               <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:6px;">
                 ${(q.options || []).map(opt => `
-                  <label class="option-label" onclick="window.diagGrammarEngine.recordAnswer('${q.id}', '${opt.charAt(0)}')">
-                    <input type="radio" name="rad_g_${q.id}" value="${opt.charAt(0)}">
+                  <label class="option-label" onclick="window.diagGrammarEngine.recordChoice('${q.id}', '${opt.charAt(0)}')">
+                    <input type="radio" name="ans_${q.id}" value="${opt.charAt(0)}">
                     <span>${opt}</span>
                   </label>
                 `).join('')}
               </div>
-              <div id="gfb_${q.id}" style="display:none; font-size:12.5px; font-weight:800; margin-top:8px; padding:6px 10px; border-radius:6px;"></div>
+              <div id="fb_${q.id}" style="display:none; font-size:12.5px; font-weight:800; margin-top:8px; padding:6px 10px; border-radius:6px;"></div>
             </div>
           `;
-        // B. Điền từ (Part 1, 2, 3) & Viết lại câu (Part 5)
         } else {
           const promptText = q.prompt ? q.prompt.replace('[blank]', '_______') : '';
           html += `
-            <div class="q-item-box" id="gbox_${q.id}" style="margin-bottom:12px; background:#FAF7F2;">
+            <div class="q-item-box" id="box_${q.id}" style="margin-bottom:12px; background:#FAF7F2;">
               <b style="font-size:14px; color:#1E293B; display:block; margin-bottom:6px;">Câu ${q.num}. ${promptText}</b>
               <div style="display:flex; align-items:center; gap:8px;">
                 ${q.targetStart ? `<span style="font-weight:800; color:#059669; font-size:14px;">${q.targetStart}</span>` : ''}
-                <input type="text" class="diag-input" id="inp_g_${q.id}" placeholder="Điền câu trả lời..." oninput="window.diagGrammarEngine.recordAnswer('${q.id}', this.value)" style="flex:1; margin-top:0;">
+                <input type="text" class="diag-input" id="inp_g_${q.id}" placeholder="Điền câu trả lời..." oninput="window.diagGrammarEngine.recordChoice('${q.id}', this.value)" style="flex:1; margin-top:0;">
               </div>
-              <div id="gfb_${q.id}" style="display:none; font-size:12.5px; font-weight:800; margin-top:8px; padding:6px 10px; border-radius:6px;"></div>
+              <div id="fb_${q.id}" style="display:none; font-size:12.5px; font-weight:800; margin-top:8px; padding:6px 10px; border-radius:6px;"></div>
             </div>
           `;
         }
@@ -117,56 +189,48 @@ export class DiagGrammarEngine {
       html += `</div>`;
     });
 
-    // KHUNG BÁO CÁO KẾT QUẢ CHẤM CỦA AI
     html += `
-      <div id="aiGrammarReportCard" style="display:none; background:#FFFFFF; border:3px solid #059669; border-radius:20px; padding:26px; margin-top:24px;">
-        <h3 style="color:#059669; margin:0 0 10px 0; font-size:20px; font-weight:900;">🤖 BÁO CÁO PHÂN TÍCH CHUYÊN SÂU TỪ AI GEMINI</h3>
+      <div id="aiGrammarReportCard" style="display:none; background:#FFFFFF; border:3px solid #059669; border-radius:20px; padding:24px; margin-top:20px;">
+        <h3 style="color:#059669; margin:0 0 10px 0; font-size:18px; font-weight:900;">🤖 BÁO CÁO PHÂN TÍCH TỪ AI GEMINI</h3>
         <div id="aiGrammarStreamText" style="line-height:1.75; font-size:14.5px; color:#1E293B;"></div>
       </div>
     `;
 
     mount.innerHTML = html;
-    this.restoreUserInputsUI();
   }
 
-  recordAnswer(qId, val) {
+  recordChoice(qId, val) {
     if (this.isReviewMode) return;
     this.userAnswers[qId] = String(val).trim();
   }
 
   restoreUserInputsUI() {
     Object.entries(this.userAnswers).forEach(([qId, val]) => {
+      const radio = document.querySelector(`input[name="ans_${qId}"][value="${val}"]`);
+      if (radio) radio.checked = true;
       const inp = document.getElementById(`inp_g_${qId}`);
       if (inp) inp.value = val;
-      const rad = document.querySelector(`input[name="rad_g_${qId}"][value="${val}"]`);
-      if (rad) rad.checked = true;
     });
   }
 
-  // =========================================================================
-  // 3. CHẤM BÀI TRỰC TIẾP QUA BỘ SO KHỚP REGEX (INSTANT EVALUATE)
-  // =========================================================================
   evaluate() {
     let score = 0;
-    const total = this.allQuestions.length;
+    const total = this.questions.length;
     const wrongList = [];
     const details = [];
 
-    this.allQuestions.forEach((q, idx) => {
-      const userVal = (this.userAnswers[q.id] || '').trim();
+    this.questions.forEach((q, idx) => {
+      const chosen = (this.userAnswers[q.id] || "").trim();
       let isCorrect = false;
 
-      if (q.type === 'choice') {
-        isCorrect = userVal.toUpperCase() === (q.answer || '').toUpperCase();
+      if (q.type === 'choice' || q.options) {
+        const expected = (q.answer || "").trim().toUpperCase();
+        isCorrect = chosen.toUpperCase() === expected;
       } else {
         const answersList = q.answers || (q.answer ? [q.answer] : []);
-        const cleanUser = ExerciseEngine.clean(userVal);
-        const strippedUser = ExerciseEngine.clean(ExerciseEngine.stripTargetStart(userVal, q.targetStart || ""));
-
+        const cleanUser = ExerciseEngine.clean(chosen);
         for (const ans of answersList) {
-          const cleanAns = ExerciseEngine.clean(ans);
-          const strippedAns = ExerciseEngine.clean(ExerciseEngine.stripTargetStart(ans, q.targetStart || ""));
-          if (cleanUser === cleanAns || strippedUser === strippedAns || cleanUser === strippedAns || strippedUser === cleanAns) {
+          if (cleanUser === ExerciseEngine.clean(ans)) {
             isCorrect = true;
             break;
           }
@@ -179,9 +243,10 @@ export class DiagGrammarEngine {
       const d = {
         num: q.num || idx + 1,
         questionId: q.id,
-        userAnswer: userVal || "(Bỏ trống)",
+        userAnswer: chosen || "(Bỏ trống)",
         expectedAnswer: expStr,
         isCorrect: isCorrect,
+        topic: q.topic || "",
         explanation: q.explanation || ""
       };
 
@@ -207,8 +272,8 @@ export class DiagGrammarEngine {
     this.restoreUserInputsUI();
 
     (evalResult.details || []).forEach(d => {
-      const box = document.getElementById(`gbox_${d.questionId}`);
-      const fb = document.getElementById(`gfb_${d.questionId}`);
+      const box = document.getElementById(`box_${d.questionId}`);
+      const fb = document.getElementById(`fb_${d.questionId}`);
       const inp = document.getElementById(`inp_g_${d.questionId}`);
 
       if (box) {
@@ -224,7 +289,7 @@ export class DiagGrammarEngine {
         fb.style.background = d.isCorrect ? '#DCFCE7' : '#FEE2E2';
         fb.style.color = d.isCorrect ? '#166534' : '#991B1B';
         fb.innerHTML = `
-          <div>${d.isCorrect ? '✓ ĐÚNG' : '✗ SAI'} — Đáp án chuẩn: <b>${d.expectedAnswer}</b></div>
+          <div><b>Kết quả:</b> ${d.isCorrect ? '✓ ĐÚNG' : '✗ SAI'} (Em chọn: <b>${d.userAnswer}</b> — Đáp án chuẩn: <b>${d.expectedAnswer}</b>)</div>
           ${d.explanation ? `<div style="margin-top:3px; font-size:12px; font-weight:600;">💡 ${d.explanation}</div>` : ''}
         `;
       }
@@ -233,9 +298,6 @@ export class DiagGrammarEngine {
     });
   }
 
-  // =========================================================================
-  // 4. CHẤM BẰNG AI GEMINI TOÀN BỘ 100 CÂU & PHÂN TÍCH LỖ HỔNG
-  // =========================================================================
   async startAIGrading() {
     const reportBox = document.getElementById('aiGrammarReportCard');
     const streamEl = document.getElementById('aiGrammarStreamText');
@@ -243,37 +305,23 @@ export class DiagGrammarEngine {
 
     reportBox.style.display = 'block';
     reportBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    streamEl.innerHTML = `⏳ <b>AI Gemini đang đọc toàn bộ 100 câu bài làm của Em, đối chiếu biến thể tự luận và phân tích trình độ ngữ pháp...</b>`;
+    streamEl.innerHTML = `⏳ <b>AI Gemini đang đọc toàn bộ bài làm Ngữ pháp của Em để đối chiếu cấu trúc và chấm điểm...</b>`;
 
     const apiKey = getGeminiKey();
-
-    // Gom dữ liệu bài làm của học sinh
-    const studentSubmission = this.allQuestions.map(q => {
+    const studentSubmission = this.questions.map(q => {
       const ans = this.userAnswers[q.id] || "(Chưa làm)";
-      return `Câu ${q.num}. [${q.type}] ${q.prompt || ''} ➔ Trả lời: "${ans}"`;
+      return `Câu ${q.num || q.id}. ${q.prompt || q.question || ''} ➔ Trả lời: "${ans}"`;
     }).join('\n');
 
     const promptText = `
-Bạn là Trưởng ban Khảo thí Ngữ pháp tiếng Anh IELTS. Hãy chấm toàn diện bài thi 100 câu dưới đây của học sinh.
-Xưng hô: "Anh" và gọi học viên là "Em".
-
-QUY TẮC CHẤM:
-1. Đọc từng câu trả lời của Em. Đối với các câu tự luận viết lại câu (Part 5) và thì (Part 1), hãy chấp nhận các cách đảo ngữ hoặc cấu trúc tương đương hợp lệ.
-2. Xuất báo cáo theo định dạng Markdown rõ ràng:
-   - # 🎯 BẢNG TỔNG KẾT ĐIỂM NGỮ PHÁP 100 CÂU:
-     * Điểm Phần 1 (Chia thì /25)
-     * Điểm Phần 2 (Cấu tạo từ /15)
-     * Điểm Phần 3 (Giới từ, mạo từ /25)
-     * Điểm Phần 4 (Trắc nghiệm /20)
-     * Điểm Phần 5 (Viết lại câu /15)
-     * 🏆 TỔNG ĐIỂM /100 — Ước tính Band ngữ pháp IELTS (ví dụ: Band 5.5, Band 6.5)
-   - # 🔍 TOP LỖI SAI NGHIÊM TRỌNG CẦN SỬA GẤP:
-     (Chỉ ra 5-8 câu sai tiêu biểu, trích câu Em viết, câu Anh sửa lại và lý do ngữ pháp).
-   - # 💡 LỜI KHUYÊN & LỘ TRÌNH ÔN TẬP BỨT PHÁ:
-     (Dặn dò ngắn gọn phương pháp khắc phục).
-
---- DỮ LIỆU BÀI LÀM CỦA HỌC VIÊN ---
+Bạn là Chuyên gia Khảo thí Ngữ pháp IELTS. Hãy chấm toàn diện bài thi dưới đây của học sinh. Xưng hô "Anh" và "Em".
+BÀI LÀM:
 ${studentSubmission}
+
+XUẤT BÁO CÁO (MARKDOWN):
+1. 🎯 Tổng điểm đạt được và Ước lượng Band ngữ pháp IELTS.
+2. 🔍 Chỉ ra các câu làm sai tiêu biểu và sửa lại cho chuẩn.
+3. 💡 Lời khuyên ôn tập ngắn gọn.
 `;
 
     try {
@@ -282,22 +330,19 @@ ${studentSubmission}
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ contents: [{ role: 'user', parts: [{ text: promptText }] }] })
       });
-
       const data = await res.json();
-      const outputText = data.candidates?.[0]?.content?.parts?.[0]?.text || "Không nhận được phản hồi từ AI.";
+      const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "Đã ghi nhận bài làm.";
 
       if (window.marked) {
-        streamEl.innerHTML = window.marked.parse(outputText);
+        streamEl.innerHTML = window.marked.parse(text);
       } else {
-        streamEl.innerHTML = `<pre style="white-space:pre-wrap; font-family:inherit;">${outputText}</pre>`;
+        streamEl.innerHTML = `<pre style="white-space:pre-wrap; font-family:inherit;">${text}</pre>`;
       }
 
-      // Đánh dấu tô màu đúng sai các câu trên giao diện
       const evalResult = this.evaluate();
       this.renderReviewMode(evalResult);
-
     } catch (e) {
-      streamEl.innerHTML = `<span style="color:#DC2626;">❌ Lỗi kết nối AI: ${e.message}. Em vui lòng thử lại!</span>`;
+      streamEl.innerHTML = `<span style="color:#DC2626;">❌ Lỗi kết nối AI: ${e.message}</span>`;
     }
   }
 }
