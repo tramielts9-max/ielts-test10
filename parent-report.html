@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Báo Cáo Học Tập Hàng Ngày - Trạm IELTS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      background: #F8FAFC;
+      color: #0F172A;
+      line-height: 1.6;
+      padding: 16px;
+    }
+    .report-container {
+      max-width: 680px;
+      margin: 0 auto;
+      background: #FFFFFF;
+      border-radius: 24px;
+      border: 2px solid #E2E8F0;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+      overflow: hidden;
+    }
+    .header-banner {
+      background: linear-gradient(135deg, #0284C7 0%, #0369A1 100%);
+      color: white;
+      padding: 24px 20px;
+      text-align: center;
+    }
+    .header-banner h1 {
+      font-size: 20px;
+      font-weight: 900;
+      letter-spacing: -0.5px;
+      margin-bottom: 4px;
+    }
+    .header-banner p {
+      font-size: 13.5px;
+      opacity: 0.9;
+      font-weight: 600;
+    }
+    .stats-card {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      padding: 16px 20px;
+      background: #F0F9FF;
+      border-bottom: 2px solid #E0F2FE;
+    }
+    .stat-box {
+      background: white;
+      padding: 12px;
+      border-radius: 14px;
+      border: 1.5px solid #BAE6FD;
+      text-align: center;
+    }
+    .stat-label {
+      font-size: 11.5px;
+      font-weight: 800;
+      color: #0369A1;
+      text-transform: uppercase;
+      margin-bottom: 2px;
+    }
+    .stat-value {
+      font-size: 20px;
+      font-weight: 900;
+      color: #0C4A6E;
+    }
+    .content-body {
+      padding: 20px;
+    }
+    .section-title {
+      font-size: 15px;
+      font-weight: 900;
+      color: #334155;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .attempt-card {
+      background: #FFFFFF;
+      border: 2px solid #E2E8F0;
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      transition: all 0.2s;
+    }
+    .attempt-card:hover {
+      border-color: #0284C7;
+      box-shadow: 0 4px 14px rgba(2, 132, 199, 0.08);
+    }
+    .attempt-info {
+      flex: 1;
+      min-width: 200px;
+    }
+    .attempt-title {
+      font-size: 14.5px;
+      font-weight: 800;
+      color: #0F172A;
+      margin-bottom: 4px;
+    }
+    .attempt-meta {
+      font-size: 12px;
+      color: #64748B;
+      font-weight: 600;
+    }
+    .score-badge {
+      background: #ECFDF5;
+      color: #047857;
+      border: 1.5px solid #A7F3D0;
+      padding: 6px 14px;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 900;
+      text-align: center;
+    }
+    .btn-view-detail {
+      background: #0284C7;
+      color: white;
+      text-decoration: none;
+      padding: 8px 14px;
+      border-radius: 10px;
+      font-weight: 800;
+      font-size: 12.5px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: #64748B;
+    }
+    .loading-spinner {
+      text-align: center;
+      padding: 40px 20px;
+      font-weight: 700;
+      color: #0284C7;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="report-container">
+    <!-- BANNER TIÊU ĐỀ -->
+    <div class="header-banner">
+      <h1>BÁO CÁO KẾT QUẢ HỌC TẬP</h1>
+      <p id="headerSub">Học sinh: <b id="displayStudentName">Đang tải...</b></p>
+      <p id="displayDate" style="font-size:12px; margin-top:2px; opacity:0.8;"></p>
+    </div>
+
+    <!-- KHỐI THỐNG KÊ NHANH -->
+    <div class="stats-card">
+      <div class="stat-box">
+        <div class="stat-label">Số bài hoàn thành</div>
+        <div class="stat-value" id="statCount">0</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Trạng thái ngày</div>
+        <div class="stat-value" id="statStatus" style="font-size:16px; color:#16A34A;">Đang kiểm tra</div>
+      </div>
+    </div>
+
+    <!-- DANH SÁCH BÀI LÀM TRONG NGÀY -->
+    <div class="content-body">
+      <div class="section-title">
+        <span>📝</span>
+        <span>Chi tiết các bài tập đã nộp hôm nay</span>
+      </div>
+
+      <div id="loadingBox" class="loading-spinner">
+        ⏳ Đang tải dữ liệu học tập từ máy chủ Google Drive...
+      </div>
+
+      <div id="attemptsList" style="display:none;"></div>
+
+      <div id="emptyBox" class="empty-state" style="display:none;">
+        <div style="font-size:36px; margin-bottom:8px;">📭</div>
+        <p style="font-weight:700; color:#334155; font-size:15px;">Chưa ghi nhận bài nộp nào trong ngày này.</p>
+        <p style="font-size:13px; margin-top:4px;">Nếu con vừa nộp bài, Ba/Mẹ vui lòng tải lại trang sau ít phút nhé!</p>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { CONFIG } from './js/config.js';
+
+    async function loadDailyReport() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const email = urlParams.get('email') || '';
+      
+      // Lấy ngày cần xem (nếu không có thì lấy ngày hôm nay theo giờ VN)
+      const now = new Date();
+      const localToday = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
+      const targetDate = urlParams.get('date') || localToday;
+
+      document.getElementById('displayDate').innerText = `Ngày báo cáo: ${targetDate}`;
+
+      if (!email) {
+        document.getElementById('loadingBox').style.display = 'none';
+        document.getElementById('emptyBox').style.display = 'block';
+        document.getElementById('emptyBox').innerHTML = '<p style="color:#EF4444; font-weight:800;">⚠️ Đường dẫn thiếu thông tin học sinh.</p>';
+        return;
+      }
+
+      try {
+        const response = await fetch(CONFIG.DRIVE_STORAGE_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({ action: "get_student_history", email: email })
+        });
+
+        const data = await response.json();
+        const history = data.attempts || [];
+
+        // Lọc các bài làm có timestamp trùng với ngày targetDate
+        const dailyAttempts = history.filter(item => {
+          if (!item.timestamp && !item.date) return false;
+          const itemDate = (item.timestamp || item.date || '');
+          return itemDate.includes(targetDate);
+        });
+
+        renderReport(dailyAttempts, email, targetDate);
+
+      } catch (err) {
+        document.getElementById('loadingBox').style.display = 'none';
+        document.getElementById('emptyBox').style.display = 'block';
+        document.getElementById('emptyBox').innerHTML = '<p style="color:#EF4444; font-weight:700;">⚠️ Không thể kết nối với máy chủ Google Drive. Vui lòng thử lại sau.</p>';
+      }
+    }
+
+    function renderReport(attempts, email, targetDate) {
+      document.getElementById('loadingBox').style.display = 'none';
+      const listContainer = document.getElementById('attemptsList');
+      const emptyBox = document.getElementById('emptyBox');
+      const countEl = document.getElementById('statCount');
+      const statusEl = document.getElementById('statStatus');
+      const nameEl = document.getElementById('displayStudentName');
+
+      if (!attempts || attempts.length === 0) {
+        emptyBox.style.display = 'block';
+        countEl.innerText = '0';
+        statusEl.innerText = 'Chưa nộp bài';
+        statusEl.style.color = '#EF4444';
+        nameEl.innerText = email;
+        return;
+      }
+
+      // Lấy tên học sinh từ bài nộp đầu tiên
+      const studentName = attempts[0].studentName || email;
+      nameEl.innerText = studentName;
+      countEl.innerText = attempts.length;
+      statusEl.innerText = '✓ Hoàn thành';
+      statusEl.style.color = '#16A34A';
+
+      listContainer.innerHTML = '';
+      attempts.forEach(att => {
+        const title = att.testTitle || att.testId || att.title || 'Bài kiểm tra kỹ năng';
+        const score = att.score || att.scoreStr || 'Đã nộp';
+        const time = att.timestamp || '';
+        
+        // Tạo link để phụ huynh bấm vào xem chi tiết bài làm
+        let detailUrl = '#';
+        if (att.testUrl) {
+          detailUrl = `${att.testUrl}&mode=parent&email=${encodeURIComponent(email)}&attemptId=${encodeURIComponent(att.id)}`;
+        } else {
+          // Đoán đường dẫn nếu không có sẵn testUrl
+          const isListening = (title.toLowerCase().includes('lis') || title.toLowerCase().includes('nghe'));
+          const folder = isListening ? 'listening/listening.html' : 'reading/reading.html';
+          detailUrl = `${folder}?mode=parent&email=${encodeURIComponent(email)}&attemptId=${encodeURIComponent(att.id)}`;
+        }
+
+        const card = document.createElement('div');
+        card.className = 'attempt-card';
+        card.innerHTML = `
+          <div class="attempt-info">
+            <div class="attempt-title">${title}</div>
+            <div class="attempt-meta">🕒 Thời gian nộp: ${time}</div>
+          </div>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <div class="score-badge">${score}</div>
+            <a href="${detailUrl}" class="btn-view-detail" target="_blank">
+              👁️ Xem bài làm
+            </a>
+          </div>
+        `;
+        listContainer.appendChild(card);
+      });
+
+      listContainer.style.display = 'block';
+    }
+
+    loadDailyReport();
+  </script>
+</body>
+</html>
