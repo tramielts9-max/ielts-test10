@@ -1,7 +1,17 @@
 /* ==========================================================================
    css/calendar.css - GIAO DIỆN GOOGLE CALENDAR THU NHỎ CHO ADMIN & GIÁO VIÊN
-   PHONG CÁCH: DUOLINGO X MODERN GOOGLE CALENDAR PRO
+   PHONG CÁCH: DUOLINGO X MODERN GOOGLE CALENDAR PRO (BẢN FULL-WIDTH 98%)
    ========================================================================== */
+
+/* 0. CƠ CHẾ BUNG RỘNG TRÀN VIỀN TOÀN MÀN HÌNH NHƯ PHÒNG READING */
+body.cal-fullwidth-active .main-container,
+.cal-expanded-container {
+  max-width: 98% !important;
+  width: 98% !important;
+  padding-left: 12px !important;
+  padding-right: 12px !important;
+  transition: max-width 0.2s ease;
+}
 
 /* 1. KHUNG CHỨA TOÀN BỘ BỘ LỊCH */
 .cal-app-container {
@@ -13,6 +23,8 @@
   margin-top: 15px;
   font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
   color: #261F1D;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 /* 2. THANH ĐIỀU HƯỚNG HEADER (TOOLBAR) */
@@ -84,7 +96,7 @@
   box-shadow: 0 2px 6px rgba(0,0,0,0.08);
 }
 
-/* 3. BỐ CỤC 2 CỘT (SIDEBAR + MAIN CALENDAR) */
+/* 3. BỐ CỤC 2 CỘT RỘNG RÃI */
 .cal-main-layout {
   display: grid;
   grid-template-columns: 240px 1fr;
@@ -107,7 +119,7 @@
   padding: 14px;
 }
 
-/* MINI CALENDAR CSS */
+/* MINI CALENDAR */
 .cal-mini-box {
   border-bottom: 2px dashed #E8E2D8;
   padding-bottom: 12px;
@@ -216,6 +228,7 @@
   border: 1.5px solid #E8E2D8;
   border-radius: 14px;
   background: #FFFFFF;
+  width: 100%;
 }
 
 .cal-week-header {
@@ -497,7 +510,7 @@
   flex-wrap: wrap;
 }
 
-/* 9. MODALS & BẢNG THIẾT LẬP */
+/* 9. MODALS & KHỐI TÙY CHỌN LẶP LẠI */
 .cal-modal-backdrop {
   position: fixed;
   inset: 0;
@@ -600,13 +613,43 @@
   border-width: 2.5px;
 }
 
-/* RECURRENCE CARD */
+/* KHỐI LẶP LẠI NÂNG CAO */
 .cal-recurrence-card {
   background: #F0FDF4;
   border: 2px dashed #86EFAC;
   border-radius: 14px;
   padding: 12px;
   margin-top: 10px;
+}
+
+.cal-series-badge {
+  background: #DCFCE7;
+  color: #15803D;
+  font-size: 11px;
+  font-weight: 900;
+  padding: 2px 8px;
+  border-radius: 8px;
+  border: 1px solid #86EFAC;
+}
+
+.cal-repeat-mode-box {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: #FFFFFF;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid #DCFCE7;
+}
+
+.cal-radio-repeat {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 800;
+  color: #1E293B;
+  cursor: pointer;
 }
 
 .cal-dow-selector {
