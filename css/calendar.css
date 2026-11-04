@@ -1,6 +1,6 @@
 /* ==========================================================================
    css/calendar.css - GIAO DIỆN GOOGLE CALENDAR THU NHỎ CHO ADMIN & GIÁO VIÊN
-   PHONG CÁCH: DUOLINGO X MODERN CALENDAR (HỌC NHÓM 2+ BẠN & QUẢN LÝ HỌC PHÍ)
+   PHONG CÁCH: DUOLINGO X MODERN GOOGLE CALENDAR PRO
    ========================================================================== */
 
 /* 1. KHUNG CHỨA TOÀN BỘ BỘ LỊCH */
@@ -15,7 +15,7 @@
   color: #261F1D;
 }
 
-/* 2. THANH ĐIỀU HƯỚNG HEADER (TUẦN/THÁNG, LỌC HỌC SINH, NÚT TẠO) */
+/* 2. THANH ĐIỀU HƯỚNG HEADER (TOOLBAR) */
 .cal-top-toolbar {
   display: flex;
   justify-content: space-between;
@@ -35,10 +35,27 @@
 }
 
 .cal-title-display {
-  font-size: 18px;
+  font-size: 17px;
   font-weight: 900;
   color: #8B1518;
   min-width: 170px;
+}
+
+.cal-search-input {
+  padding: 8px 12px;
+  border-radius: 12px;
+  border: 2px solid #E8E2D8;
+  background: #FAF7F2;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 13px;
+  outline: none;
+  width: 190px;
+}
+
+.cal-search-input:focus {
+  border-color: #8B1518;
+  background: #FFFFFF;
 }
 
 .cal-view-selector {
@@ -52,9 +69,9 @@
 .cal-view-btn {
   border: none;
   background: transparent;
-  padding: 6px 14px;
+  padding: 6px 12px;
   border-radius: 9px;
-  font-size: 13px;
+  font-size: 12.5px;
   font-weight: 800;
   color: #64748B;
   cursor: pointer;
@@ -67,40 +84,133 @@
   box-shadow: 0 2px 6px rgba(0,0,0,0.08);
 }
 
-.cal-filter-select {
-  padding: 8px 12px;
-  border-radius: 12px;
-  border: 2px solid #E8E2D8;
-  background: #FAF7F2;
-  font-family: inherit;
-  font-weight: 800;
-  font-size: 13.5px;
-  color: #1E293B;
-  outline: none;
-  cursor: pointer;
+/* 3. BỐ CỤC 2 CỘT (SIDEBAR + MAIN CALENDAR) */
+.cal-main-layout {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 16px;
+  transition: grid-template-columns 0.2s ease;
 }
 
-/* 3. BANNER THÔNG BÁO YÊU CẦU DỜI LỊCH (RESCHEDULE ALERTS) */
-.cal-alert-banner {
-  background: #FEF2F2;
-  border: 2px solid #FECACA;
-  border-bottom: 4px solid #F87171;
-  border-radius: 14px;
-  padding: 12px 16px;
-  margin-bottom: 16px;
+.cal-main-layout.sidebar-collapsed {
+  grid-template-columns: 0px 1fr;
+}
+
+.cal-main-layout.sidebar-collapsed .cal-sidebar {
+  display: none;
+}
+
+.cal-sidebar {
+  background: #FAF7F2;
+  border: 2px solid #E8E2D8;
+  border-radius: 16px;
+  padding: 14px;
+}
+
+/* MINI CALENDAR CSS */
+.cal-mini-box {
+  border-bottom: 2px dashed #E8E2D8;
+  padding-bottom: 12px;
+  margin-bottom: 12px;
+}
+
+.cal-mini-nav {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  flex-wrap: wrap;
-  gap: 10px;
+  margin-bottom: 8px;
 }
 
-.cal-alert-banner b {
-  color: #991B1B;
-  font-size: 14px;
+.cal-mini-btn {
+  background: #FFFFFF;
+  border: 1px solid #E8E2D8;
+  border-radius: 6px;
+  width: 24px;
+  height: 24px;
+  font-weight: 900;
+  cursor: pointer;
 }
 
-/* 4. GIAO DIỆN XEM THEO TUẦN (WEEK VIEW GRID - CHUẨN GOOGLE CALENDAR) */
+.cal-mini-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+  text-align: center;
+}
+
+.cal-mini-header-cell {
+  font-size: 10px;
+  font-weight: 800;
+  color: #78716C;
+  padding: 2px 0;
+}
+
+.cal-mini-cell {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 0;
+  border-radius: 6px;
+  cursor: pointer;
+  color: #1E293B;
+}
+
+.cal-mini-cell:hover {
+  background: #E2E8F0;
+}
+
+.cal-mini-cell.selected {
+  background: #8B1518;
+  color: #FFFFFF;
+  font-weight: 900;
+}
+
+.cal-mini-cell.today {
+  border: 1.5px solid #8B1518;
+}
+
+.cal-mini-cell.empty {
+  cursor: default;
+}
+
+/* DANH SÁCH LỌC HỌC SINH TẠI SIDEBAR */
+.cal-sidebar-student-list {
+  max-height: 260px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.cal-sidebar-student-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #334155;
+  padding: 5px 8px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.cal-sidebar-student-item:hover {
+  background: #F1ECE6;
+}
+
+.cal-sidebar-student-item.active {
+  background: #E2E8F0;
+  color: #8B1518;
+  font-weight: 900;
+}
+
+.cal-dot-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #8B1518;
+}
+
+/* 4. LƯỚI TUẦN & NGÀY (WEEK & DAY VIEW) */
 .cal-week-grid-container {
   overflow-x: auto;
   border: 1.5px solid #E8E2D8;
@@ -118,6 +228,15 @@
   z-index: 10;
 }
 
+.cal-day-header-single {
+  background: #FAF7F2;
+  border-bottom: 2px solid #E8E2D8;
+  padding: 12px 18px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .cal-week-header-cell {
   padding: 10px 4px;
   text-align: center;
@@ -129,14 +248,14 @@
 }
 
 .cal-week-header-dayname {
-  font-size: 12px;
+  font-size: 11.5px;
   font-weight: 800;
   color: #64748B;
   text-transform: uppercase;
 }
 
 .cal-week-header-daynum {
-  font-size: 18px;
+  font-size: 17px;
   font-weight: 900;
   color: #1E293B;
   margin-top: 2px;
@@ -154,7 +273,6 @@
   overflow-y: auto;
 }
 
-/* Cột giờ bên trái */
 .cal-time-col {
   background: #FAF7F2;
   border-right: 1.5px solid #E8E2D8;
@@ -171,7 +289,6 @@
   box-sizing: border-box;
 }
 
-/* Cột ngày trong tuần */
 .cal-day-col {
   border-right: 1px solid #F1ECE6;
   position: relative;
@@ -194,7 +311,7 @@
   background: #F8FAFC;
 }
 
-/* 5. THẺ SỰ KIỆN BUỔI HỌC (EVENT PILLS) */
+/* 5. THẺ SỰ KIỆN BUỔI HỌC */
 .cal-event-card {
   position: absolute;
   left: 3px;
@@ -231,44 +348,7 @@
   font-weight: 700;
 }
 
-/* MÀU SẮC TRẠNG THÁI BUỔI HỌC */
-.cal-ev-scheduled {
-  background: #E0F2FE;
-  border: 1.5px solid #7DD3FC;
-  border-left: 4px solid #0284C7;
-  color: #0369A1;
-}
-
-.cal-ev-group {
-  background: #F3E8FF;
-  border: 1.5px solid #D8B4FE;
-  border-left: 4px solid #9333EA;
-  color: #6B21A8;
-}
-
-.cal-ev-requested {
-  background: #FEF2F2;
-  border: 1.5px solid #FCA5A5;
-  border-left: 4px solid #DC2626;
-  color: #991B1B;
-  animation: pulseReschedule 1.5s infinite;
-}
-
-@keyframes pulseReschedule {
-  0% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.4); }
-  70% { box-shadow: 0 0 0 6px rgba(220, 38, 38, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
-}
-
-.cal-ev-completed {
-  background: #DCFCE7;
-  border: 1.5px solid #86EFAC;
-  border-left: 4px solid #16A34A;
-  color: #14532D;
-  opacity: 0.85;
-}
-
-/* 6. GIAO DIỆN XEM THEO THÁNG (MONTH VIEW) */
+/* 6. LƯỚI THÁNG (MONTH VIEW) */
 .cal-month-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
@@ -302,33 +382,122 @@
 
 .cal-month-event-item {
   background: #FFFFFF;
-  border: 1px solid #BAE6FD;
-  border-left: 3px solid #0284C7;
+  border: 1px solid #E2E8F0;
   border-radius: 5px;
-  padding: 2px 4px;
+  padding: 2px 5px;
   font-size: 11px;
   font-weight: 800;
   margin-bottom: 3px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  color: #0369A1;
 }
 
-.cal-month-event-item.is-group {
-  border-color: #D8B4FE;
-  border-left-color: #9333EA;
-  color: #6B21A8;
+/* 7. LỊCH BIỂU (AGENDA VIEW) */
+.cal-agenda-container {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-height: 600px;
+  overflow-y: auto;
+  padding-right: 6px;
 }
 
-.cal-month-event-item.is-requested {
-  border-color: #FCA5A5;
-  border-left-color: #DC2626;
-  background: #FEF2F2;
-  color: #991B1B;
+.cal-agenda-group {
+  background: #FFFFFF;
+  border: 2px solid #E8E2D8;
+  border-radius: 14px;
+  overflow: hidden;
 }
 
-/* 7. MODAL TẠO & SỬA BUỔI HỌC (HỌC NHÓM & HỌC PHÍ) */
+.cal-agenda-group.is-today {
+  border-color: #8B1518;
+}
+
+.cal-agenda-date-header {
+  background: #FAF7F2;
+  padding: 8px 14px;
+  font-size: 13.5px;
+  font-weight: 900;
+  color: #1E293B;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #E8E2D8;
+}
+
+.cal-pill-today {
+  background: #8B1518;
+  color: #FFFFFF;
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-weight: 900;
+}
+
+.cal-agenda-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.cal-agenda-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 14px;
+  border-bottom: 1px solid #F1ECE6;
+  cursor: pointer;
+  transition: background 0.1s;
+}
+
+.cal-agenda-item:hover {
+  background: #F8FAFC;
+}
+
+.cal-agenda-time-pill {
+  padding-left: 8px;
+  font-size: 12.5px;
+  color: #1E293B;
+  min-width: 110px;
+}
+
+.cal-agenda-content {
+  flex: 1;
+}
+
+.status-badge {
+  font-size: 11px;
+  font-weight: 900;
+  padding: 3px 8px;
+  border-radius: 8px;
+}
+
+.status-scheduled { background: #E0F2FE; color: #0369A1; }
+.status-completed { background: #DCFCE7; color: #166534; }
+.status-reschedule_requested { background: #FEE2E2; color: #991B1B; }
+
+/* 8. FOOTER TIME INSIGHTS */
+.cal-time-insights-bar {
+  margin-top: 16px;
+  padding: 12px 16px;
+  background: #FAF7F2;
+  border: 2px solid #E8E2D8;
+  border-radius: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  font-size: 13px;
+}
+
+.cal-insights-stats {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+/* 9. MODALS & BẢNG THIẾT LẬP */
 .cal-modal-backdrop {
   position: fixed;
   inset: 0;
@@ -346,14 +515,28 @@
   border: 3px solid #E8E2D8;
   border-bottom: 7px solid #D3CBC0;
   border-radius: 24px;
-  max-width: 520px;
+  max-width: 530px;
   width: 100%;
   padding: 24px;
   position: relative;
   box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-  font-family: inherit;
   max-height: 90vh;
   overflow-y: auto;
+}
+
+.cal-modal-close-btn {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  background: #F1ECE6;
+  border: none;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  font-weight: 900;
+  color: #7E7672;
+  cursor: pointer;
+  font-size: 16px;
 }
 
 .cal-form-group {
@@ -368,7 +551,7 @@
   margin-bottom: 4px;
 }
 
-.cal-form-input, .cal-form-select, .cal-form-textarea {
+.cal-form-input, .cal-form-select {
   width: 100%;
   box-sizing: border-box;
   padding: 9px 12px;
@@ -376,54 +559,118 @@
   border-radius: 10px;
   font-family: inherit;
   font-weight: 700;
-  font-size: 13.5px;
+  font-size: 13px;
   outline: none;
   background: #FAF7F2;
 }
 
-.cal-form-input:focus, .cal-form-select:focus, .cal-form-textarea:focus {
+.cal-form-input:focus, .cal-form-select:focus {
   border-color: #8B1518;
   background: #FFFFFF;
 }
 
-/* DANH SÁCH CHECKBOX CHỌN NHIỀU HỌC SINH */
-.cal-student-checklist {
-  max-height: 140px;
-  overflow-y: auto;
-  border: 2px solid #E8E2D8;
-  border-radius: 12px;
-  padding: 6px 10px;
-  background: #FAF7F2;
+/* SKILL RADIO TAGS */
+.cal-skill-tag-group {
   display: flex;
-  flex-direction: column;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.cal-skill-radio-label {
+  cursor: pointer;
+}
+
+.cal-skill-radio-label input {
+  display: none;
+}
+
+.cal-skill-pill {
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: 10px;
+  border: 1.5px solid;
+  font-size: 11.5px;
+  font-weight: 900;
+  transition: transform 0.1s;
+}
+
+.cal-skill-radio-label input:checked + .cal-skill-pill {
+  transform: scale(1.05);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+  border-width: 2.5px;
+}
+
+/* RECURRENCE CARD */
+.cal-recurrence-card {
+  background: #F0FDF4;
+  border: 2px dashed #86EFAC;
+  border-radius: 14px;
+  padding: 12px;
+  margin-top: 10px;
+}
+
+.cal-dow-selector {
+  display: flex;
   gap: 6px;
 }
 
-.cal-student-check-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+.cal-dow-btn {
+  flex: 1;
+  text-align: center;
+  cursor: pointer;
+}
+
+.cal-dow-btn input {
+  display: none;
+}
+
+.cal-dow-btn span {
+  display: block;
+  padding: 6px 0;
+  background: #FFFFFF;
+  border: 1.5px solid #CBD5E1;
+  border-radius: 8px;
+  font-weight: 800;
+  font-size: 12px;
+  color: #334155;
+}
+
+.cal-dow-btn input:checked + span {
+  background: #16A34A;
+  color: #FFFFFF;
+  border-color: #15803D;
+}
+
+/* HỘP CẢNH BÁO */
+.cal-notice-box {
+  background: #FEF2F2;
+  border: 1.5px solid #FCA5A5;
+  padding: 8px 12px;
+  border-radius: 10px;
+  margin-bottom: 12px;
+  font-size: 12.5px;
+  color: #991B1B;
+}
+
+.cal-conflict-box {
+  background: #FFFBEB;
+  border: 2px solid #FCD34D;
+  padding: 10px 14px;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  font-size: 12.5px;
+  color: #B45309;
+}
+
+.btn-3d-delete {
+  background: #EF4444;
+  color: #FFFFFF !important;
+  border-bottom: 4px solid #B91C1C;
+  padding: 10px 16px;
   font-size: 13px;
-  font-weight: 700;
-  color: #1E293B;
-  cursor: pointer;
-  padding: 4px 6px;
-  border-radius: 6px;
-  transition: background 0.1s;
 }
 
-.cal-student-check-item:hover {
-  background: #F1ECE6;
-}
-
-.cal-student-check-item input[type="checkbox"] {
-  width: 16px;
-  height: 16px;
-  accent-color: #8B1518;
-  cursor: pointer;
-}
-
-/* BẢNG QUẢN LÝ HỌC PHÍ */
+/* BẢNG HỌC PHÍ */
 .cal-tuition-table {
   width: 100%;
   border-collapse: collapse;
