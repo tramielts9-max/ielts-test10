@@ -14,7 +14,7 @@
  *  7. PHÂN LOẠI MÀU THEO KỸ NĂNG: SPEAKING, WRITING 1, WRITING 2, L&R, MOCK
  *  8. TỰ ĐỘNG BUNG GIAO DIỆN TRÀN VIỀN (FULL-WIDTH 98% TOÀN MÀN HÌNH)
  *  9. CHỐNG MẤT LỊCH VỚI SMART MERGE & ATOMIC BATCH WRITE GHI 1 LẦN TRÊN CLOUD
- * 10. TRỢ LÝ GIỌNG NÓI VOICE AI: NÓI TIẾNG VIỆT TỰ ĐỘNG XẾP LỊCH QUA WATERFALL GEMINI
+ * 10. TRỢ LÝ HYBRID AI (NÓI HOẶC GÕ CHỮ): THỜI GIAN THU ÂM KHÔNG GIỚI HẠN + WATERFALL GEMINI
  * 11. ĐỘNG CƠ XIN NGHỈ & HỌC BÙ 1-CLICK: BẢO LƯU BUỔI HỌC VÀ TẠO BUỔI BÙ LIÊN KẾT
  * =========================================================================
  */
@@ -65,10 +65,11 @@ class AdminCalendarSystem {
     this.knownStudents = [];
     this.tuitionRegistry = {};
     this.activeEditingEvent = null;
+    this.makeupTargetEvent = null;
     this.isLoading = false;
     this.isSidebarOpen = true;
 
-    // Trạng thái Trợ lý Giọng nói Voice AI
+    // Trạng thái Trợ lý Giọng nói & Gõ chữ Voice AI
     this.speechRecognition = null;
     this.isRecordingVoice = false;
     this.voiceTranscript = '';
@@ -142,12 +143,9 @@ class AdminCalendarSystem {
 
       // THUẬT TOÁN SMART MERGE: CHỐNG MẤT LỊCH TUYỆT ĐỐI
       if (Array.isArray(cloudEvents) && cloudEvents.length > 0) {
-        // Cloud có dữ liệu đầy đủ -> đồng bộ vào RAM và cập nhật Cache
         this.events = cloudEvents;
         localStorage.setItem('admin_cached_schedules', JSON.stringify(this.events));
       } else if (localEvents.length > 0) {
-        // Nếu Cloud bị chậm hoặc trả về rỗng mà LocalStorage đang có dữ liệu:
-        // GIỮ NGUYÊN DỮ LIỆU CỤC BỘ & TỰ ĐỘNG SYNC NGƯỢC LÊN CLOUD ĐỂ CỨU DỮ LIỆU
         console.warn("⚠️ Cloud trả về rỗng nhưng máy có lịch. Kích hoạt cơ chế Smart Sync phục hồi Drive!");
         this.events = localEvents;
         if (CONFIG.DRIVE_STORAGE_URL) {
@@ -299,8 +297,8 @@ class AdminCalendarSystem {
               💰 HỌC PHÍ
             </button>
 
-            <!-- 🎙️ NÚT TRỢ LÝ AI VOICE-TO-CALENDAR -->
-            <button type="button" class="btn-voice-ai ${this.isRecordingVoice ? 'recording' : ''}" id="btnVoiceCalendar" onclick="window.adminCalendar.toggleVoiceAssistant()" title="Nói tiếng Việt tự nhiên để xếp lịch (Phím tắt: V)">
+            <!-- 🎙️ NÚT TRỢ LÝ AI (NÓI HOẶC GÕ CHỮ) -->
+            <button type="button" class="btn-voice-ai ${this.isRecordingVoice ? 'recording' : ''}" id="btnVoiceCalendar" onclick="window.adminCalendar.toggleVoiceAssistant()" title="Nói hoặc gõ chữ để AI xếp lịch tự động (Phím tắt: V)">
               🎙️ ${this.isRecordingVoice ? 'ĐANG NGHE...' : 'GIỌNG NÓI AI'}
             </button>
 
@@ -914,12 +912,14 @@ class AdminCalendarSystem {
   }
 
   // =========================================================================
-  // 15. TRỢ LÝ GIỌNG NÓI VOICE AI (VOICE-TO-CALENDAR AI ENGINE)
+  // 15. TRỢ LÝ AI HYBRID (NÓI HOẶC GÕ PHÍM - THU ÂM KHÔNG GIỚI HẠN THỜI GIAN)
   // =========================================================================
   toggleVoiceAssistant() {
-    if (this.isRecordingVoice) {
-      this.stopVoiceRecognition();
+    const modal = document.getElementById('adminVoiceAssistantModal');
+    if (modal && modal.style.display === 'flex') {
+      this.closeVoiceModal();
     } else {
+      this.openVoiceModal();
       this.startVoiceRecognition();
     }
   }
@@ -927,55 +927,69 @@ class AdminCalendarSystem {
   startVoiceRecognition() {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
-      alert("⚠️ Trình duyệt của Thầy chưa hỗ trợ nhận diện giọng nói (Web Speech API). Vui lòng dùng Chrome hoặc Edge trên máy tính!");
+      console.warn("Trình duyệt không hỗ trợ Web Speech API.");
+      const statusEl = document.getElementById('calVoiceStatusText');
+      if (statusEl) statusEl.innerText = "⌨️ Micro không khả dụng. Thầy hãy gõ câu lệnh vào ô bên dưới nhé:";
       return;
     }
 
     try {
+      if (this.speechRecognition) {
+        try { this.speechRecognition.abort(); } catch(e) {}
+      }
+
       this.speechRecognition = new SpeechRecognition();
       this.speechRecognition.lang = 'vi-VN';
-      this.speechRecognition.continuous = false;
-      this.speechRecognition.interimResults = true;
+      this.speechRecognition.continuous = true;       // BẬT THU ÂM LIÊN TỤC
+      this.speechRecognition.interimResults = true;   // HIỂN THỊ CHỮ NGAY KHI ĐANG NÓI
 
       this.isRecordingVoice = true;
-      this.voiceTranscript = '';
-      this.render(); // Cập nhật nút Micro sang trạng thái đỏ
+      this.updateVoiceButtonUI(true);
 
-      this.openVoiceModal();
+      const statusEl = document.getElementById('calVoiceStatusText');
+      if (statusEl) statusEl.innerHTML = `🎙️ <span style="color:#DC2626;">Đang lắng nghe liên tục...</span> Thầy cứ nói tự nhiên, khi nào xong thì bấm nút <b>Gửi cho AI</b>:`;
 
       this.speechRecognition.onresult = (event) => {
-        let transcript = '';
+        let interim = '';
         for (let i = event.resultIndex; i < event.results.length; i++) {
-          transcript += event.results[i][0].transcript;
+          const trans = event.results[i][0].transcript;
+          if (event.results[i].isFinal) {
+            this.voiceTranscript += (this.voiceTranscript ? ' ' : '') + trans;
+          } else {
+            interim += trans;
+          }
         }
-        this.voiceTranscript = transcript;
-        const liveEl = document.getElementById('calVoiceLiveTranscript');
-        if (liveEl) liveEl.innerText = transcript || "Đang lắng nghe Thầy nói...";
+
+        // Tự động đẩy văn bản vào khung gõ chữ (Textarea) theo thời gian thực
+        const inputEl = document.getElementById('calVoiceTextInput');
+        if (inputEl) {
+          const combined = (this.voiceTranscript + (interim ? ' ' + interim : '')).trim();
+          inputEl.value = combined;
+        }
       };
 
       this.speechRecognition.onerror = (event) => {
-        console.warn("Lỗi ghi âm giọng nói:", event.error);
-        this.stopVoiceRecognition();
-        const statusEl = document.getElementById('calVoiceStatusText');
-        if (statusEl) statusEl.innerText = `⚠️ Lỗi ghi âm: ${event.error}. Thầy hãy thử nói lại nhé!`;
+        console.warn("Lỗi Web Speech:", event.error);
+        if (event.error === 'no-speech') {
+          return; // Thầy im lặng suy nghĩ thì không coi là lỗi
+        }
       };
 
       this.speechRecognition.onend = () => {
+        // TỰ ĐỘNG BẬT LẠI MICRO NẾU THẦY CHƯA CHỦ ĐỘNG BẤM DỪNG HOẶC GỬI
         if (this.isRecordingVoice) {
-          this.isRecordingVoice = false;
-          this.render();
-          if (this.voiceTranscript.trim()) {
-            this.processVoiceCommandWithAI(this.voiceTranscript.trim());
-          } else {
-            this.closeVoiceModal();
-          }
+          try {
+            this.speechRecognition.start();
+            console.log("[Voice Assistant] Duy trì Micro không giới hạn thời gian...");
+          } catch (e) {}
         }
       };
 
       this.speechRecognition.start();
     } catch (e) {
-      alert("Không thể khởi động Micro: " + e.message);
-      this.stopVoiceRecognition();
+      console.warn("Không thể mở Micro:", e);
+      this.isRecordingVoice = false;
+      this.updateVoiceButtonUI(false);
     }
   }
 
@@ -985,7 +999,34 @@ class AdminCalendarSystem {
       try { this.speechRecognition.stop(); } catch (e) {}
       this.speechRecognition = null;
     }
-    this.render();
+    this.updateVoiceButtonUI(false);
+  }
+
+  toggleMicRecordingState() {
+    if (this.isRecordingVoice) {
+      this.stopVoiceRecognition();
+      const statusEl = document.getElementById('calVoiceStatusText');
+      if (statusEl) statusEl.innerHTML = `⏸️ Đã tạm dừng Micro. Thầy có thể gõ thêm chữ hoặc bấm <b>Tiếp tục nói</b>:`;
+      const btnToggle = document.getElementById('btnCalVoiceToggleMic');
+      if (btnToggle) btnToggle.innerHTML = `🎙️ Tiếp tục nói`;
+    } else {
+      this.startVoiceRecognition();
+      const btnToggle = document.getElementById('btnCalVoiceToggleMic');
+      if (btnToggle) btnToggle.innerHTML = `⏸️ Tạm dừng Micro`;
+    }
+  }
+
+  updateVoiceButtonUI(isRec) {
+    const btn = document.getElementById('btnVoiceCalendar');
+    if (btn) {
+      if (isRec) {
+        btn.classList.add('recording');
+        btn.innerHTML = `🎙️ ĐANG NGHE...`;
+      } else {
+        btn.classList.remove('recording');
+        btn.innerHTML = `🎙️ GIỌNG NÓI AI`;
+      }
+    }
   }
 
   openVoiceModal() {
@@ -993,9 +1034,14 @@ class AdminCalendarSystem {
     if (modal) {
       modal.style.display = 'flex';
       const statusText = document.getElementById('calVoiceStatusText');
-      const liveTranscript = document.getElementById('calVoiceLiveTranscript');
-      if (statusText) statusText.innerText = "🎙️ Đang nghe... Thầy hãy nói tự nhiên bằng tiếng Việt:";
-      if (liveTranscript) liveTranscript.innerText = "Ví dụ: 'Xếp cho bạn Đặng Minh Chương học Speaking 1-1 tối thứ 3 và thứ 5 lúc 19:30 bắt đầu từ tuần này, lặp lại 12 buổi.'";
+      const textInput = document.getElementById('calVoiceTextInput');
+      const btnToggle = document.getElementById('btnCalVoiceToggleMic');
+
+      if (statusText) statusText.innerHTML = `🎙️ <span style="color:#DC2626;">Đang lắng nghe...</span> Thầy có thể nói vào Micro HOẶC gõ chữ vào ô dưới:`;
+      if (textInput && !textInput.value.trim()) {
+        textInput.value = '';
+      }
+      if (btnToggle) btnToggle.innerHTML = `⏸️ Tạm dừng Micro`;
     }
   }
 
@@ -1003,6 +1049,20 @@ class AdminCalendarSystem {
     const modal = document.getElementById('adminVoiceAssistantModal');
     if (modal) modal.style.display = 'none';
     this.stopVoiceRecognition();
+  }
+
+  // Gửi lệnh cho AI (Lấy từ ô Textarea do Thầy nói hoặc gõ tay)
+  submitVoiceCommandFromInput() {
+    this.stopVoiceRecognition();
+    const inputEl = document.getElementById('calVoiceTextInput');
+    const text = (inputEl ? inputEl.value : this.voiceTranscript).trim();
+
+    if (!text) {
+      alert("⚠️ Thầy vui lòng nói vào Micro hoặc gõ nội dung yêu cầu xếp lịch vào ô trước khi gửi nhé!");
+      return;
+    }
+
+    this.processVoiceCommandWithAI(text);
   }
 
   // Gọi Gemini AI tuần tự qua mảng Waterfall Models
@@ -1044,23 +1104,23 @@ class AdminCalendarSystem {
     throw new Error(lastError ? lastError.message : "Tất cả các model Gemini trong danh sách ưu tiên đều không phản hồi.");
   }
 
-  // Xử lý câu nói tiếng Việt bằng AI Gemini
+  // Xử lý câu nói / câu chữ bằng AI Gemini
   async processVoiceCommandWithAI(commandText) {
     const statusText = document.getElementById('calVoiceStatusText');
-    if (statusText) statusText.innerText = "⏳ AI Gemini đang bóc tách thông tin lịch học...";
+    if (statusText) statusText.innerHTML = `⏳ <b>AI Gemini đang bóc tách thông tin lịch học...</b>`;
 
     const todayStr = this.formatIsoDate(new Date());
     const studentsSummary = this.knownStudents.map(s => `${s.name} (${s.email})`).join('; ');
 
     const systemPrompt = `
 Bạn là Trợ lý AI Khảo thí & Quản lý Lịch học của Thầy tại TRẠM IELTS.
-Nhiệm vụ: Trích xuất lịch học từ câu nói tự nhiên tiếng Việt của Thầy thành JSON có cấu trúc.
+Nhiệm vụ: Trích xuất lịch học từ câu nói tự nhiên hoặc câu gõ chữ tiếng Việt của Thầy thành JSON có cấu trúc.
 
 HÔM NAY LÀ: ${todayStr} (${new Date().toLocaleDateString('vi-VN', { weekday: 'long' })}).
 DANH SÁCH HỌC SINH HIỆN CÓ:
 ${studentsSummary || 'Chưa có dữ liệu'}
 
-CÂU NÓI CỦA THẦY:
+CÂU LỆNH CỦA THẦY:
 "${commandText}"
 
 QUY TẮC BÓC TÁCH BẮT BUỘC:
@@ -1149,7 +1209,7 @@ HÃY TRẢ VỀ DUY NHẤT 1 CHUỖI JSON (KHÔNG KÈM MARKDOWN, KHÔNG \`\`\`js
       alert(`🎉 AI đã bóc tách thành công lịch của bạn [${parsedData.studentName || 'Học viên'}]! Thầy hãy kiểm tra lại và bấm 'LƯU LỊCH' nhé.`);
 
     } catch (err) {
-      alert("⚠️ Không thể phân tích giọng nói: " + err.message);
+      alert("⚠️ Không thể phân tích: " + err.message);
       this.closeVoiceModal();
     }
   }
@@ -1369,27 +1429,49 @@ HÃY TRẢ VỀ DUY NHẤT 1 CHUỖI JSON (KHÔNG KÈM MARKDOWN, KHÔNG \`\`\`js
         </div>
       </div>
 
-      <!-- 4. MODAL TRỢ LÝ GIỌNG NÓI VOICE AI -->
+      <!-- 4. MODAL TRỢ LÝ AI HYBRID (NÓI HOẶC GÕ CHỮ - THU ÂM KHÔNG GIỚI HẠN THỜI GIAN) -->
       <div id="adminVoiceAssistantModal" class="cal-modal-backdrop" style="display:none; z-index:1000002;">
-        <div class="cal-modal-box" style="max-width:480px; text-align:center;">
+        <div class="cal-modal-box" style="max-width:520px; text-align:left;">
           <button type="button" onclick="window.adminCalendar.closeVoiceModal()" class="cal-modal-close-btn">✕</button>
 
-          <div style="font-size:42px; margin-bottom:8px;">🎙️</div>
-          <h3 id="calVoiceStatusText" style="margin:0 0 10px 0; color:#4F46E5; font-size:17px; font-weight:900;">
-            Đang lắng nghe Thầy nói...
-          </h3>
-
-          <div id="calVoiceLiveTranscript" style="background:#FAF7F2; border:2px dashed #CBD5E1; border-radius:12px; padding:14px; font-size:13px; color:#334155; font-weight:700; min-height:60px; line-height:1.5;">
-            "Thầy hãy nói tự nhiên bằng tiếng Việt..."
+          <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
+            <div style="font-size:32px;">🎙️</div>
+            <div>
+              <h3 style="margin:0; color:#4F46E5; font-size:17.5px; font-weight:900;">
+                TRỢ LÝ AI XẾP LỊCH HỌC
+              </h3>
+              <div id="calVoiceStatusText" style="font-size:12.5px; color:#475569; font-weight:700; margin-top:2px;">
+                Thầy có thể nói vào Micro HOẶC gõ chữ vào ô bên dưới:
+              </div>
+            </div>
           </div>
 
-          <div style="margin-top:16px; display:flex; justify-content:center; gap:8px;">
-            <button type="button" onclick="window.adminCalendar.stopVoiceRecognition()" class="btn-3d btn-3d-red" style="padding:9px 18px; font-size:13px;">
-              ⏹️ Hoàn thành nói
+          <!-- KHUNG GÕ CHỮ & HIỂN THỊ GIỌNG NÓI ĐỒNG THỜI -->
+          <div style="margin-bottom:12px;">
+            <textarea id="calVoiceTextInput" 
+                      class="cal-form-input" 
+                      style="min-height:95px; padding:12px; font-size:13.5px; font-weight:600; line-height:1.5; border-radius:12px; resize:vertical; background:#FAF7F2; border:2px solid #CBD5E1;" 
+                      placeholder="Thầy nói vào Micro (chữ sẽ tự chạy vào đây) HOẶC gõ phím trực tiếp vào đây...&#10;Ví dụ: Xếp cho Đặng Minh Chương học Speaking 1-1 tối thứ 3 và thứ 5 lúc 19:30 bắt đầu tuần này 12 buổi..."></textarea>
+            
+            <div style="font-size:11.5px; color:#64748B; font-weight:700; margin-top:6px; display:flex; justify-content:space-between; align-items:center;">
+              <span>💡 Thầy có thể vừa nói vừa lấy tay gõ sửa lại chữ trong ô trước khi gửi.</span>
+            </div>
+          </div>
+
+          <!-- HÀNG NÚT ĐIỀU KHIỂN -->
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-top:14px; flex-wrap:wrap;">
+            <button type="button" id="btnCalVoiceToggleMic" onclick="window.adminCalendar.toggleMicRecordingState()" class="btn-3d btn-3d-white" style="padding:9px 14px; font-size:12.5px;">
+              ⏸️ Tạm dừng Micro
             </button>
-            <button type="button" onclick="window.adminCalendar.closeVoiceModal()" class="btn-3d btn-3d-white" style="padding:9px 16px; font-size:13px;">
-              Hủy bỏ
-            </button>
+
+            <div style="display:flex; gap:8px; margin-left:auto;">
+              <button type="button" onclick="window.adminCalendar.closeVoiceModal()" class="btn-3d btn-3d-white" style="padding:9px 15px; font-size:12.5px;">
+                Đóng
+              </button>
+              <button type="button" onclick="window.adminCalendar.submitVoiceCommandFromInput()" class="btn-3d" style="background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%); color:white !important; border-bottom:3.5px solid #3730A3; padding:9px 18px; font-size:13px; font-weight:900;">
+                🚀 GỬI CHO AI XẾP LỊCH
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -1927,7 +2009,6 @@ HÃY TRẢ VỀ DUY NHẤT 1 CHUỖI JSON (KHÔNG KÈM MARKDOWN, KHÔNG \`\`\`js
         const em = st.email.toLowerCase().trim();
         const info = this.tuitionRegistry[em] || { paidSessions: 12 };
 
-        // Chỉ tính các buổi đã hoàn thành (completed). Buổi excused_absence không trừ tiền
         const completed = this.events.filter(ev => {
           const match = (ev.studentEmail || '').toLowerCase().trim() === em ||
                         (Array.isArray(ev.studentEmails) && ev.studentEmails.includes(em));
