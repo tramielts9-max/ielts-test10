@@ -1,7 +1,7 @@
 /**
  * =========================================================================
  * js/calendar-system.js - BỘ MÁY GOOGLE CALENDAR QUẢN TRỊ VIÊN & DUYỆT LỊCH HỌC
- * BẢN SIÊU NÂNG CẤP (GOOGLE CALENDAR PRO X FULL-WIDTH X FLEXIBLE RECURRENCE):
+ * BẢN SIÊU NÂNG CẤP MASTER (AI VOICE CALENDAR X MAKEUP ENGINE X ATOMIC BATCH):
  *  1. SIDEBAR TRÁI: MINI CALENDAR + LỌC HỌC SINH MULTI-CHECKBOX
  *  2. 4 CHẾ ĐỘ XEM: NGÀY (DAY), TUẦN (WEEK), THÁNG (MONTH), LỊCH BIỂU (AGENDA)
  *  3. BỘ MÁY LẶP LẠI SIÊU LINH HOẠT (RECURRENCE ENGINE):
@@ -13,12 +13,38 @@
  *  6. PHÁT HIỆN TRÙNG LỊCH (CONFLICT DETECTOR: BÁO ĐỎ KHI TRÙNG GIỜ GIÁO VIÊN)
  *  7. PHÂN LOẠI MÀU THEO KỸ NĂNG: SPEAKING, WRITING 1, WRITING 2, L&R, MOCK
  *  8. TỰ ĐỘNG BUNG GIAO DIỆN TRÀN VIỀN (FULL-WIDTH 98% TOÀN MÀN HÌNH)
- *  9. BẢO LƯU 100% KHẢ NĂNG CHỐNG CRASH VỚI DỰ PHÒNG LOCALSTORAGE
+ *  9. CHỐNG MẤT LỊCH VỚI SMART MERGE & ATOMIC BATCH WRITE GHI 1 LẦN TRÊN CLOUD
+ * 10. TRỢ LÝ GIỌNG NÓI VOICE AI: NÓI TIẾNG VIỆT TỰ ĐỘNG XẾP LỊCH QUA WATERFALL GEMINI
+ * 11. ĐỘNG CƠ XIN NGHỈ & HỌC BÙ 1-CLICK: BẢO LƯU BUỔI HỌC VÀ TẠO BUỔI BÙ LIÊN KẾT
  * =========================================================================
  */
 
 import { CONFIG } from './config.js';
 import { stateManager } from './state.js';
+
+// 1. MÃ HÓA RUNTIME AUTH KEY CHO GEMINI AI (CHUẨN TỪ QUIZ-V.JS)
+const _AUTH_SEEDS = [
+  65, 81, 46, 65, 98, 56, 82, 78, 54, 75, 116, 80, 107, 51, 45, 50,
+  75, 103, 117, 114, 119, 117, 116, 65, 115, 55, 95, 118, 82, 66,
+  121, 81, 110, 113, 67, 48, 77, 86, 55, 52, 66, 119, 107, 82, 107,
+  80, 110, 74, 89, 70, 90, 49, 119
+];
+
+function getDecodedKey() {
+  return _AUTH_SEEDS.map(c => String.fromCharCode(c)).join('');
+}
+
+// 2. DANH SÁCH MODEL AI THỰC THI THEO THỨ TỰ ƯU TIÊN FALLBACK WATERFALL
+const GEMINI_WATERFALL_MODELS = [
+  'gemini-3.5-flash-lite',
+  'gemini-3.1-flash-lite',
+  'gemini-2.5-flash-lite',
+  'gemini-3.8-flash',
+  'gemini-3.7-flash',
+  'gemini-3.6-flash',
+  'gemini-3.5-flash',
+  'gemini-2.5-flash'
+];
 
 // Danh mục kỹ năng và mã màu Google Calendar chuẩn
 export const SKILL_COLORS = {
@@ -41,6 +67,11 @@ class AdminCalendarSystem {
     this.activeEditingEvent = null;
     this.isLoading = false;
     this.isSidebarOpen = true;
+
+    // Trạng thái Trợ lý Giọng nói Voice AI
+    this.speechRecognition = null;
+    this.isRecordingVoice = false;
+    this.voiceTranscript = '';
 
     // Lắng nghe phím tắt điều hướng chuẩn Google Calendar
     this.bindKeyboardShortcuts();
@@ -83,12 +114,13 @@ class AdminCalendarSystem {
     }
   }
 
-  // 1. TẢI TẤT CẢ BUỔI HỌC TỪ CLOUD / LOCALSTORAGE
+  // 1. TẢI TẤT CẢ BUỔI HỌC VỚI CƠ CHẾ SMART MERGE CHỐNG MẤT SẠCH LỊCH KHI RELOAD
   async loadSchedules() {
     this.isLoading = true;
     const user = stateManager.getUser();
 
     try {
+      let cloudEvents = null;
       if (CONFIG.DRIVE_STORAGE_URL) {
         const res = await fetch(CONFIG.DRIVE_STORAGE_URL, {
           method: "POST",
@@ -97,12 +129,43 @@ class AdminCalendarSystem {
         });
         const data = await res.json();
         if (data && data.success && Array.isArray(data.events)) {
-          this.events = data.events;
-          localStorage.setItem('admin_cached_schedules', JSON.stringify(this.events));
+          cloudEvents = data.events;
         }
       }
+
+      // Đọc bộ nhớ đệm an toàn trên thiết bị
+      let localEvents = [];
+      try {
+        const cachedRaw = localStorage.getItem('admin_cached_schedules');
+        if (cachedRaw) localEvents = JSON.parse(cachedRaw);
+      } catch (err) {}
+
+      // THUẬT TOÁN SMART MERGE: CHỐNG MẤT LỊCH TUYỆT ĐỐI
+      if (Array.isArray(cloudEvents) && cloudEvents.length > 0) {
+        // Cloud có dữ liệu đầy đủ -> đồng bộ vào RAM và cập nhật Cache
+        this.events = cloudEvents;
+        localStorage.setItem('admin_cached_schedules', JSON.stringify(this.events));
+      } else if (localEvents.length > 0) {
+        // Nếu Cloud bị chậm hoặc trả về rỗng mà LocalStorage đang có dữ liệu:
+        // GIỮ NGUYÊN DỮ LIỆU CỤC BỘ & TỰ ĐỘNG SYNC NGƯỢC LÊN CLOUD ĐỂ CỨU DỮ LIỆU
+        console.warn("⚠️ Cloud trả về rỗng nhưng máy có lịch. Kích hoạt cơ chế Smart Sync phục hồi Drive!");
+        this.events = localEvents;
+        if (CONFIG.DRIVE_STORAGE_URL) {
+          fetch(CONFIG.DRIVE_STORAGE_URL, {
+            method: "POST",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify({
+              action: "admin_save_schedules_batch",
+              adminEmail: user.email || 'tramielts9@gmail.com',
+              events: this.events
+            })
+          }).catch(e => console.warn("Lỗi tự phục hồi lên Cloud:", e));
+        }
+      } else {
+        this.events = cloudEvents || [];
+      }
     } catch (e) {
-      console.warn("Chuyển sang dùng bộ nhớ đệm thiết bị cho lịch học:", e);
+      console.warn("Mất kết nối Cloud, chuyển sang chế độ Offline Cache an toàn:", e);
       try {
         const raw = localStorage.getItem('admin_cached_schedules');
         if (raw) this.events = JSON.parse(raw);
@@ -188,6 +251,7 @@ class AdminCalendarSystem {
       else if (key === 'm') { this.switchView('month'); }
       else if (key === 'd') { this.switchView('day'); }
       else if (key === 'a') { this.switchView('agenda'); }
+      else if (key === 'v') { this.toggleVoiceAssistant(); }
     });
   }
 
@@ -235,7 +299,12 @@ class AdminCalendarSystem {
               💰 HỌC PHÍ
             </button>
 
-            <!-- NÚT XẾP LỊCH MỚI -->
+            <!-- 🎙️ NÚT TRỢ LÝ AI VOICE-TO-CALENDAR -->
+            <button type="button" class="btn-voice-ai ${this.isRecordingVoice ? 'recording' : ''}" id="btnVoiceCalendar" onclick="window.adminCalendar.toggleVoiceAssistant()" title="Nói tiếng Việt tự nhiên để xếp lịch (Phím tắt: V)">
+              🎙️ ${this.isRecordingVoice ? 'ĐANG NGHE...' : 'GIỌNG NÓI AI'}
+            </button>
+
+            <!-- NÚT XẾP LỊCH MỚI BẰNG TAY -->
             <button type="button" class="btn-3d btn-3d-red" onclick="window.adminCalendar.openCreateModal()" style="padding: 9px 18px; font-size: 13px;">
               ➕ XẾP LỊCH HỌC
             </button>
@@ -386,16 +455,26 @@ class AdminCalendarSystem {
       const heightPx = Math.max(48, this.durationToPixels(ev.startTime, ev.endTime));
       const skillStyle = this.getEventStyle(ev);
       const isSeries = !!ev.seriesId;
+      const isExcused = ev.status === 'excused_absence';
+      const isMakeup = !!ev.isMakeup;
 
       eventsHtml += `
-        <div class="cal-event-card" 
+        <div class="cal-event-card ${isExcused ? 'is-excused' : ''} ${isMakeup ? 'is-makeup' : ''}" 
              style="top: ${topPx}px; height: ${heightPx}px; background:${skillStyle.bg}; border:1.5px solid ${skillStyle.border}; border-left:5px solid ${skillStyle.color}; color:${skillStyle.color};" 
              onclick="event.stopPropagation(); window.adminCalendar.openEditModal('${ev.id}')">
           <div class="cal-event-title">
-            ${isSeries ? '🔁 ' : ''}${ev.status === 'reschedule_requested' ? '⚠️ ' : ''}${ev.isGroup ? '👥 ' : ''}${ev.studentName}
+            ${isMakeup ? '<span class="cal-makeup-badge">[HỌC BÙ]</span>' : ''}
+            ${isSeries ? '🔁 ' : ''}${isExcused ? '⏸️ (Nghỉ có phép) ' : ''}${ev.status === 'reschedule_requested' ? '⚠️ ' : ''}${ev.isGroup ? '👥 ' : ''}${ev.studentName}
           </div>
           <div class="cal-event-time">${ev.startTime} - ${ev.endTime} • ${ev.title}</div>
-          ${ev.meetUrl ? `<a href="${ev.meetUrl}" target="_blank" onclick="event.stopPropagation()" style="font-size:10px; color:${skillStyle.color}; text-decoration:underline; font-weight:800;">🔗 Vào Google Meet</a>` : ''}
+          ${isExcused ? `
+            <div style="margin-top:2px;">
+              <button type="button" class="btn-cal-makeup" onclick="event.stopPropagation(); window.adminCalendar.openMakeupModal('${ev.id}')">
+                ➕ Xếp Học Bù
+              </button>
+            </div>
+          ` : ''}
+          ${ev.meetUrl && !isExcused ? `<a href="${ev.meetUrl}" target="_blank" onclick="event.stopPropagation()" style="font-size:10px; color:${skillStyle.color}; text-decoration:underline; font-weight:800;">🔗 Vào Google Meet</a>` : ''}
         </div>
       `;
     });
@@ -453,15 +532,25 @@ class AdminCalendarSystem {
         const heightPx = Math.max(48, this.durationToPixels(ev.startTime, ev.endTime));
         const skillStyle = this.getEventStyle(ev);
         const isSeries = !!ev.seriesId;
+        const isExcused = ev.status === 'excused_absence';
+        const isMakeup = !!ev.isMakeup;
 
         eventsHtml += `
-          <div class="cal-event-card" 
+          <div class="cal-event-card ${isExcused ? 'is-excused' : ''} ${isMakeup ? 'is-makeup' : ''}" 
                style="top: ${topPx}px; height: ${heightPx}px; background:${skillStyle.bg}; border:1.5px solid ${skillStyle.border}; border-left:4.5px solid ${skillStyle.color}; color:${skillStyle.color};" 
                onclick="event.stopPropagation(); window.adminCalendar.openEditModal('${ev.id}')">
             <div class="cal-event-title">
-              ${isSeries ? '🔁 ' : ''}${ev.status === 'reschedule_requested' ? '⚠️ ' : ''}${ev.isGroup ? '👥 ' : ''}${ev.studentName}
+              ${isMakeup ? '<span class="cal-makeup-badge">[BÙ]</span>' : ''}
+              ${isSeries ? '🔁 ' : ''}${isExcused ? '⏸️ (Nghỉ) ' : ''}${ev.status === 'reschedule_requested' ? '⚠️ ' : ''}${ev.isGroup ? '👥 ' : ''}${ev.studentName}
             </div>
             <div class="cal-event-time">${ev.startTime} - ${ev.endTime}</div>
+            ${isExcused ? `
+              <div style="margin-top:2px;">
+                <button type="button" class="btn-cal-makeup" onclick="event.stopPropagation(); window.adminCalendar.openMakeupModal('${ev.id}')">
+                  ➕ Bù
+                </button>
+              </div>
+            ` : ''}
           </div>
         `;
       });
@@ -525,11 +614,13 @@ class AdminCalendarSystem {
           <div style="overflow-y:auto; max-height:65px;">
             ${dayEvents.map(ev => {
               const style = this.getEventStyle(ev);
+              const isExcused = ev.status === 'excused_absence';
+              const isMakeup = !!ev.isMakeup;
               return `
                 <div class="cal-month-event-item" 
-                     style="border-left: 3px solid ${style.color}; color:${style.color};" 
+                     style="border-left: 3px solid ${style.color}; color:${style.color}; ${isExcused ? 'opacity:0.6; text-decoration:line-through;' : ''}" 
                      onclick="event.stopPropagation(); window.adminCalendar.openEditModal('${ev.id}')">
-                  ${ev.seriesId ? '🔁' : ''} ${ev.startTime} ${ev.isGroup ? '👥' : ''} ${ev.studentName}
+                  ${isMakeup ? '[BÙ]' : ''} ${ev.seriesId ? '🔁' : ''} ${ev.startTime} ${ev.isGroup ? '👥' : ''} ${ev.studentName}
                 </div>
               `;
             }).join('')}
@@ -576,6 +667,9 @@ class AdminCalendarSystem {
               <div class="cal-agenda-list">
                 ${groups[dateStr].map(ev => {
                   const style = this.getEventStyle(ev);
+                  const isExcused = ev.status === 'excused_absence';
+                  const isMakeup = !!ev.isMakeup;
+
                   return `
                     <div class="cal-agenda-item" onclick="window.adminCalendar.openEditModal('${ev.id}')">
                       <div class="cal-agenda-time-pill" style="border-left: 4px solid ${style.color};">
@@ -583,15 +677,23 @@ class AdminCalendarSystem {
                       </div>
                       <div class="cal-agenda-content">
                         <div style="font-size:14px; font-weight:900; color:#1E293B;">
+                          ${isMakeup ? '<span class="cal-makeup-badge">[HỌC BÙ]</span> ' : ''}
                           ${ev.seriesId ? '🔁 ' : ''}${ev.isGroup ? '👥 ' : '👤 '}${ev.studentName} • <span style="color:${style.color}">${ev.title}</span>
                         </div>
                         <div style="font-size:12px; color:#64748B; margin-top:2px;">
                           ${ev.notes ? `📌 Ghi chú: ${ev.notes}` : ''}
-                          ${ev.meetUrl ? ` • <a href="${ev.meetUrl}" target="_blank" onclick="event.stopPropagation()" style="color:#0284C7; font-weight:800;">Link Meet</a>` : ''}
+                          ${ev.meetUrl && !isExcused ? ` • <a href="${ev.meetUrl}" target="_blank" onclick="event.stopPropagation()" style="color:#0284C7; font-weight:800;">Link Meet</a>` : ''}
                         </div>
                       </div>
-                      <div class="cal-agenda-status">
-                        <span class="status-badge status-${ev.status}">${ev.status === 'completed' ? 'Đã học' : (ev.status === 'reschedule_requested' ? 'Xin dời' : 'Sắp tới')}</span>
+                      <div class="cal-agenda-status" style="display:flex; align-items:center; gap:6px;">
+                        ${isExcused ? `
+                          <button type="button" class="btn-cal-makeup" onclick="event.stopPropagation(); window.adminCalendar.openMakeupModal('${ev.id}')">
+                            ➕ Xếp Học Bù
+                          </button>
+                        ` : ''}
+                        <span class="status-badge status-${ev.status}">
+                          ${ev.status === 'completed' ? 'Đã học' : (ev.status === 'reschedule_requested' ? 'Xin dời' : (ev.status === 'excused_absence' ? 'Nghỉ phép' : 'Sắp tới'))}
+                        </span>
                       </div>
                     </div>
                   `;
@@ -647,6 +749,12 @@ class AdminCalendarSystem {
     }
     if (ev.status === 'completed') {
       return { color: '#16A34A', bg: '#DCFCE7', border: '#86EFAC' };
+    }
+    if (ev.status === 'excused_absence') {
+      return { color: '#64748B', bg: '#F1F5F9', border: '#94A3B8' };
+    }
+    if (ev.isMakeup) {
+      return { color: '#C2410C', bg: '#FFF7ED', border: '#FDBA74' };
     }
     const skill = ev.skillType || (ev.isGroup ? 'writing2' : 'speaking');
     return SKILL_COLORS[skill] || SKILL_COLORS.speaking;
@@ -786,7 +894,7 @@ class AdminCalendarSystem {
     for (const ev of this.events) {
       if (excludeEventId && ev.id === excludeEventId) continue;
       if (ev.date !== date) continue;
-      if (ev.status === 'rescheduled_cancelled') continue;
+      if (ev.status === 'rescheduled_cancelled' || ev.status === 'excused_absence') continue;
 
       const [evStartH, evStartM] = ev.startTime.split(':').map(Number);
       const [evEndH, evEndM] = ev.endTime.split(':').map(Number);
@@ -806,13 +914,264 @@ class AdminCalendarSystem {
   }
 
   // =========================================================================
-  // 15. MODALS TOÀN BỘ HỆ THỐNG
+  // 15. TRỢ LÝ GIỌNG NÓI VOICE AI (VOICE-TO-CALENDAR AI ENGINE)
+  // =========================================================================
+  toggleVoiceAssistant() {
+    if (this.isRecordingVoice) {
+      this.stopVoiceRecognition();
+    } else {
+      this.startVoiceRecognition();
+    }
+  }
+
+  startVoiceRecognition() {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      alert("⚠️ Trình duyệt của Thầy chưa hỗ trợ nhận diện giọng nói (Web Speech API). Vui lòng dùng Chrome hoặc Edge trên máy tính!");
+      return;
+    }
+
+    try {
+      this.speechRecognition = new SpeechRecognition();
+      this.speechRecognition.lang = 'vi-VN';
+      this.speechRecognition.continuous = false;
+      this.speechRecognition.interimResults = true;
+
+      this.isRecordingVoice = true;
+      this.voiceTranscript = '';
+      this.render(); // Cập nhật nút Micro sang trạng thái đỏ
+
+      this.openVoiceModal();
+
+      this.speechRecognition.onresult = (event) => {
+        let transcript = '';
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          transcript += event.results[i][0].transcript;
+        }
+        this.voiceTranscript = transcript;
+        const liveEl = document.getElementById('calVoiceLiveTranscript');
+        if (liveEl) liveEl.innerText = transcript || "Đang lắng nghe Thầy nói...";
+      };
+
+      this.speechRecognition.onerror = (event) => {
+        console.warn("Lỗi ghi âm giọng nói:", event.error);
+        this.stopVoiceRecognition();
+        const statusEl = document.getElementById('calVoiceStatusText');
+        if (statusEl) statusEl.innerText = `⚠️ Lỗi ghi âm: ${event.error}. Thầy hãy thử nói lại nhé!`;
+      };
+
+      this.speechRecognition.onend = () => {
+        if (this.isRecordingVoice) {
+          this.isRecordingVoice = false;
+          this.render();
+          if (this.voiceTranscript.trim()) {
+            this.processVoiceCommandWithAI(this.voiceTranscript.trim());
+          } else {
+            this.closeVoiceModal();
+          }
+        }
+      };
+
+      this.speechRecognition.start();
+    } catch (e) {
+      alert("Không thể khởi động Micro: " + e.message);
+      this.stopVoiceRecognition();
+    }
+  }
+
+  stopVoiceRecognition() {
+    this.isRecordingVoice = false;
+    if (this.speechRecognition) {
+      try { this.speechRecognition.stop(); } catch (e) {}
+      this.speechRecognition = null;
+    }
+    this.render();
+  }
+
+  openVoiceModal() {
+    const modal = document.getElementById('adminVoiceAssistantModal');
+    if (modal) {
+      modal.style.display = 'flex';
+      const statusText = document.getElementById('calVoiceStatusText');
+      const liveTranscript = document.getElementById('calVoiceLiveTranscript');
+      if (statusText) statusText.innerText = "🎙️ Đang nghe... Thầy hãy nói tự nhiên bằng tiếng Việt:";
+      if (liveTranscript) liveTranscript.innerText = "Ví dụ: 'Xếp cho bạn Đặng Minh Chương học Speaking 1-1 tối thứ 3 và thứ 5 lúc 19:30 bắt đầu từ tuần này, lặp lại 12 buổi.'";
+    }
+  }
+
+  closeVoiceModal() {
+    const modal = document.getElementById('adminVoiceAssistantModal');
+    if (modal) modal.style.display = 'none';
+    this.stopVoiceRecognition();
+  }
+
+  // Gọi Gemini AI tuần tự qua mảng Waterfall Models
+  async callGeminiWithWaterfall(promptText) {
+    const apiKey = getDecodedKey();
+    let lastError = null;
+
+    for (const model of GEMINI_WATERFALL_MODELS) {
+      try {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ role: 'user', parts: [{ text: promptText }] }],
+            generationConfig: {
+              temperature: 0.1,
+              responseMimeType: "application/json"
+            }
+          })
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          const txt = data.candidates?.[0]?.content?.parts?.[0]?.text;
+          if (txt) {
+            console.log(`[AI Voice Calendar] Gọi thành công qua model: ${model}`);
+            return txt;
+          }
+        } else {
+          console.warn(`[AI Waterfall] Model ${model} trả về status ${res.status}, tự động chuyển model tiếp theo...`);
+        }
+      } catch (err) {
+        lastError = err;
+        console.warn(`[AI Waterfall] Lỗi model ${model}:`, err.message);
+      }
+    }
+
+    throw new Error(lastError ? lastError.message : "Tất cả các model Gemini trong danh sách ưu tiên đều không phản hồi.");
+  }
+
+  // Xử lý câu nói tiếng Việt bằng AI Gemini
+  async processVoiceCommandWithAI(commandText) {
+    const statusText = document.getElementById('calVoiceStatusText');
+    if (statusText) statusText.innerText = "⏳ AI Gemini đang bóc tách thông tin lịch học...";
+
+    const todayStr = this.formatIsoDate(new Date());
+    const studentsSummary = this.knownStudents.map(s => `${s.name} (${s.email})`).join('; ');
+
+    const systemPrompt = `
+Bạn là Trợ lý AI Khảo thí & Quản lý Lịch học của Thầy tại TRẠM IELTS.
+Nhiệm vụ: Trích xuất lịch học từ câu nói tự nhiên tiếng Việt của Thầy thành JSON có cấu trúc.
+
+HÔM NAY LÀ: ${todayStr} (${new Date().toLocaleDateString('vi-VN', { weekday: 'long' })}).
+DANH SÁCH HỌC SINH HIỆN CÓ:
+${studentsSummary || 'Chưa có dữ liệu'}
+
+CÂU NÓI CỦA THẦY:
+"${commandText}"
+
+QUY TẮC BÓC TÁCH BẮT BUỘC:
+1. "studentName": Tên học sinh tìm thấy gần nhất trong danh sách. Nếu không có trong danh sách, lấy tên được nói trong câu.
+2. "skillType": Một trong các giá trị: "speaking", "writing2", "writing1", "listening_reading", "mock". (Mặc định: "speaking").
+3. "date": Ngày bắt đầu (định dạng YYYY-MM-DD). Nếu nói "tối nay", "ngày mai", "thứ 3 tuần sau"... tự động tính toán chính xác từ hôm nay.
+4. "startTime": Giờ bắt đầu (định dạng HH:mm, ví dụ "19:30"). Mặc định: "19:30".
+5. "endTime": Giờ kết thúc (mặc định cộng thêm 2 tiếng từ startTime, ví dụ "21:30").
+6. "repeatMode": "none" (buổi đơn lẻ), "single_day" (lặp 1 thứ mỗi tuần), hoặc "multi_days" (lặp nhiều thứ).
+7. "repeatCount": Số buổi cần lặp lại (mặc định 12 nếu có lặp).
+8. "daysOfWeek": Mảng các thứ trong tuần (0: CN, 1: T2, 2: T3, 3: T4, 4: T5, 5: T6, 6: T7). Ví dụ thứ 3 và thứ 5 là [2, 4].
+9. "notes": Ghi chú thêm nếu Thầy có dặn.
+
+HÃY TRẢ VỀ DUY NHẤT 1 CHUỖI JSON (KHÔNG KÈM MARKDOWN, KHÔNG \`\`\`json):
+{
+  "studentName": "Đặng Minh Chương",
+  "skillType": "speaking",
+  "title": "Speaking 1-1 & Sửa Writing",
+  "date": "2026-11-10",
+  "startTime": "19:30",
+  "endTime": "21:30",
+  "repeatMode": "multi_days",
+  "repeatCount": 12,
+  "daysOfWeek": [2, 4],
+  "notes": ""
+}
+`;
+
+    try {
+      const rawAiResponse = await this.callGeminiWithWaterfall(systemPrompt);
+      const cleanJsonStr = rawAiResponse.replace(/^```json/, '').replace(/```$/, '').trim();
+      const parsedData = JSON.parse(cleanJsonStr);
+
+      this.closeVoiceModal();
+
+      // Tự động map học sinh
+      const matchedStudent = this.matchStudentByName(parsedData.studentName);
+      const selectedEmails = matchedStudent ? [matchedStudent.email] : [];
+
+      // Mở Modal Xếp Lịch và điền tự động dữ liệu do AI bóc tách
+      this.openCreateModal(parsedData.date || todayStr, parsedData.startTime || '19:30');
+
+      if (selectedEmails.length > 0) {
+        this.renderStudentChecklist(selectedEmails);
+      } else if (parsedData.studentName) {
+        const customInput = document.getElementById('calCustomStudentEmail');
+        if (customInput) customInput.value = parsedData.studentName;
+      }
+
+      if (parsedData.skillType) {
+        const radio = document.querySelector(`input[name="eventSkillRadio"][value="${parsedData.skillType}"]`);
+        if (radio) {
+          radio.checked = true;
+          this.updateSkillTheme(parsedData.skillType);
+        }
+      }
+
+      if (parsedData.title) document.getElementById('calInputTitle').value = parsedData.title;
+      if (parsedData.endTime) document.getElementById('calInputEndTime').value = parsedData.endTime;
+      if (parsedData.notes) document.getElementById('calInputNotes').value = parsedData.notes;
+
+      // Thiết lập chuỗi lặp lại nếu có
+      if (parsedData.repeatMode && parsedData.repeatMode !== 'none') {
+        const checkRepeat = document.getElementById('calCheckRepeat');
+        if (checkRepeat) {
+          checkRepeat.checked = true;
+          this.toggleRepeatOptions(true);
+        }
+
+        const countInput = document.getElementById('calRepeatCount');
+        if (countInput && parsedData.repeatCount) countInput.value = parsedData.repeatCount;
+
+        if (parsedData.repeatMode === 'multi_days' && Array.isArray(parsedData.daysOfWeek)) {
+          const multiRadio = document.querySelector('input[name="repeatModeRadio"][value="multi_days"]');
+          if (multiRadio) multiRadio.checked = true;
+          this.toggleDowSelection(true);
+
+          document.querySelectorAll('.cal-dow-checkbox').forEach(cb => {
+            const val = parseInt(cb.value, 10);
+            cb.checked = parsedData.daysOfWeek.includes(val);
+          });
+        }
+      }
+
+      this.validateScheduleLive();
+      alert(`🎉 AI đã bóc tách thành công lịch của bạn [${parsedData.studentName || 'Học viên'}]! Thầy hãy kiểm tra lại và bấm 'LƯU LỊCH' nhé.`);
+
+    } catch (err) {
+      alert("⚠️ Không thể phân tích giọng nói: " + err.message);
+      this.closeVoiceModal();
+    }
+  }
+
+  // Tiện ích so khớp tên học sinh thông minh
+  matchStudentByName(nameQuery) {
+    if (!nameQuery) return null;
+    const cleanQ = nameQuery.toLowerCase().trim();
+    return this.knownStudents.find(s => {
+      const cleanName = s.name.toLowerCase();
+      return cleanName.includes(cleanQ) || cleanQ.includes(cleanName);
+    }) || null;
+  }
+
+  // =========================================================================
+  // 16. MODALS TOÀN BỘ HỆ THỐNG
   // =========================================================================
   injectModals() {
     if (document.getElementById('adminCalendarModal')) return;
 
     const modalHtml = `
-      <!-- 1. MODAL XẾP & ĐIỀU CHỈNH BUỔI HỌC (CHỨA LẶP LẠI LINH HOẠT) -->
+      <!-- 1. MODAL XẾP & ĐIỀU CHỈNH BUỔI HỌC (CHỨA LẶP LẠI LINH HOẠT & HỌC BÙ) -->
       <div id="adminCalendarModal" class="cal-modal-backdrop" style="display:none;">
         <div class="cal-modal-box">
           <button type="button" onclick="window.adminCalendar.closeModal()" class="cal-modal-close-btn">✕</button>
@@ -823,6 +1182,7 @@ class AdminCalendarSystem {
 
           <div id="calModalRescheduleNotice" style="display:none;" class="cal-notice-box"></div>
           <div id="calModalConflictNotice" style="display:none;" class="cal-conflict-box"></div>
+          <div id="calModalMakeupNotice" style="display:none;" class="cal-notice-box" style="background:#FFF7ED; border-color:#FDBA74; color:#C2410C;"></div>
 
           <!-- CHỌN KỸ NĂNG & MÀU SẮC -->
           <div class="cal-form-group">
@@ -858,7 +1218,7 @@ class AdminCalendarSystem {
 
           <div style="display:grid; grid-template-columns:1.2fr 1fr 1fr; gap:10px;" class="cal-form-group">
             <div>
-              <label>📅 Ngày bắt đầu:</label>
+              <label>📅 Ngày học:</label>
               <input type="date" id="calInputDate" class="cal-form-input" onchange="window.adminCalendar.onDateChanged(); window.adminCalendar.validateScheduleLive();">
             </div>
             <div>
@@ -871,7 +1231,7 @@ class AdminCalendarSystem {
             </div>
           </div>
 
-          <!-- KHỐI TÙY CHỌN LẶP LẠI SIÊU LINH HOẠT (HIỆN Ở CẢ TẠO MỚI LẪN ĐIỀU CHỈNH) -->
+          <!-- KHỐI TÙY CHỌN LẶP LẠI SIÊU LINH HOẠT -->
           <div id="calRecurrenceSection" class="cal-recurrence-card">
             <div style="display:flex; justify-content:space-between; align-items:center;">
               <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
@@ -882,7 +1242,6 @@ class AdminCalendarSystem {
             </div>
 
             <div id="calRepeatOptions" style="display:none; margin-top:10px;">
-              <!-- 2 LỰA CHỌN: LẶP CHỈ BUỔI NÀY HOẶC NHIỀU THỨ -->
               <div class="cal-repeat-mode-box">
                 <label class="cal-radio-repeat">
                   <input type="radio" name="repeatModeRadio" value="single_day" checked onchange="window.adminCalendar.toggleDowSelection(false)">
@@ -894,7 +1253,6 @@ class AdminCalendarSystem {
                 </label>
               </div>
 
-              <!-- LỰA CHỌN CÁC THỨ TRONG TUẦN -->
               <div id="calMultiDowBox" style="display:none; margin-top:8px;">
                 <div style="font-size:12px; color:#64748B; margin-bottom:6px;">Chọn các thứ trong tuần sẽ học cùng khung giờ này:</div>
                 <div class="cal-dow-selector">
@@ -925,20 +1283,26 @@ class AdminCalendarSystem {
             <input type="text" id="calInputNotes" placeholder="Ví dụ: Đọc trước Passage 2 Cam 18..." class="cal-form-input">
           </div>
 
-          <!-- TRẠNG THÁI BUỔI HỌC -->
+          <!-- TRẠNG THÁI BUỔI HỌC (TÍCH HỢP XIN NGHỈ BẢO LƯU) -->
           <div class="cal-form-group" id="calStatusSelectGroup" style="display:none;">
             <label>Trạng thái buổi học:</label>
-            <select id="calInputStatus" class="cal-form-select">
+            <select id="calInputStatus" class="cal-form-select" onchange="window.adminCalendar.onStatusChanged(this.value)">
               <option value="scheduled">Đã xếp lịch (Scheduled)</option>
               <option value="completed">Đã hoàn thành (Trừ 1 buổi học phí)</option>
+              <option value="excused_absence">Học sinh xin nghỉ (Có bảo lưu - không trừ học phí)</option>
               <option value="reschedule_requested">Học sinh xin dời lịch</option>
             </select>
           </div>
 
           <div style="display:flex; justify-content:space-between; align-items:center; margin-top:18px; gap:8px;">
-            <button type="button" id="btnCalDeleteEvent" onclick="window.adminCalendar.promptDeleteEvent()" class="btn-3d btn-3d-delete" style="display:none;">
-              🗑️ Xóa buổi
-            </button>
+            <div style="display:flex; gap:8px;">
+              <button type="button" id="btnCalDeleteEvent" onclick="window.adminCalendar.promptDeleteEvent()" class="btn-3d btn-3d-delete" style="display:none;">
+                🗑️ Xóa buổi
+              </button>
+              <button type="button" id="btnCalMakeupAction" onclick="window.adminCalendar.openMakeupModal(window.adminCalendar.activeEditingEvent?.id)" class="btn-3d" style="display:none; background:#F97316; color:white !important; border-bottom:3.5px solid #C2410C; font-size:13px; padding:10px 14px;">
+                ➕ Xếp Lịch Bù
+              </button>
+            </div>
             <div style="display:flex; gap:8px; margin-left:auto;">
               <button type="button" onclick="window.adminCalendar.closeModal()" class="btn-3d btn-3d-white" style="padding:10px 16px; font-size:13px;">Hủy</button>
               <button type="button" id="btnCalSaveEvent" onclick="window.adminCalendar.saveEvent()" class="btn-3d btn-3d-red" style="padding:10px 20px; font-size:13.5px;">
@@ -949,7 +1313,7 @@ class AdminCalendarSystem {
         </div>
       </div>
 
-      <!-- 2. MODAL XÁC NHẬN XÓA BUỔI LẶP LẠI (CHO PHÉP CHỌN 1 TRONG 3 KIỂU XÓA) -->
+      <!-- 2. MODAL XÁC NHẬN XÓA BUỔI LẶP LẠI (3 LỰA CHỌN) -->
       <div id="adminDeleteChoiceModal" class="cal-modal-backdrop" style="display:none; z-index:1000001;">
         <div class="cal-modal-box" style="max-width:440px; text-align:center;">
           <div style="font-size:36px; margin-bottom:8px;">🗑️</div>
@@ -985,7 +1349,7 @@ class AdminCalendarSystem {
             💰 QUẢN LÝ GÓI HỌC PHÍ & ĐẾM LÙI BUỔI HỌC
           </h3>
           <p style="margin:0 0 14px 0; font-size:13px; color:#78716C; font-weight:700;">
-            Hệ thống tự động đối chiếu số buổi đã dạy hoàn thành (Completed) để tính số buổi còn lại:
+            Hệ thống tự động đối chiếu số buổi đã dạy hoàn thành (Completed) để tính số buổi còn lại (Buổi nghỉ phép được bảo lưu):
           </p>
 
           <div style="overflow-x:auto;">
@@ -1004,9 +1368,42 @@ class AdminCalendarSystem {
           </div>
         </div>
       </div>
+
+      <!-- 4. MODAL TRỢ LÝ GIỌNG NÓI VOICE AI -->
+      <div id="adminVoiceAssistantModal" class="cal-modal-backdrop" style="display:none; z-index:1000002;">
+        <div class="cal-modal-box" style="max-width:480px; text-align:center;">
+          <button type="button" onclick="window.adminCalendar.closeVoiceModal()" class="cal-modal-close-btn">✕</button>
+
+          <div style="font-size:42px; margin-bottom:8px;">🎙️</div>
+          <h3 id="calVoiceStatusText" style="margin:0 0 10px 0; color:#4F46E5; font-size:17px; font-weight:900;">
+            Đang lắng nghe Thầy nói...
+          </h3>
+
+          <div id="calVoiceLiveTranscript" style="background:#FAF7F2; border:2px dashed #CBD5E1; border-radius:12px; padding:14px; font-size:13px; color:#334155; font-weight:700; min-height:60px; line-height:1.5;">
+            "Thầy hãy nói tự nhiên bằng tiếng Việt..."
+          </div>
+
+          <div style="margin-top:16px; display:flex; justify-content:center; gap:8px;">
+            <button type="button" onclick="window.adminCalendar.stopVoiceRecognition()" class="btn-3d btn-3d-red" style="padding:9px 18px; font-size:13px;">
+              ⏹️ Hoàn thành nói
+            </button>
+            <button type="button" onclick="window.adminCalendar.closeVoiceModal()" class="btn-3d btn-3d-white" style="padding:9px 16px; font-size:13px;">
+              Hủy bỏ
+            </button>
+          </div>
+        </div>
+      </div>
     `;
 
     document.body.insertAdjacentHTML('beforeend', modalHtml);
+  }
+
+  // Xử lý đổi trạng thái trực tiếp trên modal
+  onStatusChanged(newStatus) {
+    const makeupBtn = document.getElementById('btnCalMakeupAction');
+    if (makeupBtn) {
+      makeupBtn.style.display = newStatus === 'excused_absence' ? 'inline-block' : 'none';
+    }
   }
 
   // Cập nhật nhãn lặp lại khi đổi ngày
@@ -1063,7 +1460,7 @@ class AdminCalendarSystem {
     if (!container) return;
 
     if (this.knownStudents.length === 0) {
-      container.innerHTML = `<div style="font-size:12px; color:#78716C; padding:6px;">Chưa có học sinh nào. Mày hãy gõ email vào ô dưới nhé!</div>`;
+      container.innerHTML = `<div style="font-size:12px; color:#78716C; padding:6px;">Chưa có học sinh nào. Thầy hãy gõ email vào ô dưới nhé!</div>`;
       return;
     }
 
@@ -1101,13 +1498,17 @@ class AdminCalendarSystem {
 
   openCreateModal(dateStr = '', startTimeStr = '19:30') {
     this.activeEditingEvent = null;
+    this.makeupTargetEvent = null;
+
     const preselect = this.selectedStudentFilter !== 'all' ? [this.selectedStudentFilter.toLowerCase()] : [];
     this.renderStudentChecklist(preselect);
 
     document.getElementById('calModalHeading').innerText = '➕ XẾP LỊCH HỌC MỚI';
     document.getElementById('calModalRescheduleNotice').style.display = 'none';
     document.getElementById('calModalConflictNotice').style.display = 'none';
+    document.getElementById('calModalMakeupNotice').style.display = 'none';
     document.getElementById('btnCalDeleteEvent').style.display = 'none';
+    document.getElementById('btnCalMakeupAction').style.display = 'none';
     document.getElementById('calStatusSelectGroup').style.display = 'none';
     document.getElementById('calSeriesBadge').style.display = 'none';
     document.getElementById('calRepeatCheckboxLabel').innerText = '🔁 Lặp lại buổi học này hàng tuần';
@@ -1132,18 +1533,50 @@ class AdminCalendarSystem {
     this.validateScheduleLive();
   }
 
-  // MỞ BẢNG ĐIỀU CHỈNH (CÓ ĐẦY ĐỦ KHUNG LẶP LẠI VÀ THÔNG BÁO CHUỖI)
+  // 17. MỞ MODAL XẾP LỊCH HỌC BÙ 1-CLICK (MAKEUP ENGINE)
+  openMakeupModal(eventId) {
+    const originalEv = this.events.find(e => e.id === eventId);
+    if (!originalEv) return;
+
+    this.closeModal();
+    this.openCreateModal();
+
+    this.makeupTargetEvent = originalEv;
+    const selectedList = Array.isArray(originalEv.studentEmails) ? originalEv.studentEmails : [originalEv.studentEmail];
+    this.renderStudentChecklist(selectedList.map(e => (e || '').toLowerCase()));
+
+    document.getElementById('calModalHeading').innerText = '➕ XẾP BUỔI HỌC BÙ';
+    document.getElementById('calInputTitle').value = `[HỌC BÙ] - ${originalEv.studentName} (${SKILL_COLORS[originalEv.skillType]?.label || 'IELTS'})`;
+    document.getElementById('calInputNotes').value = `Học bù cho buổi nghỉ ngày ${originalEv.date} (${originalEv.startTime} - ${originalEv.endTime})`;
+    document.getElementById('calInputMeetUrl').value = originalEv.meetUrl || '';
+
+    const skillRadio = document.querySelector(`input[name="eventSkillRadio"][value="${originalEv.skillType || 'speaking'}"]`);
+    if (skillRadio) skillRadio.checked = true;
+
+    const makeupNotice = document.getElementById('calModalMakeupNotice');
+    if (makeupNotice) {
+      makeupNotice.style.display = 'block';
+      makeupNotice.innerHTML = `📌 <b>LỊCH HỌC BÙ:</b> Buổi học này được tự động liên kết với buổi nghỉ ngày <b>${originalEv.date}</b> của học viên <b>${originalEv.studentName}</b>. Khi học sinh học xong buổi bù này, học phí mới được trừ.`;
+    }
+
+    document.getElementById('adminCalendarModal').style.display = 'flex';
+  }
+
+  // MỞ BẢNG ĐIỀU CHỈNH BUỔI HỌC
   openEditModal(eventId) {
     const ev = this.events.find(e => e.id === eventId);
     if (!ev) return;
 
     this.activeEditingEvent = ev;
+    this.makeupTargetEvent = null;
+
     const selectedList = Array.isArray(ev.studentEmails) ? ev.studentEmails : [ev.studentEmail];
     this.renderStudentChecklist(selectedList.map(e => (e || '').toLowerCase()));
 
     document.getElementById('calModalHeading').innerText = '✏️ ĐIỀU CHỈNH BUỔI HỌC';
     document.getElementById('btnCalDeleteEvent').style.display = 'block';
     document.getElementById('calStatusSelectGroup').style.display = 'block';
+    document.getElementById('calModalMakeupNotice').style.display = 'none';
 
     // HIỂN THỊ TRẠNG THÁI CHUỖI LẶP LẠI
     const seriesBadge = document.getElementById('calSeriesBadge');
@@ -1182,6 +1615,9 @@ class AdminCalendarSystem {
     document.getElementById('calInputStatus').value = ev.status || 'scheduled';
     document.getElementById('calCustomStudentEmail').value = '';
 
+    // Nút Xếp Lịch Bù hiển thị khi trạng thái là nghỉ phép
+    this.onStatusChanged(ev.status);
+
     this.onDateChanged();
     document.getElementById('adminCalendarModal').style.display = 'flex';
     this.validateScheduleLive();
@@ -1191,9 +1627,10 @@ class AdminCalendarSystem {
     const m = document.getElementById('adminCalendarModal');
     if (m) m.style.display = 'none';
     this.activeEditingEvent = null;
+    this.makeupTargetEvent = null;
   }
 
-  // 16. LƯU BUỔI HỌC (LINH HOẠT TỪNG BUỔI LẶP HOẶC TOÀN CHUỖI)
+  // 18. LƯU BUỔI HỌC (SỬ DỤNG ATOMIC BATCH WRITE KHI LẶP CHUỖI ĐỂ TRÁNH MẤT LỊCH)
   async saveEvent() {
     const checkedBoxes = Array.from(document.querySelectorAll('#calStudentChecklistContainer input[type="checkbox"]:checked'));
     let studentEmails = checkedBoxes.map(cb => cb.value.toLowerCase().trim());
@@ -1227,7 +1664,7 @@ class AdminCalendarSystem {
     const conflictResult = this.checkScheduleConflict(date, startTime, endTime, this.activeEditingEvent?.id);
     if (conflictResult.hasConflict) {
       const c = conflictResult.conflictedEvent;
-      if (!confirm(`⚠️ CẢNH BÁO: Khung giờ này Thầy đã có lịch dạy [${c.studentName}] (${c.startTime} - ${c.endTime}). Bạn có chắc muốn lưu trùng không?`)) {
+      if (!confirm(`⚠️ CẢNH BÁO: Khung giờ này Thầy đã có lịch dạy [${c.studentName}] (${c.startTime} - ${c.endTime}). Thầy có chắc muốn lưu trùng không?`)) {
         return;
       }
     }
@@ -1242,12 +1679,14 @@ class AdminCalendarSystem {
     const adminEmail = user.email || 'tramielts9@gmail.com';
 
     try {
-      // TRƯỜNG HỢP 1: ĐANG SỬA 1 BUỔI THUỘC CHUỖI LẶP LẠI
+      // TRƯỜNG HỢP 1: SỬA TOÀN BỘ CHUỖI LẶP LẠI (DÙNG ATOMIC BATCH WRITE)
       if (this.activeEditingEvent && this.activeEditingEvent.seriesId) {
         const updateAll = confirm("Buổi học này thuộc chuỗi lặp lại. Thầy có muốn cập nhật thông tin này (giờ học, link meet, ghi chú) cho TOÀN BỘ các buổi trong chuỗi không?\n\n• Bấm OK: Cập nhật toàn bộ chuỗi\n• Bấm Cancel: Chỉ sửa riêng buổi hôm nay");
         
         if (updateAll) {
           const sid = this.activeEditingEvent.seriesId;
+          const updatedBatch = [];
+
           this.events.forEach(ev => {
             if (ev.seriesId === sid) {
               ev.title = title;
@@ -1259,16 +1698,18 @@ class AdminCalendarSystem {
               ev.studentEmails = studentEmails;
               ev.studentNames = studentNames;
               ev.studentName = studentNames.join(', ');
-
-              if (CONFIG.DRIVE_STORAGE_URL) {
-                fetch(CONFIG.DRIVE_STORAGE_URL, {
-                  method: "POST",
-                  headers: { "Content-Type": "text/plain;charset=utf-8" },
-                  body: JSON.stringify({ action: "admin_save_schedule", adminEmail: adminEmail, event: ev })
-                }).catch(() => {});
-              }
+              updatedBatch.push(ev);
             }
           });
+
+          // Lưu Batch 1 lần duy nhất lên Google Drive
+          if (CONFIG.DRIVE_STORAGE_URL && updatedBatch.length > 0) {
+            await fetch(CONFIG.DRIVE_STORAGE_URL, {
+              method: "POST",
+              headers: { "Content-Type": "text/plain;charset=utf-8" },
+              body: JSON.stringify({ action: "admin_save_schedules_batch", adminEmail: adminEmail, events: updatedBatch })
+            });
+          }
 
           localStorage.setItem('admin_cached_schedules', JSON.stringify(this.events));
           alert("🎉 Đã cập nhật thành công cho toàn bộ chuỗi buổi học!");
@@ -1278,7 +1719,7 @@ class AdminCalendarSystem {
         }
       }
 
-      // TRƯỜNG HỢP 2: TẠO MỚI HOẶC BIẾN BUỔI THÀNH CHUỖI LẶP LẠI
+      // TRƯỜNG HỢP 2: TẠO MỚI CHUỖI LẶP LẠI (ATOMIC BATCH WRITE GHI 1 LẦN TRÊN DRIVE)
       if (isRepeatChecked && (!this.activeEditingEvent || !this.activeEditingEvent.seriesId)) {
         const repeatTotal = parseInt(document.getElementById('calRepeatCount')?.value, 10) || 12;
         const seriesId = `series_${Date.now()}`;
@@ -1287,7 +1728,6 @@ class AdminCalendarSystem {
         let createdCount = 0;
 
         if (repeatMode === 'single_day') {
-          // LẶP ĐÚNG 1 KHUNG GIỜ CỦA NGÀY NÀY HÀNG TUẦN
           while (createdCount < repeatTotal) {
             const thisIso = this.formatIsoDate(curCheckDate);
             newEventsBatch.push({
@@ -1308,10 +1748,9 @@ class AdminCalendarSystem {
               status: 'scheduled'
             });
             createdCount++;
-            curCheckDate.setDate(curCheckDate.getDate() + 7); // Nhảy đúng 1 tuần
+            curCheckDate.setDate(curCheckDate.getDate() + 7);
           }
         } else {
-          // LẶP NHIỀU THỨ TRONG TUẦN
           const selectedDOWs = Array.from(document.querySelectorAll('.cal-dow-checkbox:checked')).map(cb => parseInt(cb.value, 10));
           if (selectedDOWs.length === 0) {
             alert("⚠️ Vui lòng tick chọn ít nhất 1 thứ trong tuần để lặp lại!");
@@ -1347,26 +1786,30 @@ class AdminCalendarSystem {
           }
         }
 
-        // Lưu danh sách sự kiện lặp lại
-        for (const evItem of newEventsBatch) {
-          if (CONFIG.DRIVE_STORAGE_URL) {
-            fetch(CONFIG.DRIVE_STORAGE_URL, {
-              method: "POST",
-              headers: { "Content-Type": "text/plain;charset=utf-8" },
-              body: JSON.stringify({ action: "admin_save_schedule", adminEmail: adminEmail, event: evItem })
-            }).catch(() => {});
-          }
-          this.events.push(evItem);
+        // GỬI DUY NHẤT 1 HTTP REQUEST BATCH LÊN GOOGLE DRIVE
+        if (CONFIG.DRIVE_STORAGE_URL && newEventsBatch.length > 0) {
+          await fetch(CONFIG.DRIVE_STORAGE_URL, {
+            method: "POST",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify({ action: "admin_save_schedules_batch", adminEmail: adminEmail, events: newEventsBatch })
+          });
         }
 
+        // Cập nhật mảng sự kiện trong bộ nhớ máy Thầy
+        this.events.push(...newEventsBatch);
         localStorage.setItem('admin_cached_schedules', JSON.stringify(this.events));
-        alert(`🎉 Đã tự động tạo chuỗi ${createdCount} buổi học thành công!`);
+        alert(`🎉 Đã tự động tạo chuỗi ${createdCount} buổi học thành công không bị gián đoạn!`);
 
       } else {
-        // TRƯỜNG HỢP 3: LƯU BUỔI ĐƠN LẺ
+        // TRƯỜNG HỢP 3: LƯU BUỔI ĐƠN LẺ HOẶC BUỔI HỌC BÙ
+        const isMakeupSession = !!(this.makeupTargetEvent || this.activeEditingEvent?.isMakeup);
+        const originalId = this.makeupTargetEvent ? this.makeupTargetEvent.id : (this.activeEditingEvent?.originalEventId || null);
+
         const eventPayload = {
           id: this.activeEditingEvent ? this.activeEditingEvent.id : `evt_${Date.now()}`,
           seriesId: this.activeEditingEvent?.seriesId || null,
+          isMakeup: isMakeupSession,
+          originalEventId: originalId,
           studentEmail: studentEmails[0],
           studentName: studentNames.join(', '),
           studentEmails: studentEmails,
@@ -1411,17 +1854,15 @@ class AdminCalendarSystem {
   }
 
   // =========================================================================
-  // 17. XÓA BUỔI THÔNG MINH (XÓA ĐƠN HOẶC TOÀN CHUỖI)
+  // 19. XÓA BUỔI THÔNG MINH (XÓA ĐƠN HOẶC TOÀN CHUỖI)
   // =========================================================================
   promptDeleteEvent() {
     if (!this.activeEditingEvent) return;
 
     if (this.activeEditingEvent.seriesId) {
-      // Mở modal 3 lựa chọn xóa chuỗi
       document.getElementById('adminDeleteChoiceModal').style.display = 'flex';
     } else {
-      // Buổi lẻ: xác nhận thông thường
-      if (confirm(`⚠️ Bạn có chắc muốn XOÁ buổi học này không?`)) {
+      if (confirm(`⚠️ Thầy có chắc muốn XOÁ buổi học này không?`)) {
         this.executeDeleteOption('single');
       }
     }
@@ -1449,7 +1890,6 @@ class AdminCalendarSystem {
     }
 
     try {
-      // Xóa trên Drive
       for (const id of idsToDelete) {
         if (CONFIG.DRIVE_STORAGE_URL) {
           fetch(CONFIG.DRIVE_STORAGE_URL, {
@@ -1460,7 +1900,6 @@ class AdminCalendarSystem {
         }
       }
 
-      // Xóa cục bộ
       this.events = this.events.filter(e => !idsToDelete.includes(e.id));
       localStorage.setItem('admin_cached_schedules', JSON.stringify(this.events));
 
@@ -1474,7 +1913,7 @@ class AdminCalendarSystem {
   }
 
   // =========================================================================
-  // 18. QUẢN LÝ HỌC PHÍ
+  // 20. QUẢN LÝ HỌC PHÍ (TUITION TRACKER)
   // =========================================================================
   openTuitionModal() {
     const modal = document.getElementById('adminTuitionModal');
@@ -1488,6 +1927,7 @@ class AdminCalendarSystem {
         const em = st.email.toLowerCase().trim();
         const info = this.tuitionRegistry[em] || { paidSessions: 12 };
 
+        // Chỉ tính các buổi đã hoàn thành (completed). Buổi excused_absence không trừ tiền
         const completed = this.events.filter(ev => {
           const match = (ev.studentEmail || '').toLowerCase().trim() === em ||
                         (Array.isArray(ev.studentEmails) && ev.studentEmails.includes(em));
