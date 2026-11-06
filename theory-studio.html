@@ -35,7 +35,7 @@
     }
 
     .studio-container {
-      max-width: 1200px;
+      max-width: 1220px;
       margin: 0 auto;
     }
 
@@ -68,7 +68,7 @@
     /* LAYOUT 2 CỘT */
     .studio-layout {
       display: grid;
-      grid-template-columns: 1.65fr 1fr;
+      grid-template-columns: 1.6fr 1fr;
       gap: 20px;
       align-items: start;
     }
@@ -208,8 +208,9 @@
       border-color: var(--tram-red);
     }
 
+    /* ITEM PLAYLIST NÂNG CẤP THUMBNAIL & NÚT ADMIN */
     .playlist-item {
-      padding: 12px 14px;
+      padding: 10px 12px;
       border-radius: 14px;
       border: 2px solid var(--duo-border);
       background: #FAF7F2;
@@ -217,8 +218,9 @@
       margin-bottom: 8px;
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
       transition: all 0.1s ease;
+      position: relative;
     }
     .playlist-item:hover {
       background: #FFFFFF;
@@ -230,8 +232,70 @@
       border-color: #D97706;
       border-left: 6px solid #B45309;
     }
+    .playlist-item.dragging {
+      opacity: 0.4;
+      border: 2px dashed #D97706;
+    }
 
-    /* KHUNG ADMIN NHANH */
+    .playlist-thumb {
+      width: 60px;
+      height: 38px;
+      border-radius: 6px;
+      object-fit: cover;
+      flex-shrink: 0;
+      border: 1px solid var(--duo-border);
+      background: #000;
+    }
+
+    .btn-mark-done {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 2px solid #CBD5E1;
+      background: #FFFFFF;
+      color: transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 900;
+      cursor: pointer;
+      flex-shrink: 0;
+      padding: 0;
+    }
+    .btn-mark-done.done {
+      background: #16A34A;
+      border-color: #16A34A;
+      color: #FFFFFF;
+    }
+
+    /* NÚT THAO TÁC ADMIN TRÊN PLAYLIST */
+    .admin-item-actions {
+      display: none;
+      align-items: center;
+      gap: 4px;
+      flex-shrink: 0;
+    }
+    .is-admin-mode .admin-item-actions {
+      display: flex;
+    }
+    .btn-item-ctrl {
+      border: none;
+      border-radius: 6px;
+      padding: 3px 6px;
+      font-size: 11.5px;
+      font-weight: 800;
+      cursor: pointer;
+      background: #E2E8F0;
+      color: #334155;
+    }
+    .btn-item-ctrl:hover { background: #CBD5E1; }
+    .btn-item-edit { background: #DBEAFE; color: #1D4ED8; }
+    .btn-item-edit:hover { background: #BFDBFE; }
+    .btn-item-del { background: #FEE2E2; color: #DC2626; }
+    .btn-item-del:hover { background: #FECACA; }
+
+    /* KHUNG ADMIN FORM */
     .admin-drawer {
       background: #FFFBEB;
       border: 2px solid #F59E0B;
@@ -248,12 +312,11 @@
     .duo-input:focus { background: #FFFFFF; border-color: var(--tram-red); }
   </style>
 
-  <!-- NẠP YOUTUBE IFRAME API ĐỂ ĐIỀU KHIỂN VIDEO NGẦM BẢO MẬT -->
   <script src="https://www.youtube.com/iframe_api"></script>
 </head>
 <body>
 
-<div class="studio-container">
+<div class="studio-container" id="studioMainWrapper">
 
   <!-- TOPBAR -->
   <div class="studio-topbar">
@@ -277,33 +340,45 @@
     </div>
   </div>
 
-  <!-- ADMIN DRAWER (DÀNH RIÊNG CHO THẦY KHI CÓ ?admin=1 HOẶC LOGIN ADMIN) -->
+  <!-- ADMIN DRAWER (DÀNH CHO THẦY THÊM & SỬA BÀI HỌC) -->
   <div id="adminVideoDrawer" class="admin-drawer">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-      <b style="color: #92400E; font-size: 14.5px;"><i class="fa-solid fa-plus-circle"></i> THÊM BÀI GIẢNG MỚI (TỰ ĐỘNG LỌC ID YOUTUBE)</b>
-      <button type="button" class="btn-3d btn-3d-white" onclick="exportVideosJSON()" style="padding: 6px 12px; font-size: 12px;">
-        📥 Xuất File JSON Vĩnh Viễn
-      </button>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
+      <b style="color: #92400E; font-size: 14.5px;" id="adminDrawerHeaderTitle">
+        <i class="fa-solid fa-plus-circle"></i> THÊM BÀI GIẢNG MỚI (TỰ ĐỘNG LỌC ID YOUTUBE)
+      </b>
+      <div style="display: flex; gap: 8px;">
+        <button type="button" class="btn-3d btn-3d-white" id="btnCancelEdit" onclick="cancelAdminEdit()" style="display: none; padding: 6px 12px; font-size: 12px;">
+          ✕ Hủy Chỉnh Sửa
+        </button>
+        <button type="button" class="btn-3d btn-3d-white" onclick="exportVideosJSON()" style="padding: 6px 12px; font-size: 12px;">
+          📥 Xuất File JSON Vĩnh Viễn
+        </button>
+      </div>
     </div>
+
+    <input type="hidden" id="adminInputEditId" value="">
 
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">
       <div>
         <label style="font-size: 12px; font-weight: 800; color: #475569;">Phân hệ:</label>
         <select id="adminInputSkill" class="duo-input">
-          <option value="writing_t1">Writing Task 1</option>
-          <option value="writing_t2">Writing Task 2</option>
-          <option value="grammar">Ngữ Pháp</option>
-          <option value="reading">IELTS Reading</option>
-          <option value="listening">IELTS Listening</option>
-          <option value="speaking">IELTS Speaking</option>
-          <option value="vocab">Từ Vựng</option>
-          <option value="pre_writing_t1">Pre-Writing Task 1</option>
-          <option value="pre_writing_t2">Pre-Writing Task 2</option>
+          <option value="listening">4. IELTS Listening</option>
+          <option value="pre_listening">3. Pre-Listening</option>
+          <option value="reading">6. IELTS Reading</option>
+          <option value="pre_reading">5. Pre-Reading</option>
+          <option value="writing_t1">8A. IELTS Writing Task 1</option>
+          <option value="pre_writing_t1">7A. Pre-Writing Task 1</option>
+          <option value="writing_t2">8B. IELTS Writing Task 2</option>
+          <option value="pre_writing_t2">7B. Pre-Writing Task 2</option>
+          <option value="speaking">10. IELTS Speaking</option>
+          <option value="pre_speaking">9. Pre-Speaking</option>
+          <option value="grammar">2. Ngữ Pháp</option>
+          <option value="vocab">1. Từ Vựng</option>
         </select>
       </div>
       <div>
         <label style="font-size: 12px; font-weight: 800; color: #475569;">Chuyên đề / Dạng bài:</label>
-        <input type="text" id="adminInputCategory" class="duo-input" placeholder="Ví dụ: Line Graph...">
+        <input type="text" id="adminInputCategory" class="duo-input" placeholder="Ví dụ: Line Graph, Section 1...">
       </div>
       <div>
         <label style="font-size: 12px; font-weight: 800; color: #475569;">Thứ tự bài học (#):</label>
@@ -317,16 +392,21 @@
 
     <div>
       <label style="font-size: 12px; font-weight: 800; color: #475569;">Tiêu đề bài học:</label>
-      <input type="text" id="adminInputTitle" class="duo-input" placeholder="Ví dụ: Kỹ thuật viết Overview chuẩn 8.0+">
+      <input type="text" id="adminInputTitle" class="duo-input" placeholder="Ví dụ: Chiến thuật viết Overview chuẩn 8.0+">
     </div>
 
     <div>
-      <label style="font-size: 12px; font-weight: 800; color: var(--tram-red);">🔗 Dán Link YouTube bất kỳ:</label>
+      <label style="font-size: 12px; font-weight: 800; color: var(--tram-red);">🔗 Dán Link YouTube bất kỳ (Tự bóc tách ID):</label>
       <input type="text" id="adminInputUrl" class="duo-input" placeholder="https://www.youtube.com/watch?v=... hoặc https://youtu.be/...">
     </div>
 
+    <div>
+      <label style="font-size: 12px; font-weight: 800; color: #475569;">Ghi chú tóm tắt bài học:</label>
+      <input type="text" id="adminInputDesc" class="duo-input" placeholder="Những lưu ý quan trọng cần ghi nhớ...">
+    </div>
+
     <div style="display: flex; gap: 8px;">
-      <button type="button" class="btn-3d btn-3d-red" onclick="saveAdminVideo()" style="padding: 9px 18px; font-size: 13px;">
+      <button type="button" class="btn-3d btn-3d-red" id="btnAdminSubmit" onclick="saveAdminVideo()" style="padding: 9px 18px; font-size: 13px;">
         💾 Lưu Bài Giảng Ngay
       </button>
       <span id="adminSaveStatus" style="font-size: 13px; font-weight: 800; color: #16A34A; align-self: center;"></span>
@@ -339,7 +419,7 @@
     <!-- CỘT 1: KHUNG CHIẾU VIDEO BẢO MẬT & PLAYER CONTROLS -->
     <div class="video-card-box">
       <div class="video-viewport-wrapper" id="videoWrapperContainer" oncontextmenu="return false;">
-        <!-- IFRAME YOUTUBE SẼ ĐƯỢC API KHỞI TẠO TẠI ĐÂY -->
+        <!-- KHUNG PHÁT YOUTUBE CHUẨN API -->
         <div id="youtubePlayerPlaceholder"></div>
 
         <!-- ===================================================================
@@ -353,7 +433,7 @@
 
         <!-- 3. Chặn góc dưới cùng mép phải: Logo chữ YouTube -->
         <div class="shield-bottom-right-logo" title="Trạm IELTS"></div>
-        <!-- Lưu ý: Khu vực nút 'Bỏ qua quảng cáo' (cách đáy 60-80px góc phải) được để trống 100% -->
+        <!-- Khoảng trống nút 'Bỏ qua quảng cáo' (cách đáy 60-80px góc phải) được để trống 100% -->
       </div>
 
       <!-- BỘ ĐIỀU KHIỂN TRẠM IELTS CUSTOM PLAYER BAR -->
@@ -406,7 +486,7 @@
               Đang tải bài giảng...
             </h3>
             <span id="currentVideoMeta" style="font-size: 12.5px; font-weight: 700; color: #64748B;">
-              Thời lượng: --:-- • Giảng viên: Thầy Phúc
+              Thứ tự: -- • Thời lượng: --:-- • Giảng viên: Thầy Phúc
             </span>
           </div>
 
@@ -428,22 +508,22 @@
       </div>
 
       <!-- Ô TÌM KIẾM BÀI HỌC -->
-      <input type="text" id="studioSearchInput" oninput="filterVideosUI()" placeholder="🔍 Tìm kiếm bài giảng..." class="duo-input" style="padding: 9px 12px; margin-bottom: 10px;">
+      <input type="text" id="studioSearchInput" oninput="filterVideosUI()" placeholder="🔍 Tìm theo tên hoặc dạng bài..." class="duo-input" style="padding: 9px 12px; margin-bottom: 10px;">
 
-      <!-- THANH LỌC KỸ NĂNG -->
+      <!-- THANH LỌC KỸ NĂNG THEO THỨ TỰ SƯ PHẠM -->
       <div class="skill-filter-bar">
         <button type="button" class="skill-pill-btn active" onclick="setSkillFilter('all', this)">Tất Cả</button>
-        <button type="button" class="skill-pill-btn" onclick="setSkillFilter('writing_t1', this)">Writing Task 1</button>
-        <button type="button" class="skill-pill-btn" onclick="setSkillFilter('writing_t2', this)">Writing Task 2</button>
-        <button type="button" class="skill-pill-btn" onclick="setSkillFilter('grammar', this)">Ngữ Pháp</button>
-        <button type="button" class="skill-pill-btn" onclick="setSkillFilter('reading', this)">Reading</button>
         <button type="button" class="skill-pill-btn" onclick="setSkillFilter('listening', this)">Listening</button>
+        <button type="button" class="skill-pill-btn" onclick="setSkillFilter('reading', this)">Reading</button>
+        <button type="button" class="skill-pill-btn" onclick="setSkillFilter('writing_t1', this)">Writing T1</button>
+        <button type="button" class="skill-pill-btn" onclick="setSkillFilter('writing_t2', this)">Writing T2</button>
         <button type="button" class="skill-pill-btn" onclick="setSkillFilter('speaking', this)">Speaking</button>
+        <button type="button" class="skill-pill-btn" onclick="setSkillFilter('grammar', this)">Ngữ Pháp</button>
         <button type="button" class="skill-pill-btn" onclick="setSkillFilter('vocab', this)">Từ Vựng</button>
       </div>
 
-      <!-- DANH SÁCH BÀI GIẢNG -->
-      <div id="playlistItemsContainer" style="max-height: 540px; overflow-y: auto; padding-right: 4px;"></div>
+      <!-- DANH SÁCH BÀI GIẢNG CÓ KÉO THẢ, SỬA, XÓA, THUMBNAIL -->
+      <div id="playlistItemsContainer" style="max-height: 560px; overflow-y: auto; padding-right: 4px;"></div>
     </div>
 
   </div>
@@ -461,16 +541,19 @@
   let currentList = [];
   let currentIndex = 0;
   let progressTimer = null;
+  let isAdminUser = false;
+  let draggedItemId = null;
 
-  // 1. TỰ ĐỘNG BẬT CHỨC NĂNG ADMIN NẾU LÀ TÀI KHOẢN THẦY
+  // 1. NHẬN DIỆN ADMIN CHUẨN XÁC
   function checkAdminPrivilege() {
     const params = new URLSearchParams(window.location.search);
     const user = stateManager.getUser();
-    const isAdmin = params.has('admin') || 
-                    (user.email && (CONFIG.ADMIN_EMAILS || []).includes(user.email.toLowerCase().trim())) ||
-                    (user.email && user.email.includes('admin'));
+    isAdminUser = params.has('admin') || 
+                  (user.email && (CONFIG.ADMIN_EMAILS || []).includes(user.email.toLowerCase().trim())) ||
+                  (user.email && user.email.includes('admin'));
 
-    if (isAdmin) {
+    if (isAdminUser) {
+      document.getElementById('studioMainWrapper')?.classList.add('is-admin-mode');
       const btn = document.getElementById('btnToggleAdminDrawer');
       if (btn) btn.style.display = 'inline-flex';
     }
@@ -488,7 +571,6 @@
   };
 
   function initStudio() {
-    // Đọc tham số skill từ URL (ví dụ: ?skill=writing_t1)
     const params = new URLSearchParams(window.location.search);
     if (params.has('skill')) {
       activeSkill = params.get('skill');
@@ -502,7 +584,7 @@
     renderPlaylist();
   }
 
-  // 3. VẼ PLAYLIST BÀI HỌC
+  // 3. VẼ PLAYLIST BÀI HỌC CÓ THUMBNAIL, TÍCH XANH & NÚT QUẢN TRỊ
   window.setSkillFilter = (skillKey, btnEl) => {
     activeSkill = skillKey;
     document.querySelectorAll('.skill-pill-btn').forEach(b => b.classList.remove('active'));
@@ -525,7 +607,7 @@
       container.innerHTML = `
         <div style="text-align:center; padding:30px 10px; font-weight:700; color:#64748B;">
           <div style="font-size:32px; margin-bottom:8px;">📭</div>
-          Chưa có bài giảng trong chuyên đề này.<br>Thầy sẽ sớm cập nhật bài mới!
+          Chưa có bài giảng trong mục này.<br>Thầy sẽ sớm cập nhật bài mới!
         </div>
       `;
       return;
@@ -534,19 +616,46 @@
     let html = '';
     currentList.forEach((v, idx) => {
       const isActive = idx === currentIndex;
+      const isDone = theoryVideoEngine.isCompleted(v.id);
+      const thumbUrl = theoryVideoEngine.getThumbnailUrl(v.youtubeId);
+
       html += `
-        <div class="playlist-item ${isActive ? 'active' : ''}" onclick="window.playByIndex(${idx})">
-          <div style="width:30px; height:30px; border-radius:8px; background:${isActive ? '#D97706' : '#E2E8F0'}; color:${isActive ? '#FFF' : '#475569'}; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:12px; flex-shrink:0;">
-            ${isActive ? '▶' : (idx + 1)}
+        <div class="playlist-item ${isActive ? 'active' : ''}" 
+             draggable="${isAdminUser ? 'true' : 'false'}"
+             ondragstart="window.handleItemDragStart(event, '${v.id}')"
+             ondragover="window.handleItemDragOver(event)"
+             ondrop="window.handleItemDrop(event, '${v.id}')"
+             onclick="window.playByIndex(${idx})">
+          
+          <!-- TÍCH XANH HOÀN THÀNH CHO HỌC SINH -->
+          <button type="button" class="btn-mark-done ${isDone ? 'done' : ''}" 
+                  onclick="window.handleToggleDone(event, '${v.id}')" 
+                  title="${isDone ? 'Đã hoàn thành' : 'Đánh dấu đã học'}">
+            ✓
+          </button>
+
+          <!-- THUMBNAIL VIDEO TỰ ĐỘNG TỪ YOUTUBE -->
+          <img src="${thumbUrl}" class="playlist-thumb" alt="thumbnail" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'60\\' height=\\'38\\' fill=\\'%23CBD5E1\\'><rect width=\\'100%\\' height=\\'100%\\'/></svg>'">
+
+          <!-- THÔNG TIN BÀI HỌC -->
+          <div style="flex: 1; min-width: 0;">
+            <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 2px;">
+              <span style="font-size: 10px; font-weight: 900; background: rgba(0,0,0,0.06); padding: 1px 6px; border-radius: 6px; text-transform: uppercase;">
+                ${v.category || 'CHUNG'}
+              </span>
+              <span style="font-size: 11px; font-weight: 700; color: #64748B;">⏱️ ${v.duration || 'N/A'}</span>
+            </div>
+            <div style="font-size: 13px; font-weight: 800; color: #1E293B; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+              #${v.order || (idx + 1)}. ${v.title}
+            </div>
           </div>
-          <div style="flex:1; min-width:0;">
-            <div style="display:flex; align-items:center; gap:6px; margin-bottom:2px;">
-              <span style="font-size:10px; font-weight:900; background:rgba(0,0,0,0.06); padding:1px 6px; border-radius:6px; text-transform:uppercase;">${v.category || 'CHUNG'}</span>
-              <span style="font-size:11px; font-weight:700; color:#64748B;">⏱️ ${v.duration || 'N/A'}</span>
-            </div>
-            <div style="font-size:13px; font-weight:800; color:#1E293B; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
-              ${v.title}
-            </div>
+
+          <!-- NÚT ADMIN: SỬA, XÓA, MŨI TÊN ĐỔI THỨ TỰ (CHỈ HIỆN CHO THẦY) -->
+          <div class="admin-item-actions" onclick="event.stopPropagation()">
+            <button type="button" class="btn-item-ctrl" onclick="window.handleMoveOrder('${v.id}', 'up')" title="Đẩy lên">▲</button>
+            <button type="button" class="btn-item-ctrl" onclick="window.handleMoveOrder('${v.id}', 'down')" title="Đẩy xuống">▼</button>
+            <button type="button" class="btn-item-ctrl btn-item-edit" onclick="window.handleEditVideo('${v.id}')" title="Sửa bài">✏️</button>
+            <button type="button" class="btn-item-ctrl btn-item-del" onclick="window.handleDeleteVideo('${v.id}', '${v.title.replace(/'/g, "\\'")}')" title="Xóa bài">🗑️</button>
           </div>
         </div>
       `;
@@ -576,18 +685,16 @@
     }
   };
 
-  // 4. BỘ ĐIỀU KHIỂN VIDEO YOUTUBE API
+  // 4. BỘ ĐIỀU KHIỂN YOUTUBE PLAYER & GHI NHỚ GIÂY HỌC DỞ
   function loadVideoPlayer(video) {
     if (!video) return;
 
-    // Cập nhật thông tin text
     document.getElementById('currentVideoTitle').innerText = video.title;
     document.getElementById('currentVideoCategoryBadge').innerText = video.category || 'CHUYÊN ĐỀ';
-    document.getElementById('currentVideoMeta').innerText = `Thứ tự bài: #${video.order || 1} • Thời lượng: ${video.duration || 'N/A'} • Giảng viên: Thầy Phúc`;
+    document.getElementById('currentVideoMeta').innerText = `Thứ tự: #${video.order || 1} • Thời lượng: ${video.duration || 'N/A'} • Giảng viên: Thầy Phúc`;
     document.getElementById('currentVideoDesc').innerText = video.description || "Hãy chuẩn bị sổ tay để ghi chú lại các cấu trúc và chiến thuật quan trọng trong bài giảng nhé!";
 
     if (!ytPlayer) {
-      // Khởi tạo Player lần đầu
       ytPlayer = new YT.Player('youtubePlayerPlaceholder', {
         videoId: video.youtubeId,
         playerVars: {
@@ -598,18 +705,24 @@
           enablejsapi: 1
         },
         events: {
-          'onReady': onPlayerReady,
+          'onReady': () => {
+            startProgressTracking();
+            resumeSavedWatchTime(video.id);
+          },
           'onStateChange': onPlayerStateChange
         }
       });
     } else {
-      // Đã có sẵn Player -> Chuyển video
       ytPlayer.loadVideoById(video.youtubeId);
+      setTimeout(() => resumeSavedWatchTime(video.id), 600);
     }
   }
 
-  function onPlayerReady() {
-    startProgressTracking();
+  function resumeSavedWatchTime(videoId) {
+    const lastSec = theoryVideoEngine.getWatchProgress(videoId);
+    if (lastSec > 10 && ytPlayer && ytPlayer.seekTo) {
+      ytPlayer.seekTo(lastSec, true);
+    }
   }
 
   function onPlayerStateChange(event) {
@@ -688,6 +801,11 @@
       if (dur > 0) {
         document.getElementById('playerProgressBar').value = (cur / dur) * 100;
       }
+
+      // Tự động lưu tiến độ xem dở
+      if (currentList[currentIndex]?.id) {
+        theoryVideoEngine.saveWatchProgress(currentList[currentIndex].id, cur);
+      }
     }, 500);
   }
 
@@ -697,14 +815,99 @@
     return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
   }
 
-  // 6. THAO TÁC ADMIN NHANH
+  window.handleToggleDone = (e, videoId) => {
+    e.stopPropagation();
+    theoryVideoEngine.toggleCompleted(videoId);
+    renderPlaylist(document.getElementById('studioSearchInput')?.value || '');
+  };
+
+  // 6. THAO TÁC QUẢN TRỊ ADMIN (SỬA, XÓA, ĐỔI THỨ TỰ)
+  window.handleMoveOrder = async (videoId, direction) => {
+    await theoryVideoEngine.moveVideo(videoId, direction);
+    renderPlaylist();
+  };
+
+  window.handleItemDragStart = (e, videoId) => {
+    if (!isAdminUser) return;
+    draggedItemId = videoId;
+    e.target.classList.add('dragging');
+  };
+
+  window.handleItemDragOver = (e) => {
+    if (!isAdminUser) return;
+    e.preventDefault();
+  };
+
+  window.handleItemDrop = async (e, targetVideoId) => {
+    if (!isAdminUser || !draggedItemId || draggedItemId === targetVideoId) return;
+    e.preventDefault();
+
+    const currentIds = currentList.map(v => v.id);
+    const fromIdx = currentIds.indexOf(draggedItemId);
+    const toIdx = currentIds.indexOf(targetVideoId);
+
+    if (fromIdx !== -1 && toIdx !== -1) {
+      currentIds.splice(fromIdx, 1);
+      currentIds.splice(toIdx, 0, draggedItemId);
+      await theoryVideoEngine.reorderVideos(currentIds);
+      renderPlaylist();
+    }
+  };
+
+  window.handleEditVideo = (videoId) => {
+    const v = theoryVideoEngine.videos.find(item => item.id === videoId);
+    if (!v) return;
+
+    document.getElementById('adminInputEditId').value = v.id;
+    document.getElementById('adminInputSkill').value = v.skillKey;
+    document.getElementById('adminInputCategory').value = v.category || '';
+    document.getElementById('adminInputOrder').value = v.order || 1;
+    document.getElementById('adminInputDuration').value = v.duration || '';
+    document.getElementById('adminInputTitle').value = v.title;
+    document.getElementById('adminInputUrl').value = v.youtubeUrl;
+    document.getElementById('adminInputDesc').value = v.description || '';
+
+    // Cập nhật giao diện Drawer sang chế độ chỉnh sửa
+    document.getElementById('adminDrawerHeaderTitle').innerHTML = `<i class="fa-solid fa-pen-to-square"></i> ĐANG CHỈNH SỬA: [${v.title}]`;
+    document.getElementById('btnAdminSubmit').innerText = "💾 Cập Nhật Bài Giảng";
+    document.getElementById('btnCancelEdit').style.display = "inline-flex";
+
+    const d = document.getElementById('adminVideoDrawer');
+    if (d) d.style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  window.cancelAdminEdit = () => {
+    document.getElementById('adminInputEditId').value = '';
+    document.getElementById('adminInputCategory').value = '';
+    document.getElementById('adminInputOrder').value = theoryVideoEngine.videos.length + 1;
+    document.getElementById('adminInputDuration').value = '';
+    document.getElementById('adminInputTitle').value = '';
+    document.getElementById('adminInputUrl').value = '';
+    document.getElementById('adminInputDesc').value = '';
+
+    document.getElementById('adminDrawerHeaderTitle').innerHTML = `<i class="fa-solid fa-plus-circle"></i> THÊM BÀI GIẢNG MỚI (TỰ ĐỘNG LỌC ID YOUTUBE)`;
+    document.getElementById('btnAdminSubmit').innerText = "💾 Lưu Bài Giảng Ngay";
+    document.getElementById('btnCancelEdit').style.display = "none";
+  };
+
+  window.handleDeleteVideo = async (videoId, videoTitle) => {
+    if (confirm(`Thầy có chắc chắn muốn xóa bài giảng: "${videoTitle}" không?`)) {
+      await theoryVideoEngine.deleteVideo(videoId);
+      if (currentIndex >= theoryVideoEngine.videos.length) currentIndex = 0;
+      renderPlaylist();
+    }
+  };
+
   window.saveAdminVideo = async () => {
+    const editId = document.getElementById('adminInputEditId').value;
     const skillKey = document.getElementById('adminInputSkill').value;
     const category = document.getElementById('adminInputCategory').value;
     const order = document.getElementById('adminInputOrder').value;
     const duration = document.getElementById('adminInputDuration').value;
     const title = document.getElementById('adminInputTitle').value;
     const youtubeUrl = document.getElementById('adminInputUrl').value;
+    const description = document.getElementById('adminInputDesc').value;
 
     if (!title || !youtubeUrl) {
       alert("⚠️ Thầy vui lòng nhập ít nhất Tiêu đề bài học và Link YouTube nhé!");
@@ -712,15 +915,24 @@
     }
 
     try {
-      await theoryVideoEngine.saveVideo({ skillKey, category, order, duration, title, youtubeUrl });
+      await theoryVideoEngine.saveVideo({
+        id: editId || undefined,
+        skillKey,
+        category,
+        order,
+        duration,
+        title,
+        youtubeUrl,
+        description
+      });
+
       const statusEl = document.getElementById('adminSaveStatus');
       if (statusEl) {
-        statusEl.innerText = "✅ Đã lưu bài giảng thành công!";
+        statusEl.innerText = editId ? "✅ Đã cập nhật thành công!" : "✅ Đã thêm bài giảng mới!";
         setTimeout(() => statusEl.innerText = "", 2500);
       }
-      // Làm mới form
-      document.getElementById('adminInputTitle').value = '';
-      document.getElementById('adminInputUrl').value = '';
+
+      window.cancelAdminEdit();
       renderPlaylist();
     } catch (e) {
       alert("❌ " + e.message);
@@ -731,7 +943,6 @@
     theoryVideoEngine.exportJSON();
   };
 
-  // Tự động kích hoạt khi DOM tải xong
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => { if (window.YT) initStudio(); });
   } else {
