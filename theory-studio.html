@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trạm IELTS - Phòng Bài Giảng Lý Thuyết Toàn Diện</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+
+  <style>
+    :root {
+      --bg-cream: #FAF7F2;
+      --tram-red: #8B1518;
+      --tram-red-shadow: #5E0C0E;
+      --duo-border: #E8E2D8;
+      --duo-shadow: #D3CBC0;
+      --text-main: #1E1B4B;
+    }
+
+    body {
+      background-color: var(--bg-cream) !important;
+      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 100 100"><circle cx="50" cy="50" r="34" fill="none" stroke="%238B1518" stroke-width="8" opacity="0.045"/><rect x="15" y="44" width="70" height="12" rx="2" fill="%238B1518" opacity="0.045"/></svg>');
+      background-repeat: repeat;
+      background-size: 130px 130px;
+      color: #1E293B;
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      margin: 0;
+      padding: 16px;
+    }
+
+    .studio-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* TOPBAR */
+    .studio-topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #FFFFFF;
+      border: 2.5px solid var(--duo-border);
+      border-bottom: 5px solid var(--duo-shadow);
+      border-radius: 20px;
+      padding: 14px 22px;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .btn-3d {
+      border: none; border-radius: 14px; font-family: inherit; font-weight: 900; font-size: 13.5px;
+      text-transform: uppercase; padding: 10px 20px; display: inline-flex; align-items: center;
+      justify-content: center; gap: 8px; cursor: pointer; text-decoration: none; transition: all 0.08s ease;
+      box-sizing: border-box; white-space: nowrap;
+    }
+    .btn-3d:active { transform: translateY(2px); box-shadow: none !important; }
+    .btn-3d-white { background: #FFFFFF; color: #1E293B !important; border: 2px solid var(--duo-border); border-bottom: 4px solid var(--duo-shadow); }
+    .btn-3d-red { background: var(--tram-red); color: #FFFFFF !important; border-bottom: 4px solid var(--tram-red-shadow); }
+    .btn-3d-amber { background: #F59E0B; color: #1E1B4B !important; border-bottom: 4px solid #B45309; }
+
+    /* LAYOUT 2 CỘT */
+    .studio-layout {
+      display: grid;
+      grid-template-columns: 1.65fr 1fr;
+      gap: 20px;
+      align-items: start;
+    }
+
+    @media (max-width: 960px) {
+      .studio-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* KHUNG VIDEO PLAYER CHỐNG LỘ LINK & BẢO VỆ SKIP AD */
+    .video-card-box {
+      background: #FFFFFF;
+      border: 2.5px solid var(--duo-border);
+      border-bottom: 6px solid var(--duo-shadow);
+      border-radius: 24px;
+      padding: 18px;
+    }
+
+    .video-viewport-wrapper {
+      position: relative;
+      width: 100%;
+      padding-top: 56.25%; /* Tỉ lệ 16:9 */
+      background: #000000;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+    }
+
+    .video-viewport-wrapper iframe {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      border: none;
+    }
+
+    /* KHIÊN ĐỤC LỖ THÔNG MINH */
+    .shield-top-bar {
+      position: absolute; top: 0; left: 0; right: 0; height: 60px;
+      z-index: 4; background: transparent; pointer-events: auto;
+    }
+    .shield-bottom-left-link {
+      position: absolute; bottom: 0; left: 0; width: 120px; height: 52px;
+      z-index: 4; background: transparent; pointer-events: auto;
+    }
+    .shield-bottom-right-logo {
+      position: absolute; bottom: 0; right: 0; width: 95px; height: 42px;
+      z-index: 4; background: transparent; pointer-events: auto;
+    }
+
+    /* BỘ ĐIỀU KHIỂN TRẠM IELTS CUSTOM PLAYER BAR */
+    .custom-player-bar {
+      background: #0F172A;
+      color: #FFFFFF;
+      border-radius: 14px;
+      padding: 10px 14px;
+      margin-top: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .progress-seek-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .video-progress-bar {
+      flex: 1;
+      height: 6px;
+      -webkit-appearance: none;
+      background: #334155;
+      border-radius: 4px;
+      outline: none;
+      cursor: pointer;
+    }
+    .video-progress-bar::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      background: #F59E0B;
+      cursor: pointer;
+    }
+
+    .controls-action-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .ctrl-btn {
+      background: transparent;
+      border: none;
+      color: #FFFFFF;
+      font-size: 15px;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-weight: 800;
+    }
+    .ctrl-btn:hover { background: rgba(255,255,255,0.15); }
+    .speed-btn.active { background: #F59E0B; color: #0F172A; }
+
+    /* CỘT PLAYLIST */
+    .playlist-card-box {
+      background: #FFFFFF;
+      border: 2.5px solid var(--duo-border);
+      border-bottom: 6px solid var(--duo-shadow);
+      border-radius: 24px;
+      padding: 18px;
+    }
+
+    .skill-filter-bar {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+      margin-bottom: 12px;
+    }
+
+    .skill-pill-btn {
+      padding: 6px 14px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 800;
+      border: 2px solid var(--duo-border);
+      background: #FAF7F2;
+      cursor: pointer;
+      color: #64748B;
+      white-space: nowrap;
+    }
+    .skill-pill-btn.active {
+      background: var(--tram-red);
+      color: #FFFFFF;
+      border-color: var(--tram-red);
+    }
+
+    .playlist-item {
+      padding: 12px 14px;
+      border-radius: 14px;
+      border: 2px solid var(--duo-border);
+      background: #FAF7F2;
+      cursor: pointer;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: all 0.1s ease;
+    }
+    .playlist-item:hover {
+      background: #FFFFFF;
+      border-color: #F59E0B;
+      transform: translateX(3px);
+    }
+    .playlist-item.active {
+      background: #FFFBEB;
+      border-color: #D97706;
+      border-left: 6px solid #B45309;
+    }
+
+    /* KHUNG ADMIN NHANH */
+    .admin-drawer {
+      background: #FFFBEB;
+      border: 2px solid #F59E0B;
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 16px;
+      display: none;
+    }
+    .duo-input {
+      width: 100%; box-sizing: border-box; padding: 10px 14px; border: 2px solid var(--duo-border);
+      border-radius: 12px; font-size: 13.5px; font-family: inherit; font-weight: 700; color: #1E293B;
+      background: #FAF7F2; outline: none; margin-bottom: 10px;
+    }
+    .duo-input:focus { background: #FFFFFF; border-color: var(--tram-red); }
+  </style>
+
+  <!-- NẠP YOUTUBE IFRAME API ĐỂ ĐIỀU KHIỂN VIDEO NGẦM BẢO MẬT -->
+  <script src="https://www.youtube.com/iframe_api"></script>
+</head>
+<body>
+
+<div class="studio-container">
+
+  <!-- TOPBAR -->
+  <div class="studio-topbar">
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <a href="index.html" class="btn-3d btn-3d-white" style="padding: 8px 16px; font-size: 13px;">
+        <i class="fa-solid fa-arrow-left"></i> VỀ TRANG CHỦ
+      </a>
+      <div>
+        <h3 style="margin: 0; font-size: 18px; font-weight: 900; color: #1E1B4B;">PHÒNG BÀI GIẢNG LÝ THUYẾT TRẠM IELTS</h3>
+        <span style="font-size: 12px; font-weight: 700; color: #64748B;">Học phương pháp & chiến thuật độc quyền từ Thầy Phúc</span>
+      </div>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <button type="button" id="btnToggleAdminDrawer" onclick="toggleAdminDrawer()" class="btn-3d btn-3d-amber" style="display: none; padding: 8px 14px; font-size: 12px;">
+        <i class="fa-solid fa-gear"></i> QUẢN TRỊ VIDEO (ADMIN)
+      </button>
+      <span style="background: #FFF4E5; color: #D97706; border: 2px solid #FCD34D; padding: 6px 14px; border-radius: 12px; font-weight: 900; font-size: 12.5px;">
+        <i class="fa-solid fa-shield-halved"></i> BẢN QUYỀN TRẠM IELTS
+      </span>
+    </div>
+  </div>
+
+  <!-- ADMIN DRAWER (DÀNH RIÊNG CHO THẦY KHI CÓ ?admin=1 HOẶC LOGIN ADMIN) -->
+  <div id="adminVideoDrawer" class="admin-drawer">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+      <b style="color: #92400E; font-size: 14.5px;"><i class="fa-solid fa-plus-circle"></i> THÊM BÀI GIẢNG MỚI (TỰ ĐỘNG LỌC ID YOUTUBE)</b>
+      <button type="button" class="btn-3d btn-3d-white" onclick="exportVideosJSON()" style="padding: 6px 12px; font-size: 12px;">
+        📥 Xuất File JSON Vĩnh Viễn
+      </button>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">
+      <div>
+        <label style="font-size: 12px; font-weight: 800; color: #475569;">Phân hệ:</label>
+        <select id="adminInputSkill" class="duo-input">
+          <option value="writing_t1">Writing Task 1</option>
+          <option value="writing_t2">Writing Task 2</option>
+          <option value="grammar">Ngữ Pháp</option>
+          <option value="reading">IELTS Reading</option>
+          <option value="listening">IELTS Listening</option>
+          <option value="speaking">IELTS Speaking</option>
+          <option value="vocab">Từ Vựng</option>
+          <option value="pre_writing_t1">Pre-Writing Task 1</option>
+          <option value="pre_writing_t2">Pre-Writing Task 2</option>
+        </select>
+      </div>
+      <div>
+        <label style="font-size: 12px; font-weight: 800; color: #475569;">Chuyên đề / Dạng bài:</label>
+        <input type="text" id="adminInputCategory" class="duo-input" placeholder="Ví dụ: Line Graph...">
+      </div>
+      <div>
+        <label style="font-size: 12px; font-weight: 800; color: #475569;">Thứ tự bài học (#):</label>
+        <input type="number" id="adminInputOrder" class="duo-input" value="1">
+      </div>
+      <div>
+        <label style="font-size: 12px; font-weight: 800; color: #475569;">Thời lượng (phút:giây):</label>
+        <input type="text" id="adminInputDuration" class="duo-input" placeholder="Ví dụ: 15:30">
+      </div>
+    </div>
+
+    <div>
+      <label style="font-size: 12px; font-weight: 800; color: #475569;">Tiêu đề bài học:</label>
+      <input type="text" id="adminInputTitle" class="duo-input" placeholder="Ví dụ: Kỹ thuật viết Overview chuẩn 8.0+">
+    </div>
+
+    <div>
+      <label style="font-size: 12px; font-weight: 800; color: var(--tram-red);">🔗 Dán Link YouTube bất kỳ:</label>
+      <input type="text" id="adminInputUrl" class="duo-input" placeholder="https://www.youtube.com/watch?v=... hoặc https://youtu.be/...">
+    </div>
+
+    <div style="display: flex; gap: 8px;">
+      <button type="button" class="btn-3d btn-3d-red" onclick="saveAdminVideo()" style="padding: 9px 18px; font-size: 13px;">
+        💾 Lưu Bài Giảng Ngay
+      </button>
+      <span id="adminSaveStatus" style="font-size: 13px; font-weight: 800; color: #16A34A; align-self: center;"></span>
+    </div>
+  </div>
+
+  <!-- BỐ CỤC CHÍNH 2 CỘT -->
+  <div class="studio-layout">
+
+    <!-- CỘT 1: KHUNG CHIẾU VIDEO BẢO MẬT & PLAYER CONTROLS -->
+    <div class="video-card-box">
+      <div class="video-viewport-wrapper" id="videoWrapperContainer" oncontextmenu="return false;">
+        <!-- IFRAME YOUTUBE SẼ ĐƯỢC API KHỞI TẠO TẠI ĐÂY -->
+        <div id="youtubePlayerPlaceholder"></div>
+
+        <!-- ===================================================================
+             LÁ CHẮN ĐỤC LỖ THÔNG MINH (CHẶN NÚT LINK + CHỪA NÚT SKIP AD)
+             =================================================================== -->
+        <!-- 1. Chặn dải trên cùng: Tên video + Nút chia sẻ -->
+        <div class="shield-top-bar" title="Trạm IELTS Masterclass Player"></div>
+
+        <!-- 2. Chặn góc dưới bên trái: Nút mắt xích 🔗 (Copy link) -->
+        <div class="shield-bottom-left-link" title="Bản quyền Trạm IELTS"></div>
+
+        <!-- 3. Chặn góc dưới cùng mép phải: Logo chữ YouTube -->
+        <div class="shield-bottom-right-logo" title="Trạm IELTS"></div>
+        <!-- Lưu ý: Khu vực nút 'Bỏ qua quảng cáo' (cách đáy 60-80px góc phải) được để trống 100% -->
+      </div>
+
+      <!-- BỘ ĐIỀU KHIỂN TRẠM IELTS CUSTOM PLAYER BAR -->
+      <div class="custom-player-bar">
+        <!-- HÀNG 1: THANH TUA VIDEO & THỜI GIAN -->
+        <div class="progress-seek-row">
+          <span id="playerCurrentTime" style="font-size: 12px; font-weight: 800; min-width: 40px;">00:00</span>
+          <input type="range" id="playerProgressBar" class="video-progress-bar" value="0" min="0" max="100" step="0.1" oninput="onSeekbarInput(this.value)">
+          <span id="playerTotalDuration" style="font-size: 12px; font-weight: 800; min-width: 40px; color: #94A3B8;">00:00</span>
+        </div>
+
+        <!-- HÀNG 2: CÁC NÚT PHÁT, TỐC ĐỘ, ÂM LƯỢNG, TOÀN MÀN HÌNH -->
+        <div class="controls-action-row">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <button type="button" class="ctrl-btn" id="btnPlayPause" onclick="togglePlayPause()" title="Phát/Tạm dừng">
+              <i class="fa-solid fa-play" id="iconPlayPause"></i>
+            </button>
+            <button type="button" class="ctrl-btn" onclick="seekRelative(-10)" title="Lùi 10 giây">
+              <i class="fa-solid fa-rotate-left"></i> 10s
+            </button>
+            <button type="button" class="ctrl-btn" onclick="seekRelative(10)" title="Tua tới 10 giây">
+              10s <i class="fa-solid fa-rotate-right"></i>
+            </button>
+            <button type="button" class="ctrl-btn" id="btnMute" onclick="toggleMute()" title="Bật/Tắt âm">
+              <i class="fa-solid fa-volume-high" id="iconMute"></i>
+            </button>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <span style="font-size: 11px; font-weight: 800; color: #94A3B8; margin-right: 2px;">TỐC ĐỘ:</span>
+            <button type="button" class="ctrl-btn speed-btn" onclick="setPlaySpeed(0.75, this)">0.75x</button>
+            <button type="button" class="ctrl-btn speed-btn active" onclick="setPlaySpeed(1.0, this)">1.0x</button>
+            <button type="button" class="ctrl-btn speed-btn" onclick="setPlaySpeed(1.25, this)">1.25x</button>
+            <button type="button" class="ctrl-btn speed-btn" onclick="setPlaySpeed(1.5, this)">1.5x</button>
+            <button type="button" class="ctrl-btn" onclick="toggleFullScreenPlayer()" title="Toàn màn hình">
+              <i class="fa-solid fa-expand"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- THÔNG TIN BÀI HỌC ĐANG PHÁT -->
+      <div style="margin-top: 14px;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; flex-wrap: wrap;">
+          <div>
+            <span id="currentVideoCategoryBadge" style="background: #FDF2F2; color: var(--tram-red); border: 1.5px solid #F8B4B7; font-size: 11px; font-weight: 900; padding: 2px 10px; border-radius: 8px; text-transform: uppercase;">
+              CHUYÊN ĐỀ
+            </span>
+            <h3 id="currentVideoTitle" style="margin: 6px 0 2px 0; font-size: 19px; font-weight: 900; color: #1E1B4B;">
+              Đang tải bài giảng...
+            </h3>
+            <span id="currentVideoMeta" style="font-size: 12.5px; font-weight: 700; color: #64748B;">
+              Thời lượng: --:-- • Giảng viên: Thầy Phúc
+            </span>
+          </div>
+
+          <div style="display: flex; gap: 6px;">
+            <button type="button" class="btn-3d btn-3d-white" onclick="changeVideoOffset(-1)" style="padding: 7px 12px; font-size: 12px;">⏮️ Bài trước</button>
+            <button type="button" class="btn-3d btn-3d-red" onclick="changeVideoOffset(1)" style="padding: 7px 12px; font-size: 12px;">Bài tiếp ⏭️</button>
+          </div>
+        </div>
+
+        <p id="currentVideoDesc" style="margin: 10px 0 0 0; font-size: 13.5px; font-weight: 600; color: #475569; background: #FAF7F2; border: 1.5px solid var(--duo-border); padding: 12px; border-radius: 12px; line-height: 1.5;"></p>
+      </div>
+    </div>
+
+    <!-- CỘT 2: PLAYLIST & TÌM KIẾM -->
+    <div class="playlist-card-box">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+        <h4 style="margin: 0; font-size: 15px; font-weight: 900; color: #1E1B4B;">📚 DANH SÁCH BÀI HỌC</h4>
+        <span id="playlistCountBadge" style="background: #E5DFD5; font-size: 11px; font-weight: 800; padding: 2px 8px; border-radius: 8px;">0 bài</span>
+      </div>
+
+      <!-- Ô TÌM KIẾM BÀI HỌC -->
+      <input type="text" id="studioSearchInput" oninput="filterVideosUI()" placeholder="🔍 Tìm kiếm bài giảng..." class="duo-input" style="padding: 9px 12px; margin-bottom: 10px;">
+
+      <!-- THANH LỌC KỸ NĂNG -->
+      <div class="skill-filter-bar">
+        <button type="button" class="skill-pill-btn active" onclick="setSkillFilter('all', this)">Tất Cả</button>
+        <button type="button" class="skill-pill-btn" onclick="setSkillFilter('writing_t1', this)">Writing Task 1</button>
+        <button type="button" class="skill-pill-btn" onclick="setSkillFilter('writing_t2', this)">Writing Task 2</button>
+        <button type="button" class="skill-pill-btn" onclick="setSkillFilter('grammar', this)">Ngữ Pháp</button>
+        <button type="button" class="skill-pill-btn" onclick="setSkillFilter('reading', this)">Reading</button>
+        <button type="button" class="skill-pill-btn" onclick="setSkillFilter('listening', this)">Listening</button>
+        <button type="button" class="skill-pill-btn" onclick="setSkillFilter('speaking', this)">Speaking</button>
+        <button type="button" class="skill-pill-btn" onclick="setSkillFilter('vocab', this)">Từ Vựng</button>
+      </div>
+
+      <!-- DANH SÁCH BÀI GIẢNG -->
+      <div id="playlistItemsContainer" style="max-height: 540px; overflow-y: auto; padding-right: 4px;"></div>
+    </div>
+
+  </div>
+
+</div>
+
+<script type="module">
+  import { theoryVideoEngine } from './js/theory-video-engine.js';
+  import { CONFIG } from './js/config.js';
+  import { stateManager } from './js/state.js';
+
+  let ytPlayer = null;
+  let isYtReady = false;
+  let activeSkill = 'all';
+  let currentList = [];
+  let currentIndex = 0;
+  let progressTimer = null;
+
+  // 1. TỰ ĐỘNG BẬT CHỨC NĂNG ADMIN NẾU LÀ TÀI KHOẢN THẦY
+  function checkAdminPrivilege() {
+    const params = new URLSearchParams(window.location.search);
+    const user = stateManager.getUser();
+    const isAdmin = params.has('admin') || 
+                    (user.email && (CONFIG.ADMIN_EMAILS || []).includes(user.email.toLowerCase().trim())) ||
+                    (user.email && user.email.includes('admin'));
+
+    if (isAdmin) {
+      const btn = document.getElementById('btnToggleAdminDrawer');
+      if (btn) btn.style.display = 'inline-flex';
+    }
+  }
+
+  window.toggleAdminDrawer = () => {
+    const d = document.getElementById('adminVideoDrawer');
+    if (d) d.style.display = (d.style.display === 'block') ? 'none' : 'block';
+  };
+
+  // 2. KHỞI TẠO YOUTUBE API CHUẨN
+  window.onYouTubeIframeAPIReady = () => {
+    isYtReady = true;
+    initStudio();
+  };
+
+  function initStudio() {
+    // Đọc tham số skill từ URL (ví dụ: ?skill=writing_t1)
+    const params = new URLSearchParams(window.location.search);
+    if (params.has('skill')) {
+      activeSkill = params.get('skill');
+      document.querySelectorAll('.skill-pill-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.getAttribute('onclick')?.includes(`'${activeSkill}'`)) btn.classList.add('active');
+      });
+    }
+
+    checkAdminPrivilege();
+    renderPlaylist();
+  }
+
+  // 3. VẼ PLAYLIST BÀI HỌC
+  window.setSkillFilter = (skillKey, btnEl) => {
+    activeSkill = skillKey;
+    document.querySelectorAll('.skill-pill-btn').forEach(b => b.classList.remove('active'));
+    if (btnEl) btnEl.classList.add('active');
+    renderPlaylist();
+  };
+
+  window.filterVideosUI = () => {
+    const q = document.getElementById('studioSearchInput')?.value || '';
+    renderPlaylist(q);
+  };
+
+  function renderPlaylist(searchQ = '') {
+    currentList = theoryVideoEngine.getVideos(activeSkill, searchQ);
+    const container = document.getElementById('playlistItemsContainer');
+    const badge = document.getElementById('playlistCountBadge');
+    if (badge) badge.innerText = `${currentList.length} bài`;
+
+    if (currentList.length === 0) {
+      container.innerHTML = `
+        <div style="text-align:center; padding:30px 10px; font-weight:700; color:#64748B;">
+          <div style="font-size:32px; margin-bottom:8px;">📭</div>
+          Chưa có bài giảng trong chuyên đề này.<br>Thầy sẽ sớm cập nhật bài mới!
+        </div>
+      `;
+      return;
+    }
+
+    let html = '';
+    currentList.forEach((v, idx) => {
+      const isActive = idx === currentIndex;
+      html += `
+        <div class="playlist-item ${isActive ? 'active' : ''}" onclick="window.playByIndex(${idx})">
+          <div style="width:30px; height:30px; border-radius:8px; background:${isActive ? '#D97706' : '#E2E8F0'}; color:${isActive ? '#FFF' : '#475569'}; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:12px; flex-shrink:0;">
+            ${isActive ? '▶' : (idx + 1)}
+          </div>
+          <div style="flex:1; min-width:0;">
+            <div style="display:flex; align-items:center; gap:6px; margin-bottom:2px;">
+              <span style="font-size:10px; font-weight:900; background:rgba(0,0,0,0.06); padding:1px 6px; border-radius:6px; text-transform:uppercase;">${v.category || 'CHUNG'}</span>
+              <span style="font-size:11px; font-weight:700; color:#64748B;">⏱️ ${v.duration || 'N/A'}</span>
+            </div>
+            <div style="font-size:13px; font-weight:800; color:#1E293B; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+              ${v.title}
+            </div>
+          </div>
+        </div>
+      `;
+    });
+
+    container.innerHTML = html;
+
+    if (currentList.length > 0 && currentIndex < currentList.length) {
+      loadVideoPlayer(currentList[currentIndex]);
+    }
+  }
+
+  window.playByIndex = (idx) => {
+    if (idx >= 0 && idx < currentList.length) {
+      currentIndex = idx;
+      loadVideoPlayer(currentList[idx]);
+      renderPlaylist(document.getElementById('studioSearchInput')?.value || '');
+    }
+  };
+
+  window.changeVideoOffset = (direction) => {
+    const target = currentIndex + direction;
+    if (target >= 0 && target < currentList.length) {
+      window.playByIndex(target);
+    } else {
+      alert(direction > 0 ? "🎉 Em đã xem hết danh sách bài trong mục này!" : "Đây là bài đầu tiên rồi em nhé!");
+    }
+  };
+
+  // 4. BỘ ĐIỀU KHIỂN VIDEO YOUTUBE API
+  function loadVideoPlayer(video) {
+    if (!video) return;
+
+    // Cập nhật thông tin text
+    document.getElementById('currentVideoTitle').innerText = video.title;
+    document.getElementById('currentVideoCategoryBadge').innerText = video.category || 'CHUYÊN ĐỀ';
+    document.getElementById('currentVideoMeta').innerText = `Thứ tự bài: #${video.order || 1} • Thời lượng: ${video.duration || 'N/A'} • Giảng viên: Thầy Phúc`;
+    document.getElementById('currentVideoDesc').innerText = video.description || "Hãy chuẩn bị sổ tay để ghi chú lại các cấu trúc và chiến thuật quan trọng trong bài giảng nhé!";
+
+    if (!ytPlayer) {
+      // Khởi tạo Player lần đầu
+      ytPlayer = new YT.Player('youtubePlayerPlaceholder', {
+        videoId: video.youtubeId,
+        playerVars: {
+          autoplay: 0,
+          rel: 0,
+          modestbranding: 1,
+          iv_load_policy: 3,
+          enablejsapi: 1
+        },
+        events: {
+          'onReady': onPlayerReady,
+          'onStateChange': onPlayerStateChange
+        }
+      });
+    } else {
+      // Đã có sẵn Player -> Chuyển video
+      ytPlayer.loadVideoById(video.youtubeId);
+    }
+  }
+
+  function onPlayerReady() {
+    startProgressTracking();
+  }
+
+  function onPlayerStateChange(event) {
+    const icon = document.getElementById('iconPlayPause');
+    if (event.data === YT.PlayerState.PLAYING) {
+      if (icon) icon.className = "fa-solid fa-pause";
+      startProgressTracking();
+    } else {
+      if (icon) icon.className = "fa-solid fa-play";
+      clearInterval(progressTimer);
+    }
+  }
+
+  // 5. CÁC HÀM CUSTOM CONTROLS TRẠM IELTS
+  window.togglePlayPause = () => {
+    if (!ytPlayer || !ytPlayer.getPlayerState) return;
+    const state = ytPlayer.getPlayerState();
+    if (state === YT.PlayerState.PLAYING) {
+      ytPlayer.pauseVideo();
+    } else {
+      ytPlayer.playVideo();
+    }
+  };
+
+  window.seekRelative = (seconds) => {
+    if (!ytPlayer || !ytPlayer.getCurrentTime) return;
+    const cur = ytPlayer.getCurrentTime();
+    ytPlayer.seekTo(cur + seconds, true);
+  };
+
+  window.setPlaySpeed = (speed, btnEl) => {
+    if (!ytPlayer || !ytPlayer.setPlaybackRate) return;
+    ytPlayer.setPlaybackRate(speed);
+    document.querySelectorAll('.speed-btn').forEach(b => b.classList.remove('active'));
+    if (btnEl) btnEl.classList.add('active');
+  };
+
+  window.toggleMute = () => {
+    if (!ytPlayer || !ytPlayer.isMuted) return;
+    const icon = document.getElementById('iconMute');
+    if (ytPlayer.isMuted()) {
+      ytPlayer.unMute();
+      if (icon) icon.className = "fa-solid fa-volume-high";
+    } else {
+      ytPlayer.mute();
+      if (icon) icon.className = "fa-solid fa-volume-xmark";
+    }
+  };
+
+  window.onSeekbarInput = (val) => {
+    if (!ytPlayer || !ytPlayer.getDuration) return;
+    const duration = ytPlayer.getDuration();
+    const targetSec = (val / 100) * duration;
+    ytPlayer.seekTo(targetSec, true);
+  };
+
+  window.toggleFullScreenPlayer = () => {
+    const box = document.getElementById('videoWrapperContainer');
+    if (!document.fullscreenElement) {
+      box.requestFullscreen?.() || box.webkitRequestFullscreen?.();
+    } else {
+      document.exitFullscreen?.();
+    }
+  };
+
+  function startProgressTracking() {
+    clearInterval(progressTimer);
+    progressTimer = setInterval(() => {
+      if (!ytPlayer || !ytPlayer.getCurrentTime) return;
+      const cur = ytPlayer.getCurrentTime();
+      const dur = ytPlayer.getDuration() || 0;
+
+      document.getElementById('playerCurrentTime').innerText = formatSec(cur);
+      document.getElementById('playerTotalDuration').innerText = formatSec(dur);
+
+      if (dur > 0) {
+        document.getElementById('playerProgressBar').value = (cur / dur) * 100;
+      }
+    }, 500);
+  }
+
+  function formatSec(sec) {
+    const m = Math.floor(sec / 60);
+    const s = Math.floor(sec % 60);
+    return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+  }
+
+  // 6. THAO TÁC ADMIN NHANH
+  window.saveAdminVideo = async () => {
+    const skillKey = document.getElementById('adminInputSkill').value;
+    const category = document.getElementById('adminInputCategory').value;
+    const order = document.getElementById('adminInputOrder').value;
+    const duration = document.getElementById('adminInputDuration').value;
+    const title = document.getElementById('adminInputTitle').value;
+    const youtubeUrl = document.getElementById('adminInputUrl').value;
+
+    if (!title || !youtubeUrl) {
+      alert("⚠️ Thầy vui lòng nhập ít nhất Tiêu đề bài học và Link YouTube nhé!");
+      return;
+    }
+
+    try {
+      await theoryVideoEngine.saveVideo({ skillKey, category, order, duration, title, youtubeUrl });
+      const statusEl = document.getElementById('adminSaveStatus');
+      if (statusEl) {
+        statusEl.innerText = "✅ Đã lưu bài giảng thành công!";
+        setTimeout(() => statusEl.innerText = "", 2500);
+      }
+      // Làm mới form
+      document.getElementById('adminInputTitle').value = '';
+      document.getElementById('adminInputUrl').value = '';
+      renderPlaylist();
+    } catch (e) {
+      alert("❌ " + e.message);
+    }
+  };
+
+  window.exportVideosJSON = () => {
+    theoryVideoEngine.exportJSON();
+  };
+
+  // Tự động kích hoạt khi DOM tải xong
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => { if (window.YT) initStudio(); });
+  } else {
+    if (window.YT) initStudio();
+  }
+</script>
+</body>
+</html>
