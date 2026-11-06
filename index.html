@@ -162,7 +162,7 @@
     .btn-module-white:active { transform: translateY(2px); border-bottom-width: 2px !important; }
 
     /* =========================================================================
-       BANNER ĐẶC TRỊ CHO TRUNG TÂM VIDEO LÝ THUYẾT (NẰM TRÊN TỪ VỰNG)
+       BANNER ĐẶC TRỊ CHO TRUNG TÂM VIDEO LÝ THUYẾT (NGAY TRÊN TỪ VỰNG)
        ========================================================================= */
     .master-theory-banner {
       background: linear-gradient(135deg, #0F172A 0%, #1E1B4B 45%, #8B1518 100%);
@@ -238,99 +238,6 @@
     .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .2s; border-radius: 50%; }
     input:checked + .slider { background-color: var(--tram-red); }
     input:checked + .slider:before { transform: translateX(20px); }
-
-    /* =========================================================================
-       CSS CHO PHÒNG CHIẾU VIDEO STUDIO (HỌC SINH)
-       ========================================================================= */
-    .theory-studio-box {
-      background: #FFFFFF;
-      border: 3px solid #E8E2D8;
-      border-bottom: 7px solid #D3CBC0;
-      border-radius: 26px;
-      max-width: 1080px;
-      width: 100%;
-      padding: 24px;
-      position: relative;
-      box-shadow: 0 25px 60px rgba(0,0,0,0.35);
-      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-      max-height: 92vh;
-      display: flex;
-      flex-direction: column;
-    }
-    .video-player-shield-wrapper {
-      position: relative;
-      width: 100%;
-      padding-top: 56.25%; /* 16:9 Aspect Ratio */
-      background: #000000;
-      border-radius: 16px;
-      overflow: hidden;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.25);
-    }
-    .video-player-shield-wrapper iframe {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      border: none;
-    }
-    /* Lá chắn vô hình chặn click nhảy sang YouTube */
-    .yt-invisible-shield-top {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 60px;
-      z-index: 2;
-      background: transparent;
-    }
-    .yt-invisible-shield-logo {
-      position: absolute;
-      bottom: 0;
-      right: 0;
-      width: 90px;
-      height: 48px;
-      z-index: 2;
-      background: transparent;
-    }
-    .theory-playlist-item {
-      padding: 12px 14px;
-      border-radius: 12px;
-      border: 2px solid #E8E2D8;
-      background: #FAF7F2;
-      cursor: pointer;
-      margin-bottom: 8px;
-      transition: all 0.1s ease;
-      display: flex;
-      gap: 12px;
-      align-items: center;
-    }
-    .theory-playlist-item:hover {
-      background: #FFFFFF;
-      border-color: #F59E0B;
-      transform: translateX(3px);
-    }
-    .theory-playlist-item.active {
-      background: #FFFBEB;
-      border-color: #D97706;
-      border-left: 6px solid #B45309;
-    }
-    .theory-pill-filter {
-      padding: 6px 14px;
-      border-radius: 12px;
-      font-size: 12.5px;
-      font-weight: 800;
-      border: 2px solid #E8E2D8;
-      background: #FAF7F2;
-      cursor: pointer;
-      color: #64748B;
-      white-space: nowrap;
-    }
-    .theory-pill-filter.active {
-      background: #1E1B4B;
-      color: #FFFFFF;
-      border-color: #1E1B4B;
-    }
   </style>
 </head>
 <body>
@@ -423,7 +330,7 @@
         <button type="button" class="admin-tab-btn active" id="btnAdminTabStudents" onclick="switchAdminTab('students')">👥 Danh Sách Học Sinh</button>
         <button type="button" class="admin-tab-btn" id="btnAdminTabCalendar" onclick="switchAdminTab('calendar')">📅 Lịch Dạy & Học (Google Calendar)</button>
         <button type="button" class="admin-tab-btn" id="btnAdminTabModules" onclick="switchAdminTab('modules')">⚙️ Bật / Tắt Phân Hệ</button>
-        <!-- TAB 4 MỚI: QUẢN LÝ VIDEO LÝ THUYẾT -->
+        <!-- TAB 4: QUẢN LÝ VIDEO LÝ THUYẾT (ADMIN) -->
         <button type="button" class="admin-tab-btn" id="btnAdminTabVideos" onclick="switchAdminTab('videos')">🎬 Quản Lý Video Lý Thuyết</button>
       </div>
 
@@ -452,16 +359,21 @@
         <div id="adminModuleToggleList" style="display: flex; flex-direction: column; gap: 10px;"></div>
       </div>
 
-      <!-- TAB 4 MỚI: QUẢN TRỊ VIÊN THÊM/SỬA VIDEO LÝ THUYẾT -->
+      <!-- TAB 4: QUẢN TRỊ VIÊN THÊM/SỬA VIDEO LÝ THUYẾT -->
       <div id="adminTabContentVideos" style="display: none;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
           <div>
             <h4 style="margin: 0; font-size: 17px; font-weight: 900; color: #1E1B4B;">🎬 QUẢN LÝ VIDEO BÀI GIẢNG LÝ THUYẾT (ADMIN)</h4>
-            <span style="font-size: 13px; font-weight: 700; color: var(--text-muted);">Dán link YouTube bất kỳ, hệ thống sẽ tự phân loại và hiển thị lên banner cho học sinh</span>
+            <span style="font-size: 13px; font-weight: 700; color: var(--text-muted);">Dán link YouTube bất kỳ, hệ thống sẽ tự phân loại và hiển thị lên phòng học cho học sinh</span>
           </div>
-          <button type="button" class="btn-3d btn-3d-amber" onclick="window.adminExportVideosJSON()" style="padding: 8px 16px; font-size: 13px;">
-            <i class="fa-solid fa-file-export"></i> 📥 Xuất File JSON Vĩnh Viễn
-          </button>
+          <div style="display: flex; gap: 8px;">
+            <a href="theory-studio.html?admin=1" target="_blank" class="btn-3d btn-3d-white" style="padding: 8px 14px; font-size: 12.5px;">
+              👁️ Mở Phòng Học Studio
+            </a>
+            <button type="button" class="btn-3d btn-3d-amber" onclick="window.adminExportVideosJSON()" style="padding: 8px 14px; font-size: 12.5px;">
+              <i class="fa-solid fa-file-export"></i> 📥 Xuất File JSON Vĩnh Viễn
+            </button>
+          </div>
         </div>
 
         <!-- FORM THÊM / CẬP NHẬT VIDEO -->
@@ -608,6 +520,7 @@
 
       <!-- =========================================================================
            BANNER TO VÀ NỔI BẬT: TRUNG TÂM BÀI GIẢNG LÝ THUYẾT (NGAY TRÊN ĐẦU TỪ VỰNG)
+           BẤM NÚT SẼ MỞ THẲNG TRANG RIÊNG: theory-studio.html
            ========================================================================= -->
       <div class="master-theory-banner" id="bannerMasterTheory">
         <div style="max-width: 680px;">
@@ -625,9 +538,9 @@
           </p>
         </div>
         <div>
-          <button type="button" class="btn-3d btn-3d-amber" onclick="window.openTheoryStudioModal('all')" style="padding: 14px 28px; font-size: 15px;">
+          <a href="theory-studio.html" class="btn-3d btn-3d-amber" style="padding: 14px 28px; font-size: 15px; text-decoration: none;">
             <i class="fa-solid fa-play"></i> <span id="bannerTheoryCountBtnText">MỞ PHÒNG BÀI GIẢNG &rarr;</span>
-          </button>
+          </a>
         </div>
       </div>
 
@@ -780,81 +693,6 @@
 </div>
 
 <!-- =========================================================================
-     MODAL PHÒNG CHIẾU VIDEO STUDIO LÝ THUYẾT (DÀNH CHO HỌC SINH)
-     ========================================================================= -->
-<div id="theoryStudioModal" style="display:none; position:fixed; inset:0; z-index:999999; background:rgba(15, 23, 42, 0.82); backdrop-filter:blur(8px); align-items:center; justify-content:center; padding:16px;">
-  <div class="theory-studio-box">
-    
-    <!-- HEADER STUDIO -->
-    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--duo-border); padding-bottom: 14px; margin-bottom: 14px; flex-wrap: wrap; gap: 10px;">
-      <div style="display: flex; align-items: center; gap: 10px;">
-        <span style="font-size: 26px;">🎬</span>
-        <div>
-          <h3 style="margin: 0; font-size: 19px; font-weight: 900; color: #1E1B4B;">PHÒNG BÀI GIẢNG LÝ THUYẾT TRẠM IELTS</h3>
-          <span style="font-size: 12.5px; font-weight: 700; color: var(--text-muted);" id="theoryStudioTotalVideos">Đang tải danh sách bài học...</span>
-        </div>
-      </div>
-      <div style="display: flex; align-items: center; gap: 10px;">
-        <input type="text" id="theorySearchInput" oninput="window.filterTheoryVideos()" placeholder="🔍 Tìm kiếm bài giảng..." style="padding: 8px 14px; border-radius: 12px; border: 2px solid var(--duo-border); background: #FAF7F2; font-family: inherit; font-size: 13px; font-weight: 700; outline: none; width: 200px;">
-        <button type="button" onclick="window.closeTheoryStudioModal()" style="background:#F1ECE6; border:none; width:36px; height:36px; border-radius:50%; font-weight:900; color:#7E7672; cursor:pointer; font-size:16px;">✕</button>
-      </div>
-    </div>
-
-    <!-- THANH LỌC KỸ NĂNG -->
-    <div style="display: flex; gap: 6px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 12px;" id="theorySkillFilterBar">
-      <button type="button" class="theory-pill-filter active" onclick="window.filterTheoryBySkill('all')">Tất Cả</button>
-      <button type="button" class="theory-pill-filter" onclick="window.filterTheoryBySkill('writing_t1')">Writing Task 1</button>
-      <button type="button" class="theory-pill-filter" onclick="window.filterTheoryBySkill('writing_t2')">Writing Task 2</button>
-      <button type="button" class="theory-pill-filter" onclick="window.filterTheoryBySkill('grammar')">Ngữ Pháp</button>
-      <button type="button" class="theory-pill-filter" onclick="window.filterTheoryBySkill('reading')">IELTS Reading</button>
-      <button type="button" class="theory-pill-filter" onclick="window.filterTheoryBySkill('listening')">IELTS Listening</button>
-      <button type="button" class="theory-pill-filter" onclick="window.filterTheoryBySkill('speaking')">IELTS Speaking</button>
-      <button type="button" class="theory-pill-filter" onclick="window.filterTheoryBySkill('vocab')">Từ Vựng</button>
-    </div>
-
-    <!-- BỐ CỤC 2 CỘT STUDIO: TRÁI PHÁT VIDEO - PHẢI PLAYLIST -->
-    <div style="display: grid; grid-template-columns: 1.6fr 1fr; gap: 18px; flex: 1; min-height: 0; overflow: hidden;" id="theoryStudioBodyLayout">
-      
-      <!-- CỘT TRÁI: VIDEO PLAYER & THÔNG TIN -->
-      <div style="display: flex; flex-direction: column; overflow-y: auto; padding-right: 6px;" oncontextmenu="return false;">
-        <div class="video-player-shield-wrapper">
-          <iframe id="theoryMainIframe" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-          <!-- LÁ CHẮN BẢO VỆ CHẶNG CLICK CHUYỂN TRANG YOUTUBE -->
-          <div class="yt-invisible-shield-top" title="Phát bài giảng trên Trạm IELTS"></div>
-          <div class="yt-invisible-shield-logo" title="Trạm IELTS Masterclass"></div>
-        </div>
-
-        <div style="margin-top: 14px;">
-          <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; flex-wrap: wrap;">
-            <div>
-              <span id="theoryPlayerCategoryBadge" style="background: #FDF2F2; color: #8B1518; border: 1.5px solid #F8B4B7; font-size: 11.5px; font-weight: 900; padding: 2px 10px; border-radius: 10px; text-transform: uppercase;">CHUYÊN ĐỀ</span>
-              <h4 id="theoryPlayerTitle" style="margin: 6px 0 2px 0; font-size: 18px; font-weight: 900; color: #1E1B4B;">Chọn một bài học từ danh sách</h4>
-              <span id="theoryPlayerMeta" style="font-size: 13px; font-weight: 700; color: var(--text-muted);">Thời lượng: --:-- • Giảng dạy: Thầy Phúc</span>
-            </div>
-            <div style="display: flex; gap: 8px;">
-              <button type="button" class="btn-3d btn-3d-white" id="btnTheoryPrev" onclick="window.navigateTheoryVideo(-1)" style="padding: 8px 14px; font-size: 12.5px;">⏮️ Bài trước</button>
-              <button type="button" class="btn-3d btn-3d-red" id="btnTheoryNext" onclick="window.navigateTheoryVideo(1)" style="padding: 8px 14px; font-size: 12.5px;">Bài tiếp ⏭️</button>
-            </div>
-          </div>
-          <p id="theoryPlayerDesc" style="margin: 10px 0 0 0; font-size: 13.5px; font-weight: 600; color: #475569; background: #F8FAFC; border: 1.5px solid #E2E8F0; padding: 12px; border-radius: 12px; line-height: 1.5;"></p>
-        </div>
-      </div>
-
-      <!-- CỘT PHẢI: PLAYLIST BÀI HỌC -->
-      <div style="display: flex; flex-direction: column; min-height: 0; background: #FAF7F2; border: 2px solid var(--duo-border); border-radius: 16px; padding: 14px;">
-        <div style="font-size: 13px; font-weight: 900; color: #1E1B4B; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
-          <span>📚 DANH SÁCH BÀI GIẢNG</span>
-          <span id="theoryFilteredCountBadge" style="background: #E5DFD5; padding: 2px 8px; border-radius: 8px; font-size: 11.5px;">0 bài</span>
-        </div>
-        <div id="theoryPlaylistContainer" style="flex: 1; overflow-y: auto; padding-right: 4px;"></div>
-      </div>
-
-    </div>
-
-  </div>
-</div>
-
-<!-- =========================================================================
      MODAL GỬI BÁO CÁO PHỤ HUYNH TỪ TRANG CHỦ (GIỮ NGUYÊN 100%)
      ========================================================================= -->
 <div id="indexParentReportModal" style="display:none; position:fixed; inset:0; z-index:999999; background:rgba(15, 23, 42, 0.75); backdrop-filter:blur(6px); align-items:center; justify-content:center; padding:16px; font-family:'Plus Jakarta Sans', system-ui, sans-serif;">
@@ -970,13 +808,8 @@
   let rawAdminAttempts = [];
   let studentsMap = {};
   let systemSettings = { modules: {} };
-  let currentActiveTheorySkill = 'all';
-  let currentLoadedVideosList = [];
-  let currentPlayingIndex = 0;
 
-  // =========================================================================
-  // LOGIC BẬT MODAL BÁO CÁO PHỤ HUYNH CHO HỌC SINH TẠI TRANG CHỦ (GIỮ NGUYÊN)
-  // =========================================================================
+  // 1. LOGIC BẬT MODAL BÁO CÁO PHỤ HUYNH CHO HỌC SINH TẠI TRANG CHỦ
   window.openDailyParentReportModal = () => {
     const user = stateManager.getUser();
     if (!user.email) {
@@ -1052,7 +885,7 @@
     }, 2500);
   }
 
-  // 1. CƠ CHẾ SINH MÃ HỌC VIÊN TR-XXXX & KIỂM TRA QUYỀN
+  // 2. CƠ CHẾ SINH MÃ HỌC VIÊN TR-XXXX & KIỂM TRA QUYỀN
   function getOrCreateStudentId() {
     let id = localStorage.getItem('tram_student_id');
     if (!id) {
@@ -1146,7 +979,6 @@
     location.reload();
   };
 
-  // 2. ĐIỀU HƯỚNG NÚT "XEM LẠI"
   function resolveReviewPageUrl(pageUrl, attemptId = '', email = '') {
     if (!pageUrl) return `reading/runner-reading.html?attemptId=${attemptId}&email=${encodeURIComponent(email)}`;
 
@@ -1257,9 +1089,7 @@
     }
   }
 
-  // =========================================================================
-  // LOGIC PHÒNG CHIẾU VIDEO STUDIO (HỌC SINH)
-  // =========================================================================
+  // 4. CẬP NHẬT SỐ LƯỢNG VIDEO TRÊN BANNER
   function updateBannerVideoCounter() {
     const allVids = theoryVideoEngine.getVideos('all');
     const btnText = document.getElementById('bannerTheoryCountBtnText');
@@ -1268,131 +1098,7 @@
     }
   }
 
-  window.openTheoryStudioModal = (skillKey = 'all') => {
-    currentActiveTheorySkill = skillKey;
-    const modal = document.getElementById('theoryStudioModal');
-    if (modal) modal.style.display = 'flex';
-    
-    // Cập nhật trạng thái active pill filter
-    document.querySelectorAll('.theory-pill-filter').forEach(btn => {
-      btn.classList.remove('active');
-      if (btn.getAttribute('onclick')?.includes(`'${skillKey}'`)) {
-        btn.classList.add('active');
-      }
-    });
-
-    renderTheoryPlaylist();
-  };
-
-  window.closeTheoryStudioModal = () => {
-    const modal = document.getElementById('theoryStudioModal');
-    const iframe = document.getElementById('theoryMainIframe');
-    if (iframe) iframe.src = ''; // Dừng phát video
-    if (modal) modal.style.display = 'none';
-  };
-
-  window.filterTheoryBySkill = (skillKey) => {
-    currentActiveTheorySkill = skillKey;
-    document.querySelectorAll('.theory-pill-filter').forEach(btn => btn.classList.remove('active'));
-    event?.target?.classList.add('active');
-    renderTheoryPlaylist();
-  };
-
-  window.filterTheoryVideos = () => {
-    const q = document.getElementById('theorySearchInput')?.value || '';
-    renderTheoryPlaylist(q);
-  };
-
-  function renderTheoryPlaylist(searchQ = '') {
-    const container = document.getElementById('theoryPlaylistContainer');
-    const countBadge = document.getElementById('theoryFilteredCountBadge');
-    const totalVideosText = document.getElementById('theoryStudioTotalVideos');
-    if (!container) return;
-
-    currentLoadedVideosList = theoryVideoEngine.getVideos(currentActiveTheorySkill, searchQ);
-
-    if (countBadge) countBadge.innerText = `${currentLoadedVideosList.length} bài`;
-    if (totalVideosText) totalVideosText.innerText = `Kho lưu trữ ${theoryVideoEngine.getVideos('all').length} bài giảng chuẩn mực IELTS`;
-
-    if (currentLoadedVideosList.length === 0) {
-      container.innerHTML = `
-        <div style="text-align: center; padding: 30px 10px; font-weight: 700; color: var(--text-muted);">
-          <div style="font-size: 32px; margin-bottom: 8px;">📭</div>
-          Chưa có video nào trong mục này.<br>Thầy sẽ sớm cập nhật bài giảng mới nhất!
-        </div>
-      `;
-      return;
-    }
-
-    let html = '';
-    currentLoadedVideosList.forEach((vid, idx) => {
-      const isActive = idx === currentPlayingIndex;
-      html += `
-        <div class="theory-playlist-item ${isActive ? 'active' : ''}" onclick="window.playTheoryVideoByIndex(${idx})">
-          <div style="width: 32px; height: 32px; border-radius: 8px; background: ${isActive ? '#D97706' : '#E2E8F0'}; color: ${isActive ? '#FFF' : '#475569'}; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 13px; flex-shrink: 0;">
-            ${isActive ? '▶' : (idx + 1)}
-          </div>
-          <div style="flex: 1; min-width: 0;">
-            <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 2px;">
-              <span style="font-size: 10.5px; font-weight: 900; background: rgba(0,0,0,0.06); padding: 1px 6px; border-radius: 6px; text-transform: uppercase;">${vid.category || 'Chuyên đề'}</span>
-              <span style="font-size: 11px; font-weight: 700; color: #64748B;">⏱️ ${vid.duration || 'N/A'}</span>
-            </div>
-            <div style="font-size: 13.5px; font-weight: 800; color: #1E293B; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-              ${vid.title}
-            </div>
-          </div>
-        </div>
-      `;
-    });
-
-    container.innerHTML = html;
-
-    // Tự động phát video đầu tiên nếu chưa chọn
-    if (currentLoadedVideosList.length > 0 && currentPlayingIndex < currentLoadedVideosList.length) {
-      loadVideoIntoPlayer(currentLoadedVideosList[currentPlayingIndex]);
-    }
-  }
-
-  window.playTheoryVideoByIndex = (index) => {
-    if (index >= 0 && index < currentLoadedVideosList.length) {
-      currentPlayingIndex = index;
-      loadVideoIntoPlayer(currentLoadedVideosList[index]);
-      renderTheoryPlaylist(document.getElementById('theorySearchInput')?.value || '');
-    }
-  };
-
-  window.navigateTheoryVideo = (direction) => {
-    const newIdx = currentPlayingIndex + direction;
-    if (newIdx >= 0 && newIdx < currentLoadedVideosList.length) {
-      window.playTheoryVideoByIndex(newIdx);
-    } else {
-      alert(direction > 0 ? "🎉 Em đã xem hết danh sách bài trong mục này!" : "Đây là bài đầu tiên trong danh mục rồi em nhé!");
-    }
-  };
-
-  function loadVideoIntoPlayer(video) {
-    if (!video) return;
-    const iframe = document.getElementById('theoryMainIframe');
-    const title = document.getElementById('theoryPlayerTitle');
-    const catBadge = document.getElementById('theoryPlayerCategoryBadge');
-    const meta = document.getElementById('theoryPlayerMeta');
-    const desc = document.getElementById('theoryPlayerDesc');
-
-    if (iframe) {
-      // Nhúng YouTube an toàn, tắt liên kết ngoài
-      iframe.src = `https://www.youtube-nocookie.com/embed/${video.youtubeId}?enablejsapi=1&rel=0&modestbranding=1&iv_load_policy=3`;
-    }
-    if (title) title.innerText = video.title;
-    if (catBadge) catBadge.innerText = video.category || 'CHUYÊN ĐỀ';
-    if (meta) meta.innerText = `Thứ tự bài: #${video.order || 1} • Thời lượng: ${video.duration || 'N/A'} • Hướng dẫn: Thầy Phúc`;
-    if (desc) {
-      desc.innerText = video.description || "Hãy chuẩn bị sổ tay để ghi chú lại các cấu trúc và chiến thuật quan trọng trong bài giảng nhé!";
-    }
-  }
-
-  // =========================================================================
-  // LOGIC TAB QUẢN TRỊ ADMIN (TAB 4: QUẢN LÝ VIDEO LÝ THUYẾT)
-  // =========================================================================
+  // 5. CHUYỂN VIEW VÀ TAB ADMIN
   window.switchMainView = (view) => {
     const studentSec = document.getElementById('studentViewSection');
     const adminSec = document.getElementById('adminPanelSection');
@@ -1424,7 +1130,6 @@
     const btnC = document.getElementById('btnAdminTabCalendar');
     const btnV = document.getElementById('btnAdminTabVideos');
 
-    // Tắt toàn bộ
     [tabStudents, tabModules, tabCalendar, tabVideos].forEach(t => { if (t) t.style.display = 'none'; });
     [btnS, btnM, btnC, btnV].forEach(b => { if (b) b.classList.remove('active'); });
 
@@ -1446,6 +1151,7 @@
     }
   };
 
+  // 6. LOGIC ADMIN QUẢN LÝ VIDEO LÝ THUYẾT
   function renderAdminVideoTable() {
     const container = document.getElementById('adminVideoTableContainer');
     if (!container) return;
@@ -1573,9 +1279,7 @@
     theoryVideoEngine.exportJSON();
   };
 
-  // =========================================================================
-  // CÁC HÀM XỬ LÝ HỌC SINH & LỊCH TRÌNH CŨ (GIỮ NGUYÊN 100%)
-  // =========================================================================
+  // 7. CÁC HÀM QUẢN LÝ HỌC VIÊN CŨ (GIỮ NGUYÊN 100%)
   async function loadAdminData() {
     const user = stateManager.getUser();
     const container = document.getElementById('adminStudentsContainer');
