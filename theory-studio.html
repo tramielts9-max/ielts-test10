@@ -35,7 +35,7 @@
     }
 
     .studio-container {
-      max-width: 1220px;
+      max-width: 1240px;
       margin: 0 auto;
     }
 
@@ -68,7 +68,7 @@
     /* LAYOUT 2 CỘT */
     .studio-layout {
       display: grid;
-      grid-template-columns: 1.6fr 1fr;
+      grid-template-columns: 1.55fr 1fr;
       gap: 20px;
       align-items: start;
     }
@@ -188,7 +188,7 @@
       gap: 6px;
       overflow-x: auto;
       padding-bottom: 8px;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
     }
 
     .skill-pill-btn {
@@ -208,7 +208,54 @@
       border-color: var(--tram-red);
     }
 
-    /* ITEM PLAYLIST NÂNG CẤP THUMBNAIL & NÚT ADMIN */
+    /* THANH LỌC DẠNG BÀI CON (SUB-CATEGORY PILLS) */
+    .sub-filter-scroll-wrapper {
+      background: #F8FAFC;
+      border: 1.5px solid #E2E8F0;
+      border-radius: 14px;
+      padding: 8px 10px;
+      margin-bottom: 12px;
+    }
+    .sub-filter-title {
+      font-size: 11px;
+      font-weight: 900;
+      color: #0284C7;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .sub-filter-bar {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+    .sub-pill-btn {
+      padding: 5px 12px;
+      border-radius: 10px;
+      font-size: 11.5px;
+      font-weight: 800;
+      border: 1.5px solid #CBD5E1;
+      background: #FFFFFF;
+      cursor: pointer;
+      color: #334155;
+      white-space: nowrap;
+      transition: all 0.1s ease;
+    }
+    .sub-pill-btn:hover {
+      border-color: #0284C7;
+      color: #0284C7;
+    }
+    .sub-pill-btn.active {
+      background: #0284C7;
+      color: #FFFFFF;
+      border-color: #0284C7;
+      box-shadow: 0 2px 6px rgba(2, 132, 199, 0.25);
+    }
+
+    /* PLAYLIST ITEM */
     .playlist-item {
       padding: 10px 12px;
       border-radius: 14px;
@@ -232,13 +279,13 @@
       border-color: #D97706;
       border-left: 6px solid #B45309;
     }
-    .playlist-item.dragging {
-      opacity: 0.4;
-      border: 2px dashed #D97706;
+    .playlist-item.is-draft {
+      opacity: 0.7;
+      border-style: dashed;
     }
 
     .playlist-thumb {
-      width: 60px;
+      width: 62px;
       height: 38px;
       border-radius: 6px;
       object-fit: cover;
@@ -269,7 +316,18 @@
       color: #FFFFFF;
     }
 
-    /* NÚT THAO TÁC ADMIN TRÊN PLAYLIST */
+    .badge-draft-tag {
+      background: #FEE2E2;
+      color: #DC2626;
+      border: 1px solid #FCA5A5;
+      font-size: 10px;
+      font-weight: 900;
+      padding: 1px 6px;
+      border-radius: 6px;
+      text-transform: uppercase;
+    }
+
+    /* NÚT THAO TÁC ADMIN */
     .admin-item-actions {
       display: none;
       align-items: center;
@@ -291,11 +349,10 @@
     }
     .btn-item-ctrl:hover { background: #CBD5E1; }
     .btn-item-edit { background: #DBEAFE; color: #1D4ED8; }
-    .btn-item-edit:hover { background: #BFDBFE; }
     .btn-item-del { background: #FEE2E2; color: #DC2626; }
-    .btn-item-del:hover { background: #FECACA; }
+    .btn-item-pub { background: #FEF3C7; color: #B45309; }
 
-    /* KHUNG ADMIN FORM */
+    /* ADMIN DRAWER */
     .admin-drawer {
       background: #FFFBEB;
       border: 2px solid #F59E0B;
@@ -340,7 +397,7 @@
     </div>
   </div>
 
-  <!-- ADMIN DRAWER (DÀNH CHO THẦY THÊM & SỬA BÀI HỌC) -->
+  <!-- ADMIN DRAWER (THÊM & SỬA BÀI HỌC) -->
   <div id="adminVideoDrawer" class="admin-drawer">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
       <b style="color: #92400E; font-size: 14.5px;" id="adminDrawerHeaderTitle">
@@ -360,25 +417,25 @@
 
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">
       <div>
-        <label style="font-size: 12px; font-weight: 800; color: #475569;">Phân hệ:</label>
+        <label style="font-size: 12px; font-weight: 800; color: #475569;">Phân hệ kỹ năng:</label>
         <select id="adminInputSkill" class="duo-input">
-          <option value="listening">4. IELTS Listening</option>
-          <option value="pre_listening">3. Pre-Listening</option>
           <option value="reading">6. IELTS Reading</option>
-          <option value="pre_reading">5. Pre-Reading</option>
+          <option value="listening">4. IELTS Listening</option>
           <option value="writing_t1">8A. IELTS Writing Task 1</option>
-          <option value="pre_writing_t1">7A. Pre-Writing Task 1</option>
           <option value="writing_t2">8B. IELTS Writing Task 2</option>
-          <option value="pre_writing_t2">7B. Pre-Writing Task 2</option>
           <option value="speaking">10. IELTS Speaking</option>
-          <option value="pre_speaking">9. Pre-Speaking</option>
           <option value="grammar">2. Ngữ Pháp</option>
           <option value="vocab">1. Từ Vựng</option>
+          <option value="pre_reading">5. Pre-Reading</option>
+          <option value="pre_listening">3. Pre-Listening</option>
+          <option value="pre_writing_t1">7A. Pre-Writing Task 1</option>
+          <option value="pre_writing_t2">7B. Pre-Writing Task 2</option>
+          <option value="pre_speaking">9. Pre-Speaking</option>
         </select>
       </div>
       <div>
-        <label style="font-size: 12px; font-weight: 800; color: #475569;">Chuyên đề / Dạng bài:</label>
-        <input type="text" id="adminInputCategory" class="duo-input" placeholder="Ví dụ: Line Graph, Section 1...">
+        <label style="font-size: 12px; font-weight: 800; color: #475569;">Dạng bài con (Sub-Category):</label>
+        <input type="text" id="adminInputCategory" class="duo-input" placeholder="Ví dụ: TRUE/FALSE/NOT GIVEN, GAP FILL...">
       </div>
       <div>
         <label style="font-size: 12px; font-weight: 800; color: #475569;">Thứ tự bài học (#):</label>
@@ -392,17 +449,25 @@
 
     <div>
       <label style="font-size: 12px; font-weight: 800; color: #475569;">Tiêu đề bài học:</label>
-      <input type="text" id="adminInputTitle" class="duo-input" placeholder="Ví dụ: Chiến thuật viết Overview chuẩn 8.0+">
+      <input type="text" id="adminInputTitle" class="duo-input" placeholder="Ví dụ: GIẢI QUYẾT DẠNG TRUE/FALSE/NOT GIVEN...">
     </div>
 
     <div>
       <label style="font-size: 12px; font-weight: 800; color: var(--tram-red);">🔗 Dán Link YouTube bất kỳ (Tự bóc tách ID):</label>
-      <input type="text" id="adminInputUrl" class="duo-input" placeholder="https://www.youtube.com/watch?v=... hoặc https://youtu.be/...">
+      <input type="text" id="adminInputUrl" class="duo-input" placeholder="https://youtu.be/... hoặc https://www.youtube.com/watch?v=...">
     </div>
 
     <div>
       <label style="font-size: 12px; font-weight: 800; color: #475569;">Ghi chú tóm tắt bài học:</label>
       <input type="text" id="adminInputDesc" class="duo-input" placeholder="Những lưu ý quan trọng cần ghi nhớ...">
+    </div>
+
+    <!-- NÚT GẠT BẢN NHÁP / CÔNG KHAI -->
+    <div style="margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+      <input type="checkbox" id="adminInputIsPublished" checked style="width: 18px; height: 18px; cursor: pointer;">
+      <label for="adminInputIsPublished" style="font-size: 13px; font-weight: 800; color: #166534; cursor: pointer;">
+        ✓ Công khai bài giảng cho học sinh xem ngay (Bỏ tích để lưu dạng Bản nháp)
+      </label>
     </div>
 
     <div style="display: flex; gap: 8px;">
@@ -419,33 +484,22 @@
     <!-- CỘT 1: KHUNG CHIẾU VIDEO BẢO MẬT & PLAYER CONTROLS -->
     <div class="video-card-box">
       <div class="video-viewport-wrapper" id="videoWrapperContainer" oncontextmenu="return false;">
-        <!-- KHUNG PHÁT YOUTUBE CHUẨN API -->
         <div id="youtubePlayerPlaceholder"></div>
 
-        <!-- ===================================================================
-             LÁ CHẮN ĐỤC LỖ THÔNG MINH (CHẶN NÚT LINK + CHỪA NÚT SKIP AD)
-             =================================================================== -->
-        <!-- 1. Chặn dải trên cùng: Tên video + Nút chia sẻ -->
+        <!-- LÁ CHẮN ĐỤC LỖ THÔNG MINH -->
         <div class="shield-top-bar" title="Trạm IELTS Masterclass Player"></div>
-
-        <!-- 2. Chặn góc dưới bên trái: Nút mắt xích 🔗 (Copy link) -->
         <div class="shield-bottom-left-link" title="Bản quyền Trạm IELTS"></div>
-
-        <!-- 3. Chặn góc dưới cùng mép phải: Logo chữ YouTube -->
         <div class="shield-bottom-right-logo" title="Trạm IELTS"></div>
-        <!-- Khoảng trống nút 'Bỏ qua quảng cáo' (cách đáy 60-80px góc phải) được để trống 100% -->
       </div>
 
       <!-- BỘ ĐIỀU KHIỂN TRẠM IELTS CUSTOM PLAYER BAR -->
       <div class="custom-player-bar">
-        <!-- HÀNG 1: THANH TUA VIDEO & THỜI GIAN -->
         <div class="progress-seek-row">
           <span id="playerCurrentTime" style="font-size: 12px; font-weight: 800; min-width: 40px;">00:00</span>
           <input type="range" id="playerProgressBar" class="video-progress-bar" value="0" min="0" max="100" step="0.1" oninput="onSeekbarInput(this.value)">
           <span id="playerTotalDuration" style="font-size: 12px; font-weight: 800; min-width: 40px; color: #94A3B8;">00:00</span>
         </div>
 
-        <!-- HÀNG 2: CÁC NÚT PHÁT, TỐC ĐỘ, ÂM LƯỢNG, TOÀN MÀN HÌNH -->
         <div class="controls-action-row">
           <div style="display: flex; align-items: center; gap: 8px;">
             <button type="button" class="ctrl-btn" id="btnPlayPause" onclick="togglePlayPause()" title="Phát/Tạm dừng">
@@ -500,21 +554,21 @@
       </div>
     </div>
 
-    <!-- CỘT 2: PLAYLIST & TÌM KIẾM -->
+    <!-- CỘT 2: PLAYLIST & BỘ LỌC 2 TẦNG (KỸ NĂNG + DẠNG BÀI CON) -->
     <div class="playlist-card-box">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
         <h4 style="margin: 0; font-size: 15px; font-weight: 900; color: #1E1B4B;">📚 DANH SÁCH BÀI HỌC</h4>
         <span id="playlistCountBadge" style="background: #E5DFD5; font-size: 11px; font-weight: 800; padding: 2px 8px; border-radius: 8px;">0 bài</span>
       </div>
 
-      <!-- Ô TÌM KIẾM BÀI HỌC -->
+      <!-- Ô TÌM KIẾM -->
       <input type="text" id="studioSearchInput" oninput="filterVideosUI()" placeholder="🔍 Tìm theo tên hoặc dạng bài..." class="duo-input" style="padding: 9px 12px; margin-bottom: 10px;">
 
-      <!-- THANH LỌC KỸ NĂNG THEO THỨ TỰ SƯ PHẠM -->
+      <!-- TẦNG 1: LỌC THEO KỸ NĂNG LỚN -->
       <div class="skill-filter-bar">
         <button type="button" class="skill-pill-btn active" onclick="setSkillFilter('all', this)">Tất Cả</button>
-        <button type="button" class="skill-pill-btn" onclick="setSkillFilter('listening', this)">Listening</button>
         <button type="button" class="skill-pill-btn" onclick="setSkillFilter('reading', this)">Reading</button>
+        <button type="button" class="skill-pill-btn" onclick="setSkillFilter('listening', this)">Listening</button>
         <button type="button" class="skill-pill-btn" onclick="setSkillFilter('writing_t1', this)">Writing T1</button>
         <button type="button" class="skill-pill-btn" onclick="setSkillFilter('writing_t2', this)">Writing T2</button>
         <button type="button" class="skill-pill-btn" onclick="setSkillFilter('speaking', this)">Speaking</button>
@@ -522,8 +576,16 @@
         <button type="button" class="skill-pill-btn" onclick="setSkillFilter('vocab', this)">Từ Vựng</button>
       </div>
 
-      <!-- DANH SÁCH BÀI GIẢNG CÓ KÉO THẢ, SỬA, XÓA, THUMBNAIL -->
-      <div id="playlistItemsContainer" style="max-height: 560px; overflow-y: auto; padding-right: 4px;"></div>
+      <!-- TẦNG 2: BỘ LỌC DẠNG BÀI CON (SUB-CATEGORY PILLS TỰ ĐỘNG) -->
+      <div class="sub-filter-scroll-wrapper" id="subFilterWrapper" style="display: none;">
+        <div class="sub-filter-title">
+          <i class="fa-solid fa-layer-group"></i> DẠNG BÀI TRỌNG TÂM:
+        </div>
+        <div class="sub-filter-bar" id="subCategoryFilterBar"></div>
+      </div>
+
+      <!-- DANH SÁCH PLAYLIST BÀI GIẢNG -->
+      <div id="playlistItemsContainer" style="max-height: 520px; overflow-y: auto; padding-right: 4px;"></div>
     </div>
 
   </div>
@@ -538,13 +600,13 @@
   let ytPlayer = null;
   let isYtReady = false;
   let activeSkill = 'all';
+  let activeSubCategory = 'all';
   let currentList = [];
   let currentIndex = 0;
   let progressTimer = null;
   let isAdminUser = false;
   let draggedItemId = null;
 
-  // 1. NHẬN DIỆN ADMIN CHUẨN XÁC
   function checkAdminPrivilege() {
     const params = new URLSearchParams(window.location.search);
     const user = stateManager.getUser();
@@ -564,7 +626,6 @@
     if (d) d.style.display = (d.style.display === 'block') ? 'none' : 'block';
   };
 
-  // 2. KHỞI TẠO YOUTUBE API CHUẨN
   window.onYouTubeIframeAPIReady = () => {
     isYtReady = true;
     initStudio();
@@ -581,15 +642,49 @@
     }
 
     checkAdminPrivilege();
+    renderSubCategoriesUI();
     renderPlaylist();
   }
 
-  // 3. VẼ PLAYLIST BÀI HỌC CÓ THUMBNAIL, TÍCH XANH & NÚT QUẢN TRỊ
+  // TỰ ĐỘNG TẠO HÀNG NÚT DẠNG BÀI CON (SUB-CATEGORY PILLS)
+  function renderSubCategoriesUI() {
+    const wrapper = document.getElementById('subFilterWrapper');
+    const bar = document.getElementById('subCategoryFilterBar');
+    if (!wrapper || !bar) return;
+
+    const subCats = theoryVideoEngine.getSubCategories(activeSkill);
+
+    if (subCats.length <= 1) {
+      wrapper.style.display = 'none';
+      activeSubCategory = 'all';
+      return;
+    }
+
+    wrapper.style.display = 'block';
+    let html = `<button type="button" class="sub-pill-btn ${activeSubCategory === 'all' ? 'active' : ''}" onclick="window.setSubCategoryFilter('all', this)">Tất Cả (${subCats.length} dạng)</button>`;
+    
+    subCats.forEach(cat => {
+      const isAct = activeSubCategory === cat;
+      html += `<button type="button" class="sub-pill-btn ${isAct ? 'active' : ''}" onclick="window.setSubCategoryFilter('${cat.replace(/'/g, "\\'")}', this)">${cat}</button>`;
+    });
+
+    bar.innerHTML = html;
+  }
+
   window.setSkillFilter = (skillKey, btnEl) => {
     activeSkill = skillKey;
+    activeSubCategory = 'all';
     document.querySelectorAll('.skill-pill-btn').forEach(b => b.classList.remove('active'));
     if (btnEl) btnEl.classList.add('active');
+    renderSubCategoriesUI();
     renderPlaylist();
+  };
+
+  window.setSubCategoryFilter = (subCat, btnEl) => {
+    activeSubCategory = subCat;
+    document.querySelectorAll('.sub-pill-btn').forEach(b => b.classList.remove('active'));
+    if (btnEl) btnEl.classList.add('active');
+    renderPlaylist(document.getElementById('studioSearchInput')?.value || '');
   };
 
   window.filterVideosUI = () => {
@@ -598,7 +693,7 @@
   };
 
   function renderPlaylist(searchQ = '') {
-    currentList = theoryVideoEngine.getVideos(activeSkill, searchQ);
+    currentList = theoryVideoEngine.getVideos(activeSkill, activeSubCategory, searchQ, isAdminUser);
     const container = document.getElementById('playlistItemsContainer');
     const badge = document.getElementById('playlistCountBadge');
     if (badge) badge.innerText = `${currentList.length} bài`;
@@ -617,41 +712,42 @@
     currentList.forEach((v, idx) => {
       const isActive = idx === currentIndex;
       const isDone = theoryVideoEngine.isCompleted(v.id);
+      const isDraft = v.isPublished === false;
       const thumbUrl = theoryVideoEngine.getThumbnailUrl(v.youtubeId);
 
       html += `
-        <div class="playlist-item ${isActive ? 'active' : ''}" 
+        <div class="playlist-item ${isActive ? 'active' : ''} ${isDraft ? 'is-draft' : ''}" 
              draggable="${isAdminUser ? 'true' : 'false'}"
              ondragstart="window.handleItemDragStart(event, '${v.id}')"
              ondragover="window.handleItemDragOver(event)"
              ondrop="window.handleItemDrop(event, '${v.id}')"
              onclick="window.playByIndex(${idx})">
           
-          <!-- TÍCH XANH HOÀN THÀNH CHO HỌC SINH -->
           <button type="button" class="btn-mark-done ${isDone ? 'done' : ''}" 
                   onclick="window.handleToggleDone(event, '${v.id}')" 
                   title="${isDone ? 'Đã hoàn thành' : 'Đánh dấu đã học'}">
             ✓
           </button>
 
-          <!-- THUMBNAIL VIDEO TỰ ĐỘNG TỪ YOUTUBE -->
-          <img src="${thumbUrl}" class="playlist-thumb" alt="thumbnail" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'60\\' height=\\'38\\' fill=\\'%23CBD5E1\\'><rect width=\\'100%\\' height=\\'100%\\'/></svg>'">
+          <img src="${thumbUrl}" class="playlist-thumb" alt="thumbnail" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'62\\' height=\\'38\\' fill=\\'%23CBD5E1\\'><rect width=\\'100%\\' height=\\'100%\\'/></svg>'">
 
-          <!-- THÔNG TIN BÀI HỌC -->
           <div style="flex: 1; min-width: 0;">
             <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 2px;">
               <span style="font-size: 10px; font-weight: 900; background: rgba(0,0,0,0.06); padding: 1px 6px; border-radius: 6px; text-transform: uppercase;">
                 ${v.category || 'CHUNG'}
               </span>
               <span style="font-size: 11px; font-weight: 700; color: #64748B;">⏱️ ${v.duration || 'N/A'}</span>
+              ${isDraft ? `<span class="badge-draft-tag">BẢN NHÁP</span>` : ''}
             </div>
             <div style="font-size: 13px; font-weight: 800; color: #1E293B; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
               #${v.order || (idx + 1)}. ${v.title}
             </div>
           </div>
 
-          <!-- NÚT ADMIN: SỬA, XÓA, MŨI TÊN ĐỔI THỨ TỰ (CHỈ HIỆN CHO THẦY) -->
           <div class="admin-item-actions" onclick="event.stopPropagation()">
+            <button type="button" class="btn-item-ctrl btn-item-pub" onclick="window.handleTogglePublish('${v.id}')" title="${isDraft ? 'Bấm để Công khai' : 'Bấm để Chuyển thành Bản nháp'}">
+              ${isDraft ? '🕶️ Ẩn' : '👁️ Hiện'}
+            </button>
             <button type="button" class="btn-item-ctrl" onclick="window.handleMoveOrder('${v.id}', 'up')" title="Đẩy lên">▲</button>
             <button type="button" class="btn-item-ctrl" onclick="window.handleMoveOrder('${v.id}', 'down')" title="Đẩy xuống">▼</button>
             <button type="button" class="btn-item-ctrl btn-item-edit" onclick="window.handleEditVideo('${v.id}')" title="Sửa bài">✏️</button>
@@ -685,7 +781,6 @@
     }
   };
 
-  // 4. BỘ ĐIỀU KHIỂN YOUTUBE PLAYER & GHI NHỚ GIÂY HỌC DỞ
   function loadVideoPlayer(video) {
     if (!video) return;
 
@@ -736,7 +831,6 @@
     }
   }
 
-  // 5. CÁC HÀM CUSTOM CONTROLS TRẠM IELTS
   window.togglePlayPause = () => {
     if (!ytPlayer || !ytPlayer.getPlayerState) return;
     const state = ytPlayer.getPlayerState();
@@ -802,7 +896,6 @@
         document.getElementById('playerProgressBar').value = (cur / dur) * 100;
       }
 
-      // Tự động lưu tiến độ xem dở
       if (currentList[currentIndex]?.id) {
         theoryVideoEngine.saveWatchProgress(currentList[currentIndex].id, cur);
       }
@@ -821,10 +914,15 @@
     renderPlaylist(document.getElementById('studioSearchInput')?.value || '');
   };
 
-  // 6. THAO TÁC QUẢN TRỊ ADMIN (SỬA, XÓA, ĐỔI THỨ TỰ)
+  // ADMIN ACTIONS: ẨN/HIỆN, SỬA, XÓA, ĐỔI THỨ TỰ
+  window.handleTogglePublish = async (videoId) => {
+    await theoryVideoEngine.togglePublishStatus(videoId);
+    renderPlaylist(document.getElementById('studioSearchInput')?.value || '');
+  };
+
   window.handleMoveOrder = async (videoId, direction) => {
     await theoryVideoEngine.moveVideo(videoId, direction);
-    renderPlaylist();
+    renderPlaylist(document.getElementById('studioSearchInput')?.value || '');
   };
 
   window.handleItemDragStart = (e, videoId) => {
@@ -866,8 +964,8 @@
     document.getElementById('adminInputTitle').value = v.title;
     document.getElementById('adminInputUrl').value = v.youtubeUrl;
     document.getElementById('adminInputDesc').value = v.description || '';
+    document.getElementById('adminInputIsPublished').checked = v.isPublished !== false;
 
-    // Cập nhật giao diện Drawer sang chế độ chỉnh sửa
     document.getElementById('adminDrawerHeaderTitle').innerHTML = `<i class="fa-solid fa-pen-to-square"></i> ĐANG CHỈNH SỬA: [${v.title}]`;
     document.getElementById('btnAdminSubmit').innerText = "💾 Cập Nhật Bài Giảng";
     document.getElementById('btnCancelEdit').style.display = "inline-flex";
@@ -885,6 +983,7 @@
     document.getElementById('adminInputTitle').value = '';
     document.getElementById('adminInputUrl').value = '';
     document.getElementById('adminInputDesc').value = '';
+    document.getElementById('adminInputIsPublished').checked = true;
 
     document.getElementById('adminDrawerHeaderTitle').innerHTML = `<i class="fa-solid fa-plus-circle"></i> THÊM BÀI GIẢNG MỚI (TỰ ĐỘNG LỌC ID YOUTUBE)`;
     document.getElementById('btnAdminSubmit').innerText = "💾 Lưu Bài Giảng Ngay";
@@ -895,6 +994,7 @@
     if (confirm(`Thầy có chắc chắn muốn xóa bài giảng: "${videoTitle}" không?`)) {
       await theoryVideoEngine.deleteVideo(videoId);
       if (currentIndex >= theoryVideoEngine.videos.length) currentIndex = 0;
+      renderSubCategoriesUI();
       renderPlaylist();
     }
   };
@@ -908,6 +1008,7 @@
     const title = document.getElementById('adminInputTitle').value;
     const youtubeUrl = document.getElementById('adminInputUrl').value;
     const description = document.getElementById('adminInputDesc').value;
+    const isPublished = document.getElementById('adminInputIsPublished').checked;
 
     if (!title || !youtubeUrl) {
       alert("⚠️ Thầy vui lòng nhập ít nhất Tiêu đề bài học và Link YouTube nhé!");
@@ -923,7 +1024,8 @@
         duration,
         title,
         youtubeUrl,
-        description
+        description,
+        isPublished
       });
 
       const statusEl = document.getElementById('adminSaveStatus');
@@ -933,6 +1035,7 @@
       }
 
       window.cancelAdminEdit();
+      renderSubCategoriesUI();
       renderPlaylist();
     } catch (e) {
       alert("❌ " + e.message);
