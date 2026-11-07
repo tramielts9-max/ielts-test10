@@ -6,6 +6,7 @@
  * - TÍCH HỢP HỆ THỐNG KÉO THẢ MATCHING CHUẨN LISTENING (DRAG & DROP + CLICK-TO-PLACE)
  * - TÍCH HỢP HIGHLIGHT READING KHÔNG GIỚI HẠN & BẢO LƯU KHI CHUYỂN PASSAGE
  * - CƠ CHẾ LÀM TRÒN OVERALL BAND CHUẨN QUY TẮC IDP & BRITISH COUNCIL
+ * - [MỚI] ĐÓNG GÓI 100% DỮ LIỆU BÀI LÀM LÊN GOOGLE DRIVE & HỖ TRỢ ADMIN XEM LẠI TỪ XA
  */
 
 const _WRITING_PREFIX = "AQ.Ab8RN6KGTRGy";
@@ -21,6 +22,8 @@ const _AI_KEY_SEEDS = [
 function getGeminiKey() {
   return _AI_KEY_SEEDS.map(c => String.fromCharCode(c)).join('');
 }
+
+const CLOUD_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyNErQQFdciAQM0k9KUrACtpX7rxKkopjChYAC2Ubwj5MGzFOeekDEGs8C1n7P9cNR6vg/exec";
 
 class DiagnosticFullTestEngine {
   constructor() {
@@ -57,6 +60,7 @@ class DiagnosticFullTestEngine {
     this.isRecording = false;
     this.speechRecognition = null;
     this.isReviewMode = false;
+    this.currentAttemptSnapshot = null;
   }
 
   async init() {
@@ -77,6 +81,13 @@ class DiagnosticFullTestEngine {
 
     this.initSpeechRecognition();
     this.startTimer();
+
+    // Khôi phục Review Mode nếu có attemptId trên URL (Hỗ trợ Admin / Phụ huynh xem từ xa)
+    const attemptId = urlParams.get('attemptId');
+    const emailParam = urlParams.get('email') || '';
+    if (attemptId) {
+      await this.restoreReviewMode(attemptId, emailParam);
+    }
   }
 
   // =========================================================================
@@ -1109,7 +1120,7 @@ XUẤT BÁO CÁO (DƯỚI 200 TỪ):
   }
 
   // =========================================================================
-  // 7. NỘP TOÀN BỘ BÀI THI FULL MOCK TEST
+  // 7. NỘP TOÀN BỘ BÀI THI FULL MOCK TEST & LƯU VÀO GOOGLE DRIVE CLOUD
   // =========================================================================
   async submitFullMockTest() {
     if (!confirm("Em có chắc chắn muốn nộp toàn bộ bài Full Mock Test để xuất Overall Band Score chuẩn và xem lời giải chi tiết từng phần?")) return;
@@ -1299,18 +1310,95 @@ XUẤT BÁO CÁO (DƯỚI 200 TỪ):
       gTotal
     });
 
-    // 9. Gọi AI chấm trực tiếp nếu có bài viết/nói
+    // 9. ĐÓNG GÓI BÀI LÀM LÊN GOOGLE DRIVE CLOUD CHỐNG MẤT DỮ LIỆU
+    const studentEmail = localStorage.getItem('ielts_student_email') || 'guest@gmail.com';
+    const studentName = localStorage.getItem('ielts_student_name') || 'Học viên';
+    const studentId = localStorage.getItem('tram_student_id') || 'TR-FULLTEST';
+
+    const attemptSnapshot = {
+      id: "ft_attempt_" + Date.now(),
+      timestamp: new Date().toLocaleString('vi-VN'),
+      testTitle: `Cambridge 21 Full Mock Test (Set ${this.setNum})`,
+      studentName: studentName,
+      studentEmail: studentEmail,
+      studentId: studentId,
+      score: `Band ${overallBand}`,
+      timeSpent: `${Math.round(this.timerSeconds / 60)} phút`,
+      moduleType: "fulltest",
+      pageUrl: `diagnostic/runner-fulltest.html?set=${this.setNum}`,
+      details: {
+        overallBand,
+        timeSpent: `${Math.round(this.timerSeconds / 60)} phút`,
+        lisBand,
+        lCorrect,
+        readBand,
+        rCorrect,
+        writeBand,
+        spkBand,
+        gScore,
+        gTotal,
+        grammarAnswers: this.userAnswers.grammar || {},
+        listeningAnswers: this.userAnswers.listening || {},
+        readingAnswers: this.userAnswers.reading || {},
+        writingAnswers: {
+          task1: wt1Text,
+          task2: wt2Text
+        },
+        speakingAnswers: {
+          part1: spk1Text,
+          part2: spk2Text,
+          part3: spk3Text
+        },
+        wAiFeedback: "",
+        sAiFeedback: ""
+      }
+    };
+
+    this.currentAttemptSnapshot = attemptSnapshot;
+
+    // Lưu vào Local Storage
+    try {
+      const localHist = JSON.parse(localStorage.getItem('ielts_local_history') || '[]');
+      localHist.unshift(attemptSnapshot);
+      localStorage.setItem('ielts_local_history', JSON.stringify(localHist));
+    } catch(e) {}
+
+    // Bắn gói tin lên máy chủ Google Drive
+    this.syncAttemptToCloud(attemptSnapshot);
+
+    // 10. Gọi AI chấm trực tiếp nếu có bài viết/nói và lưu phản biện vào Cloud
     if (wt1Words > 0 || wt2Words > 0) {
-      this.renderInlineWritingAICard(wt1Text, wt2Text);
+      this.renderInlineWritingAICard(wt1Text, wt2Text).then(feedback => {
+        if (feedback && this.currentAttemptSnapshot) {
+          this.currentAttemptSnapshot.details.wAiFeedback = feedback;
+          this.syncAttemptToCloud(this.currentAttemptSnapshot);
+        }
+      });
     }
     if (spkAllWords > 0) {
-      this.renderInlineSpeakingAICard(spk1Text, spk2Text, spk3Text);
+      this.renderInlineSpeakingAICard(spk1Text, spk2Text, spk3Text).then(feedback => {
+        if (feedback && this.currentAttemptSnapshot) {
+          this.currentAttemptSnapshot.details.sAiFeedback = feedback;
+          this.syncAttemptToCloud(this.currentAttemptSnapshot);
+        }
+      });
     }
 
     if (btn) {
       btn.innerHTML = `✓ ĐÃ NỘP BÀI — ĐANG Ở CHẾ ĐỘ XEM LẠI`;
       btn.style.background = "#059669";
     }
+  }
+
+  // Tiện ích gửi dữ liệu lên Google Drive
+  syncAttemptToCloud(snapshot) {
+    if (!CLOUD_SCRIPT_URL || !snapshot || !snapshot.studentEmail) return;
+    fetch(CLOUD_SCRIPT_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({ action: "save_attempt", attempt: snapshot })
+    }).catch(() => {});
   }
 
   // --- RENDER THANH BANNER NỔI TRÊN ĐẦU FULL TEST ---
@@ -1372,9 +1460,9 @@ XUẤT BÁO CÁO (DƯỚI 200 TỪ):
   }
 
   // --- RENDER AI CHẤM TRỰC TIẾP WRITING TASK 1 & 2 ---
-  async renderInlineWritingAICard(t1, t2) {
+  async renderInlineWritingAICard(t1, t2, preloadedFeedback = null) {
     const secWriting = document.getElementById('section_ft_writing');
-    if (!secWriting) return;
+    if (!secWriting) return "";
 
     let aiCard = document.getElementById('ftInlineWritingAiReport');
     if (!aiCard) {
@@ -1395,8 +1483,14 @@ XUẤT BÁO CÁO (DƯỚI 200 TỪ):
     `;
 
     const streamBox = document.getElementById('ftInlineWritingAiStream');
-    const wKey = getWritingKey();
 
+    if (preloadedFeedback) {
+      if (window.marked && streamBox) streamBox.innerHTML = window.marked.parse(preloadedFeedback);
+      else if (streamBox) streamBox.innerHTML = `<pre style="white-space:pre-wrap; font-family:inherit;">${preloadedFeedback}</pre>`;
+      return preloadedFeedback;
+    }
+
+    const wKey = getWritingKey();
     const promptText = `
 Bạn là Giám khảo Khảo thí IELTS Writing cự phách. Hãy đọc bài viết dưới đây của học sinh và xuất phiếu chấm điểm chi tiết.
 Xưng hô: "Anh" và gọi học viên là "Em".
@@ -1434,15 +1528,17 @@ XUẤT BÁO CÁO THEO ĐÚNG CẤU TRÚC MARKDOWN:
       } else if (streamBox) {
         streamBox.innerHTML = `<pre style="white-space:pre-wrap; font-family:inherit;">${feedback}</pre>`;
       }
+      return feedback;
     } catch(e) {
       if (streamBox) streamBox.innerHTML = `<span style="color:#DC2626;">❌ Không thể kết nối AI: ${e.message}</span>`;
+      return "";
     }
   }
 
   // --- RENDER AI CHẤM TRỰC TIẾP SPEAKING ---
-  async renderInlineSpeakingAICard(s1, s2, s3) {
+  async renderInlineSpeakingAICard(s1, s2, s3, preloadedFeedback = null) {
     const secSpeaking = document.getElementById('section_ft_speaking');
-    if (!secSpeaking) return;
+    if (!secSpeaking) return "";
 
     let aiCard = document.getElementById('ftInlineSpeakingAiReport');
     if (!aiCard) {
@@ -1463,8 +1559,14 @@ XUẤT BÁO CÁO THEO ĐÚNG CẤU TRÚC MARKDOWN:
     `;
 
     const streamBox = document.getElementById('ftInlineSpeakingAiStream');
-    const apiKey = getGeminiKey();
 
+    if (preloadedFeedback) {
+      if (window.marked && streamBox) streamBox.innerHTML = window.marked.parse(preloadedFeedback);
+      else if (streamBox) streamBox.innerHTML = `<pre style="white-space:pre-wrap; font-family:inherit;">${preloadedFeedback}</pre>`;
+      return preloadedFeedback;
+    }
+
+    const apiKey = getGeminiKey();
     const promptText = `
 Bạn là Chuyên gia Khảo thí IELTS Speaking. Hãy nhận xét bài nói dưới đây của học sinh. Xưng hô "Anh" và "Em".
 BẢN KÝ ÂM SPEAKING:
@@ -1492,8 +1594,10 @@ XUẤT BÁO CÁO:
       } else if (streamBox) {
         streamBox.innerHTML = `<pre style="white-space:pre-wrap; font-family:inherit;">${feedback}</pre>`;
       }
+      return feedback;
     } catch(e) {
       if (streamBox) streamBox.innerHTML = `<span style="color:#DC2626;">❌ Không thể kết nối AI: ${e.message}</span>`;
+      return "";
     }
   }
 
@@ -1526,7 +1630,6 @@ XUẤT BÁO CÁO:
     let savedRange = null;
 
     const checkSelection = (e) => {
-      // Nếu click vào thẻ mark đã tô màu -> cho phép xóa trực tiếp
       if (e.target && e.target.classList.contains('ielts-user-highlight')) {
         if (confirm("Em có muốn xóa đoạn bôi vàng này không?")) {
           const markEl = e.target;
@@ -1583,6 +1686,113 @@ XUẤT BÁO CÁO:
       window.getSelection().removeAllRanges();
       savedRange = null;
     };
+  }
+
+  // =========================================================================
+  // 9. REVIEW MODE: KHÔI PHỤC TOÀN DIỆN BÀI THI TỪ LOCALSTORAGE HOẶC CLOUD
+  // =========================================================================
+  async restoreReviewMode(attemptId, emailParam = "") {
+    this.isReviewMode = true;
+    clearInterval(this.timerInterval);
+
+    try {
+      let att = null;
+      const localHist = JSON.parse(localStorage.getItem('ielts_local_history') || '[]');
+      att = localHist.find(a => a.id === attemptId);
+
+      // Kéo từ Google Drive nếu mở trên máy khác
+      if ((!att || !att.details) && (emailParam || CLOUD_SCRIPT_URL)) {
+        const queryEmail = emailParam || localStorage.getItem('ielts_student_email') || '';
+        if (queryEmail) {
+          try {
+            const res = await fetch(CLOUD_SCRIPT_URL, {
+              method: "POST",
+              headers: { "Content-Type": "text/plain;charset=utf-8" },
+              body: JSON.stringify({
+                action: "get_single_attempt",
+                email: queryEmail,
+                attemptId: attemptId
+              })
+            });
+            const cloudData = await res.json();
+            if (cloudData && cloudData.attempt) {
+              att = cloudData.attempt;
+            }
+          } catch(err) {
+            console.warn("Lỗi kéo Full Test từ Cloud:", err);
+          }
+        }
+      }
+
+      if (!att || !att.details) return;
+      const d = att.details;
+
+      // 1. Phục hồi Ngữ pháp
+      if (d.grammarAnswers) {
+        this.userAnswers.grammar = d.grammarAnswers;
+        Object.entries(d.grammarAnswers).forEach(([qid, val]) => {
+          const inp = document.getElementById(`inp_ft_g_${qid}`);
+          if (inp) { inp.value = val; inp.disabled = true; }
+          const rad = document.querySelector(`input[name="ans_ft_g_${qid}"][value="${val}"]`);
+          if (rad) { rad.checked = true; }
+        });
+        this.gradeGrammarSection(false);
+      }
+
+      // 2. Phục hồi Listening
+      if (d.listeningAnswers) {
+        this.userAnswers.listening = d.listeningAnswers;
+        this.switchLisPart(0);
+      }
+
+      // 3. Phục hồi Reading
+      if (d.readingAnswers) {
+        this.userAnswers.reading = d.readingAnswers;
+        this.switchReadPassage(0);
+      }
+
+      // 4. Phục hồi Writing
+      if (d.writingAnswers) {
+        const t1 = document.getElementById('ft_writing_task1');
+        const t2 = document.getElementById('ft_writing_task2');
+        if (t1 && d.writingAnswers.task1) { t1.value = d.writingAnswers.task1; t1.disabled = true; }
+        if (t2 && d.writingAnswers.task2) { t2.value = d.writingAnswers.task2; t2.disabled = true; }
+        if (d.writingAnswers.task1 || d.writingAnswers.task2) {
+          this.renderInlineWritingAICard(d.writingAnswers.task1 || '', d.writingAnswers.task2 || '', d.wAiFeedback);
+        }
+      }
+
+      // 5. Phục hồi Speaking
+      if (d.speakingAnswers) {
+        const s1 = document.getElementById('ft_spk_part1');
+        const s2 = document.getElementById('ft_spk_part2');
+        const s3 = document.getElementById('ft_spk_part3');
+        if (s1 && d.speakingAnswers.part1) { s1.value = d.speakingAnswers.part1; s1.disabled = true; }
+        if (s2 && d.speakingAnswers.part2) { s2.value = d.speakingAnswers.part2; s2.disabled = true; }
+        if (s3 && d.speakingAnswers.part3) { s3.value = d.speakingAnswers.part3; s3.disabled = true; }
+        if (d.speakingAnswers.part1 || d.speakingAnswers.part2 || d.speakingAnswers.part3) {
+          this.renderInlineSpeakingAICard(d.speakingAnswers.part1 || '', d.speakingAnswers.part2 || '', d.speakingAnswers.part3 || '', d.sAiFeedback);
+        }
+      }
+
+      // Vẽ Banner kết quả
+      this.renderInPlaceResultBanner({
+        overallBand: d.overallBand || att.score.replace('Band ', '').trim(),
+        timeSpent: att.timeSpent || '180 phút',
+        lisBand: d.lisBand || '0.0',
+        lCorrect: d.lCorrect || 0,
+        readBand: d.readBand || '0.0',
+        rCorrect: d.rCorrect || 0,
+        writeBand: d.writeBand || '0.0',
+        spkBand: d.spkBand || '0.0',
+        gScore: d.gScore || 0,
+        gTotal: d.gTotal || 100
+      });
+
+      document.getElementById('btnSubmitFullMockTest')?.remove();
+    } catch(e) {
+      console.warn("Lỗi khôi phục Full Mock Test:", e);
+    }
   }
 }
 
