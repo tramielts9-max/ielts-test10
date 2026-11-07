@@ -1,7 +1,7 @@
 /**
  * js/theory-video-engine.js - HẠ TẦNG QUẢN LÝ VIDEO LÝ THUYẾT & CHIẾN THUẬT IELTS MASTER
  * Tích hợp 20 bài giảng Reading Cambridge thực tế của Thầy Phúc
- * Hỗ trợ Bộ lọc Dạng bài con (Sub-Category), Chế độ Bản nháp/Công khai, Kéo thả & Sắp xếp chuẩn sư phạm
+ * Hỗ trợ Bộ lọc Dạng bài con (Sub-Category), Quản lý Category 2 chiều, Chuyển dạng bài đơn & hàng loạt
  */
 
 import { CONFIG } from './config.js';
@@ -9,6 +9,7 @@ import { CONFIG } from './config.js';
 const THEORY_STORAGE_KEY = 'tram_theory_videos_data';
 const COMPLETED_STORAGE_KEY = 'tram_theory_completed_vids';
 const WATCH_PROGRESS_KEY = 'tram_theory_watch_progress';
+const CATEGORY_ORDER_KEY = 'tram_theory_category_order';
 
 // THỨ TỰ ƯU TIÊN SƯ PHẠM CHO TAB TẤT CẢ
 const SKILL_PRIORITY = {
@@ -26,7 +27,7 @@ const SKILL_PRIORITY = {
   'vocab': 12
 };
 
-// 20 BÀI GIẢNG READING CAMBRIDGE THỰC TẾ CHUẨN MỰC TỪ THẦY PHÚC
+// 20 BÀI GIẢNG READING CAMBRIDGE GỐC CỦA THẦY PHÚC
 const REAL_DEFAULT_VIDEOS = [
   {
     "id": "vid_1793938556045",
@@ -280,16 +281,32 @@ const REAL_DEFAULT_VIDEOS = [
 class TheoryVideoEngine {
   constructor() {
     this.videos = this.loadLocalVideos();
+    this.categoryOrders = this.loadCategoryOrders();
     this.syncFromCloud();
   }
 
-  // Chuẩn hóa tên Dạng bài (Xóa khoảng trắng thừa giữa dấu gạch chéo)
+  // Chuẩn hóa tên Dạng bài
   normalizeCategory(cat = '') {
     if (!cat) return 'CHUNG';
     return cat.trim().replace(/\s*\/\s*/g, '/').toUpperCase();
   }
 
-  // 1. Tải dữ liệu từ LocalStorage (Ưu tiên dữ liệu Thầy đã nhập)
+  loadCategoryOrders() {
+    try {
+      const raw = localStorage.getItem(CATEGORY_ORDER_KEY);
+      return raw ? JSON.parse(raw) : {};
+    } catch (e) {
+      return {};
+    }
+  }
+
+  saveCategoryOrders(orders) {
+    try {
+      this.categoryOrders = orders;
+      localStorage.setItem(CATEGORY_ORDER_KEY, JSON.stringify(orders));
+    } catch (e) {}
+  }
+
   loadLocalVideos() {
     try {
       const raw = localStorage.getItem(THEORY_STORAGE_KEY);
@@ -333,26 +350,46 @@ class TheoryVideoEngine {
     return `https://img.youtube.com/vi/${youtubeId}/mqdefault.jpg`;
   }
 
-  // LẤY DANH SÁCH DẠNG BÀI CON (SUB-CATEGORIES) TỰ ĐỘNG THEO KỸ NĂNG
-  getSubCategories(skillKey = 'all') {
+  // LẤY DANH SÁCH DẠNG BÀI KÈM SỐ ĐẾM BÀI HỌC VÀ THỨ TỰ SẮP XẾP
+  getSubCategories(skillKey = 'all', isAdmin = false) {
     let list = this.videos;
+    if (!isAdmin) {
+      list = list.filter(v => v.isPublished !== false);
+    }
     if (skillKey && skillKey !== 'all') {
       list = list.filter(v => v.skillKey === skillKey);
     }
 
-    const set = new Set();
+    const counts = {};
     list.forEach(v => {
       const cat = this.normalizeCategory(v.category);
-      if (cat) set.add(cat);
+      counts[cat] = (counts[cat] || 0) + 1;
     });
-    return Array.from(set);
+
+    let cats = Object.keys(counts);
+
+    // Áp dụng thứ tự sắp xếp dạng bài đã lưu
+    const savedOrder = this.categoryOrders[skillKey] || [];
+    if (savedOrder.length > 0) {
+      cats.sort((a, b) => {
+        let idxA = savedOrder.indexOf(a);
+        let idxB = savedOrder.indexOf(b);
+        if (idxA === -1) idxA = 999;
+        if (idxB === -1) idxB = 999;
+        return idxA - idxB;
+      });
+    }
+
+    return cats.map(name => ({
+      name,
+      count: counts[name]
+    }));
   }
 
   // LỌC VIDEO KÈM SUB-CATEGORY & PHÂN QUYỀN BẢN NHÁP
   getVideos(skillKey = 'all', subCategory = 'all', searchQuery = '', isAdmin = false) {
     let list = [...this.videos];
 
-    // Học sinh chỉ xem bài công khai (isPublished !== false)
     if (!isAdmin) {
       list = list.filter(v => v.isPublished !== false);
     }
@@ -375,7 +412,6 @@ class TheoryVideoEngine {
       );
     }
 
-    // Sắp xếp thứ tự ưu tiên: Kỹ năng ➔ Thứ tự Order
     list.sort((a, b) => {
       if (skillKey === 'all') {
         const pA = SKILL_PRIORITY[a.skillKey] || 99;
@@ -388,7 +424,105 @@ class TheoryVideoEngine {
     return list;
   }
 
-  // BẬT / TẮT TRẠNG THÁI BẢN NHÁP (1-CLICK DÀNH CHO ADMIN)
+  // DI CHUYỂN DẠNG BÀI CHO 1 VIDEO
+  async moveVideoCategory(videoId, newCategory) {
+    const v = this.videos.find(item => item.id === videoId);
+    if (!v) return;
+    v.category = this.normalizeCategory(newCategory);
+    v.updatedAt = new Date().toISOString();
+    this.saveLocalVideos(this.videos);
+    await this.syncToCloud();
+    return true;
+  }
+
+  // DI CHUYỂN DẠNG BÀI HÀNG LOẠT (BATCH MOVE)
+  async batchMoveCategory(videoIds = [], newCategory) {
+    if (!videoIds.length || !newCategory) return;
+    const targetCat = this.normalizeCategory(newCategory);
+    let changed = false;
+
+    this.videos.forEach(v => {
+      if (videoIds.includes(v.id)) {
+        v.category = targetCat;
+        v.updatedAt = new Date().toISOString();
+        changed = true;
+      }
+    });
+
+    if (changed) {
+      this.saveLocalVideos(this.videos);
+      await this.syncToCloud();
+    }
+    return true;
+  }
+
+  // ĐỔI TÊN DẠNG BÀI TOÀN HỆ THỐNG (RENAME CATEGORY)
+  async renameCategory(skillKey, oldName, newName) {
+    if (!oldName || !newName) return;
+    const normOld = this.normalizeCategory(oldName);
+    const normNew = this.normalizeCategory(newName);
+    if (normOld === normNew) return;
+
+    this.videos.forEach(v => {
+      if ((skillKey === 'all' || v.skillKey === skillKey) && this.normalizeCategory(v.category) === normOld) {
+        v.category = normNew;
+        v.updatedAt = new Date().toISOString();
+      }
+    });
+
+    // Cập nhật mảng thứ tự
+    if (this.categoryOrders[skillKey]) {
+      this.categoryOrders[skillKey] = this.categoryOrders[skillKey].map(c => c === normOld ? normNew : c);
+      this.saveCategoryOrders(this.categoryOrders);
+    }
+
+    this.saveLocalVideos(this.videos);
+    await this.syncToCloud();
+    return true;
+  }
+
+  // XÓA DẠNG BÀI (CHUYỂN TOÀN BỘ BÀI SANG DẠNG MẶC ĐỊNH HOẶC CHUNG)
+  async deleteCategory(skillKey, catName, fallbackCat = 'CHUNG') {
+    if (!catName) return;
+    const normCat = this.normalizeCategory(catName);
+    const targetFallback = this.normalizeCategory(fallbackCat);
+
+    this.videos.forEach(v => {
+      if ((skillKey === 'all' || v.skillKey === skillKey) && this.normalizeCategory(v.category) === normCat) {
+        v.category = targetFallback;
+        v.updatedAt = new Date().toISOString();
+      }
+    });
+
+    if (this.categoryOrders[skillKey]) {
+      this.categoryOrders[skillKey] = this.categoryOrders[skillKey].filter(c => c !== normCat);
+      this.saveCategoryOrders(this.categoryOrders);
+    }
+
+    this.saveLocalVideos(this.videos);
+    await this.syncToCloud();
+    return true;
+  }
+
+  // SẮP XẾP THỨ TỰ HIỂN THỊ CÁC NÚT DẠNG BÀI
+  async moveCategoryOrder(skillKey, catName, direction) {
+    const list = this.getSubCategories(skillKey, true).map(c => c.name);
+    const idx = list.indexOf(catName);
+    if (idx === -1) return;
+
+    const targetIdx = direction === 'up' ? idx - 1 : idx + 1;
+    if (targetIdx < 0 || targetIdx >= list.length) return;
+
+    const temp = list[idx];
+    list[idx] = list[targetIdx];
+    list[targetIdx] = temp;
+
+    const orders = { ...this.categoryOrders };
+    orders[skillKey] = list;
+    this.saveCategoryOrders(orders);
+    return list;
+  }
+
   async togglePublishStatus(videoId) {
     const v = this.videos.find(item => item.id === videoId);
     if (!v) return;
@@ -468,7 +602,6 @@ class TheoryVideoEngine {
     await this.syncToCloud();
   }
 
-  // TÍCH XANH HOÀN THÀNH
   isCompleted(videoId) {
     try {
       const arr = JSON.parse(localStorage.getItem(COMPLETED_STORAGE_KEY) || '[]');
@@ -486,7 +619,6 @@ class TheoryVideoEngine {
     } catch (e) { return false; }
   }
 
-  // GHI NHỚ GIÂY HỌC DỞ
   saveWatchProgress(videoId, seconds) {
     if (!videoId || seconds < 5) return;
     try {
