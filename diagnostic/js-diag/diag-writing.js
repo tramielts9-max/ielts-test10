@@ -1,11 +1,11 @@
 /**
  * diagnostic/js-diag/diag-writing.js
  * BỘ ĐIỀU KHIỂN WRITING KHẢO THÍ CHUYÊN BIỆT (TEST 1, TEST 2, TEST 3)
- * BẢN FULL ĐẦY ĐỦ 100% - BẢO TOÀN TẤT CẢ TÍNH NĂNG GỐC + TÍCH HỢP CHUẨN RUBRIC AI
+ * BẢN FULL ĐẦY ĐỦ 100% - KHÔNG CẮT BỚT BẤT KỲ TÍNH NĂNG NÀO
  * - RENDER BIỂU ĐỒ TASK 1, BRAINSTORM TIẾNG VIỆT, TỪ KHÓA, PEEL BODY
- * - ĐẾM TỪ REALTIME, LIGHTBOX PHÓNG TO ẢNH BIỂU ĐỒ
- * - CHẤM ĐIỂM CHUẨN 4 TIÊU CHÍ (TA/TR, CC, LR, GRA) TỪ 0.0 ĐẾN 9.0 QUA DIAG-AI.JS
- * - REVIEW MODE TRỰC TIẾP TRÊN GIAO DIỆN (INLINE AI GRADING)
+ * - ĐẾM TỪ REALTIME CẢNH BÁO MÀU ĐẠT CHUẨN (150 TỪ TASK 1 / 250 TỪ TASK 2)
+ * - PHÒNG NGỰ BỎ TRỐNG BÀI: 0 TỪ ➔ TRẢ THẲNG BAND 0.0 KHÔNG GỌI AI
+ * - LIGHTBOX PHÓNG TO ẢNH BIỂU ĐỒ & INLINE AI GRADING THEO RUBRIC
  */
 
 import { diagAIService } from './diag-ai.js';
@@ -24,7 +24,7 @@ export class DiagWritingEngine {
   // =========================================================================
   async loadTestFromJson(jsonUrl) {
     try {
-      const res = await fetch(jsonUrl);
+      const res = await fetch(`${jsonUrl}?t=${Date.now()}`);
       if (!res.ok) throw new Error(`HTTP ${res.status}: Không thể tải ${jsonUrl}`);
       this.data = await res.json();
 
@@ -35,6 +35,7 @@ export class DiagWritingEngine {
       };
 
       this.userAnswers = {};
+      this.isReviewMode = false;
       return true;
     } catch (err) {
       console.warn("[DiagWritingEngine] Không thể nạp JSON Writing ngoài:", err);
@@ -194,8 +195,8 @@ export class DiagWritingEngine {
                           class="diag-textarea" 
                           style="height:90px;" 
                           placeholder="${sec.placeholder}" 
-                          oninput="window.diagWritingEngine.handleTextareaInput('${sec.id}', 'count_${sec.id}')"></textarea>
-                <div style="text-align:right; font-size:12px; font-weight:800; color:#64748B; margin-top:2px;" id="count_${sec.id}">0 từ</div>
+                          oninput="window.diagWritingEngine.handleTextareaInput('${sec.id}', 'count_${sec.id}', 80)"></textarea>
+                <div style="text-align:right; font-size:12px; font-weight:800; color:#D97706; margin-top:2px;" id="count_${sec.id}">0 từ</div>
               </div>
             `).join('')}
           ` : `
@@ -206,8 +207,8 @@ export class DiagWritingEngine {
                       class="diag-textarea" 
                       style="height:80px;" 
                       placeholder="${t1.stage2?.placeholder || 'Viết 1 câu Overview hoàn chỉnh bằng tiếng Anh tại đây...'}" 
-                      oninput="window.diagWritingEngine.handleTextareaInput('diag_wt1_input', 'wt1WordCount')"></textarea>
-            <div style="text-align:right; font-size:12px; font-weight:800; color:#64748B; margin-top:4px;" id="wt1WordCount">0 từ</div>
+                      oninput="window.diagWritingEngine.handleTextareaInput('diag_wt1_input', 'wt1WordCount', 20)"></textarea>
+            <div style="text-align:right; font-size:12px; font-weight:800; color:#D97706; margin-top:4px;" id="wt1WordCount">0 từ</div>
           `}
         </div>
 
@@ -306,8 +307,8 @@ export class DiagWritingEngine {
                         class="diag-textarea" 
                         style="height:85px;" 
                         placeholder="${sec.placeholder || 'Viết tiếng Anh tại đây...'}" 
-                        oninput="window.diagWritingEngine.handleTextareaInput('${sec.id || `diag_wt2_part_${idx + 1}`}', 'count_wt2_${idx + 1}')"></textarea>
-              <div style="text-align:right; font-size:12px; font-weight:800; color:#64748B; margin-top:2px;" id="count_wt2_${idx + 1}">0 từ</div>
+                        oninput="window.diagWritingEngine.handleTextareaInput('${sec.id || `diag_wt2_part_${idx + 1}`}', 'count_wt2_${idx + 1}', 60)"></textarea>
+              <div style="text-align:right; font-size:12px; font-weight:800; color:#D97706; margin-top:2px;" id="count_wt2_${idx + 1}">0 từ</div>
             </div>
           `).join('')}
         </div>
@@ -317,9 +318,9 @@ export class DiagWritingEngine {
   }
 
   // =========================================================================
-  // 5. CÁC HÀM XỬ LÝ SỰ KIỆN: ĐẾM TỪ, LƯU TRỮ VÀ PHÓNG TO ẢNH
+  // 5. CÁC HÀM XỬ LÝ SỰ KIỆN: ĐẾM TỪ CẢNH BÁO MÀU, LƯU TRỮ VÀ PHÓNG TO ẢNH
   // =========================================================================
-  handleTextareaInput(textareaId, counterId) {
+  handleTextareaInput(textareaId, counterId, minWords = 0) {
     if (this.isReviewMode) return;
     const el = document.getElementById(textareaId);
     if (!el) return;
@@ -330,7 +331,18 @@ export class DiagWritingEngine {
     const words = val.length === 0 ? 0 : val.split(/\s+/).filter(Boolean).length;
     const counterEl = document.getElementById(counterId);
     if (counterEl) {
-      counterEl.innerText = `${words} từ`;
+      if (minWords > 0) {
+        if (words >= minWords) {
+          counterEl.style.color = "#059669";
+          counterEl.innerText = `✓ ${words} từ (Đã đạt chuẩn)`;
+        } else {
+          counterEl.style.color = "#D97706";
+          counterEl.innerText = `⚠️ ${words} từ (Cần tối thiểu ${minWords} từ)`;
+        }
+      } else {
+        counterEl.style.color = "#64748B";
+        counterEl.innerText = `${words} từ`;
+      }
     }
   }
 
@@ -344,7 +356,7 @@ export class DiagWritingEngine {
       const el = document.getElementById(fieldId);
       if (el) {
         el.value = val;
-        const counterMatch = document.getElementById(`count_${fieldId}`);
+        const counterMatch = document.getElementById(`count_${fieldId}`) || document.getElementById('wt1WordCount');
         if (counterMatch) {
           const words = val.trim().length === 0 ? 0 : val.trim().split(/\s+/).filter(Boolean).length;
           counterMatch.innerText = `${words} từ`;
@@ -398,6 +410,25 @@ export class DiagWritingEngine {
     const sub = this.getWritingSubmissionData();
     const mount = document.getElementById('inlineWritingAiMount');
     if (!mount) return { overallBand: "0.0" };
+
+    const t1Words = sub.task1Text ? sub.task1Text.split(/\s+/).filter(Boolean).length : 0;
+    const t2Words = sub.task2Text ? sub.task2Text.split(/\s+/).filter(Boolean).length : 0;
+    const totalWords = t1Words + t2Words;
+
+    // PHÒNG NGỰ: NẾU THÍ SINH HOÀN TOÀN BỎ TRỐNG ➔ TRẢ BAND 0.0 KHÔNG GỌI AI
+    if (totalWords === 0) {
+      mount.innerHTML = `
+        <div style="background:#FEF2F2; border:2.5px solid #EF4444; border-radius:18px; padding:20px; margin-top:24px;">
+          <h4 style="color:#991B1B; margin:0 0 6px 0; font-size:16px; font-weight:900;">
+            ✍️ PHIẾU CHẤM ĐIỂM WRITING: BAND 0.0
+          </h4>
+          <p style="margin:0; font-size:13.5px; color:#7F1D1D; font-weight:700;">
+            Học viên không thực hiện bài viết này (Does not attempt the task in any way).
+          </p>
+        </div>
+      `;
+      return { overallBand: "0.0" };
+    }
 
     mount.innerHTML = `
       <div style="background:#FFFFFF; border:3px solid #2563EB; border-radius:18px; padding:22px; margin-top:24px; box-shadow:0 8px 24px rgba(37, 99, 235, 0.12);">
