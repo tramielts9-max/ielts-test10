@@ -1,7 +1,10 @@
 /**
  * diagnostic/js-diag/diag-engine.js
  * BỘ MÁY ĐIỀU PHỐI KHẢO THÍ CHẨN ĐOÁN THÍCH ỨNG MASTER (TEST 1, 2, 3 & 3 SET XOAY TUA)
- * BẢN FULL ĐẦY ĐỦ 100% - KHÔNG XÓA MÀN HÌNH KHI NỘP BÀI - AI CHẤM TRỰC TIẾP TRÊN GIAO DIỆN
+ * BẢN FULL ĐẦY ĐỦ 100% - KHÔNG CẮT BỚT BẤT KỲ DÒNG NÀO
+ * - XÓA BỎ TOÀN BỘ ĐIỂM SÀN ẢO 4.5 WRITING & SPEAKING
+ * - BỎ TRỐNG BÀI ➔ TRẢ THẲNG BAND 0.0 THEO ĐÚNG CHUẨN KHẢO THÍ
+ * - IN-PLACE REVIEW & INLINE AI GRADING TRỰC TIẾP TRÊN GIAO DIỆN
  */
 
 import { diagGrammarEngine } from './diag-grammar.js';
@@ -76,7 +79,7 @@ class DiagnosticEngineMaster {
     // 1. Nạp Ngữ pháp
     await this.initGrammarFromJson();
 
-    // 2. Nạp Listening (cho cả Test 1, 2, 3 không bị chặn)
+    // 2. Nạp Listening
     await this.initListeningFromJson();
 
     // 3. Nạp Reading
@@ -140,7 +143,7 @@ class DiagnosticEngineMaster {
     }
   }
 
-  // --- CHUYỂN TAB VÀ TIMER (HOẠT ĐỘNG CẢ TRONG LÚC THI VÀ KHI XEM LẠI) ---
+  // --- CHUYỂN TAB VÀ TIMER ---
   switchSection(skillKey) {
     ['grammar', 'listening', 'reading', 'writing', 'speaking'].forEach(s => {
       const tab = document.getElementById(`tabNav_${s}`);
@@ -203,9 +206,16 @@ class DiagnosticEngineMaster {
     }
   }
 
+  // Tiện ích đếm từ phòng ngự
+  countWords(str) {
+    if (!str || typeof str !== 'string') return 0;
+    const cleaned = str.replace(/[\r\n\t]+/g, ' ').replace(/[^\p{L}\p{N}\s]/gu, '').trim();
+    if (!cleaned) return 0;
+    return cleaned.split(/\s+/).filter(Boolean).length;
+  }
+
   // =========================================================================
-  // 4. CHẤM BÀI TRỰC TIẾP TRÊN GIAO DIỆN (IN-PLACE REVIEW & INLINE AI GRADING)
-  // TUYỆT ĐỐI KHÔNG XÓA DOM - GIỮ NGUYÊN 5 TAB ĐỂ HỌC SINH XEM LẠI TỪNG CÂU
+  // 4. CHẤM BÀI TRỰC TIẾP TRÊN GIAO DIỆN (XÓA SÀN ĐIỂM ẢO 4.5/5.5)
   // =========================================================================
   async submitFullExam() {
     if (!confirm("Em có chắc chắn muốn nộp bài thi để hệ thống phân tích câu chữ và AI chấm điểm trực tiếp trên bài làm không?")) {
@@ -244,18 +254,64 @@ class DiagnosticEngineMaster {
     if (spk1Inp) spk1Inp.disabled = true;
     if (spk2Inp) spk2Inp.disabled = true;
 
-    // 5. Tính toán sơ bộ Band điểm
-    let writingBand = (wt1Text.length > 50 && wt2Text.length > 80) ? 6.0 : 4.5;
-    let speakingBand = (spk1Text.length > 30 || spk2Text.length > 30) ? 5.5 : 4.5;
+    // 5. TÍNH TOÁN BAND ĐIỂM CHUẨN XÁC TUYỆT ĐỐI (XÓA SÀN ẢO)
+    const wt1Words = this.countWords(wt1Text);
+    const wt2Words = this.countWords(wt2Text);
+    const totalWritingWords = wt1Words + wt2Words;
 
+    let writingBand = 0.0;
+    if (totalWritingWords === 0) {
+      writingBand = 0.0; // Bỏ trống = Band 0.0
+    } else if (totalWritingWords < 15) {
+      writingBand = 1.0;
+    } else if (totalWritingWords < 35) {
+      writingBand = 2.5;
+    } else if (totalWritingWords < 70) {
+      writingBand = 3.5;
+    } else if (totalWritingWords < 130) {
+      writingBand = 4.5;
+    } else if (totalWritingWords < 200) {
+      writingBand = 5.5;
+    } else {
+      writingBand = 6.0;
+    }
+
+    const spk1Words = this.countWords(spk1Text);
+    const spk2Words = this.countWords(spk2Text);
+    const totalSpeakingWords = spk1Words + spk2Words;
+
+    let speakingBand = 0.0;
+    if (totalSpeakingWords === 0) {
+      speakingBand = 0.0; // Bỏ trống = Band 0.0
+    } else if (totalSpeakingWords < 10) {
+      speakingBand = 1.5;
+    } else if (totalSpeakingWords < 25) {
+      speakingBand = 2.5;
+    } else if (totalSpeakingWords < 50) {
+      speakingBand = 3.5;
+    } else if (totalSpeakingWords < 100) {
+      speakingBand = 4.5;
+    } else {
+      speakingBand = 5.5;
+    }
+
+    // Tỉ lệ phần trăm các môn
     const lisRatio = lisEval.total > 0 ? (lisEval.score / lisEval.total) : 0;
     const gRatio = grammarResult.total > 0 ? (grammarResult.score / grammarResult.total) : 0;
     const rRatio = readingResult.total > 0 ? (readingResult.score / readingResult.total) : 0;
     const overallScore = Math.round((gRatio * 25) + (lisRatio * 25) + (rRatio * 25) + ((writingBand / 9) * 25));
 
-    let estimatedBand = "4.5";
+    // ĐỊNH VỊ BAND CHẨN ĐOÁN
+    let estimatedBand = "0.0";
     let bandReason = "";
-    if (overallScore < 35) {
+
+    if (overallScore === 0) {
+      estimatedBand = "0.0";
+      bandReason = "Em chưa làm các câu hỏi trong bài khảo sát. Hãy quay lại làm bài để hệ thống phân tích năng lực chính xác.";
+    } else if (overallScore < 20) {
+      estimatedBand = "1.0 - 2.5";
+      bandReason = "Mức độ nhận diện ngôn ngữ ở giai đoạn bắt đầu (Pre-A1). Cần xây nền từ vựng sinh hoạt cơ bản và phát âm ngữ âm.";
+    } else if (overallScore < 38) {
       estimatedBand = "3.0 - 3.5";
       bandReason = "Hổng kiến thức thì cơ bản và từ vựng nhận diện. Cần tập trung xây gốc Ngữ pháp & Dictation nghe bắt âm A1/A2.";
     } else if (overallScore < 55) {
@@ -269,7 +325,7 @@ class DiagnosticEngineMaster {
       bandReason = "Phản xạ nhanh, phân biệt rõ căn cứ bài đọc và tránh được bẫy suy diễn. Sẵn sàng bứt phá các dạng đề chuyên sâu.";
     }
 
-    // 6. KÍCH HOẠT CHẾ ĐỘ XEM LẠI TRÊN CẢ 3 BỘ MÁY
+    // 6. KÍCH HOẠT CHẾ ĐỘ XEM LẠI TRÊN CẢ 4 BỘ MÁY
     diagGrammarEngine.renderReviewMode(grammarResult);
     diagListeningEngine.renderReviewMode(lisEval);
     diagReadingEngine.renderReviewMode(readingResult);
@@ -277,26 +333,26 @@ class DiagnosticEngineMaster {
       diagWritingEngine.renderReviewMode(writingSubData.answersSnapshot || {});
     }
 
-    // 7. HIỂN THỊ THANH BANNER KẾT QUẢ NỔI TRÊN ĐẦU TRANG (KHÔNG PHÁ GIAO DIỆN)
+    // 7. HIỂN THỊ THANH BANNER KẾT QUẢ NỔI TRÊN ĐẦU TRANG
     this.renderInPlaceResultBanner({
       overallBand: `Band ${estimatedBand}`,
       overallScore: `${overallScore}/100`,
       gScore: `${grammarResult.score}/${grammarResult.total}`,
       lScore: `${lisEval.score}/${lisEval.total}`,
       rScore: `${readingResult.score}/${readingResult.total}`,
-      wBand: `Band ${writingBand}`,
-      sBand: `Band ${speakingBand}`,
+      wBand: `Band ${writingBand.toFixed(1)}`,
+      sBand: `Band ${speakingBand.toFixed(1)}`,
       bandReason: bandReason,
       timeSpent: `${Math.round(this.timerSeconds / 60)} phút`
     });
 
-    // 8. GỌI AI GEMINI CHẤM INLINE TRỰC TIẾP DƯỚI BÀI VIẾT (TAB WRITING)
-    this.renderInlineWritingAICard(wt1Text, wt2Text);
+    // 8. GỌI AI CHẤM TRỰC TIẾP DƯỚI BÀI VIẾT (CHỈ GỌI KHI CÓ BÀI LÀM)
+    this.renderInlineWritingAICard(wt1Text, wt2Text, totalWritingWords);
 
-    // 9. GỌI AI GEMINI CHẤM INLINE TRỰC TIẾP DƯỚI BÀI NÓI (TAB SPEAKING)
-    this.renderInlineSpeakingAICard(spk1Text, spk2Text);
+    // 9. GỌI AI CHẤM TRỰC TIẾP DƯỚI BÀI NÓI (CHỈ GỌI KHI CÓ BÀI NÓI)
+    this.renderInlineSpeakingAICard(spk1Text, spk2Text, totalSpeakingWords);
 
-    // 10. Lưu lịch sử
+    // 10. Lưu lịch sử làm bài
     const attemptSnapshot = {
       id: "diag_attempt_" + Date.now(),
       timestamp: new Date().toLocaleString('vi-VN'),
@@ -314,8 +370,8 @@ class DiagnosticEngineMaster {
       localHist.unshift(attemptSnapshot);
       localStorage.setItem('ielts_local_history', JSON.stringify(localHist));
 
-      if (this.testId === 'test_01') localStorage.setItem('diag_unlocked_test2', 'true');
-      if (this.testId === 'test_02') localStorage.setItem('diag_unlocked_test3', 'true');
+      if (this.testId === 'test_01' && overallScore >= 40) localStorage.setItem('diag_unlocked_test2', 'true');
+      if (this.testId === 'test_02' && overallScore >= 55) localStorage.setItem('diag_unlocked_test3', 'true');
     } catch(e) {}
 
     fetch(CLOUD_SCRIPT_URL, {
@@ -393,7 +449,7 @@ class DiagnosticEngineMaster {
   }
 
   // --- RENDER AI CHẤM TRỰC TIẾP DƯỚI BÀI VIẾT (TAB WRITING) ---
-  async renderInlineWritingAICard(t1, t2) {
+  async renderInlineWritingAICard(t1, t2, totalWords = 0) {
     const secWriting = document.getElementById('section_writing');
     if (!secWriting) return;
 
@@ -402,6 +458,20 @@ class DiagnosticEngineMaster {
       aiCard = document.createElement('div');
       aiCard.id = 'inlineWritingAiReport';
       secWriting.appendChild(aiCard);
+    }
+
+    if (totalWords === 0) {
+      aiCard.innerHTML = `
+        <div style="background:#FEF2F2; border:2.5px solid #EF4444; border-radius:18px; padding:18px; margin-top:20px;">
+          <h4 style="color:#991B1B; margin:0 0 6px 0; font-size:16px; font-weight:900;">
+            ✍️ PHẦN THI WRITING: BAND 0.0
+          </h4>
+          <p style="margin:0; font-size:13.5px; color:#7F1D1D; font-weight:700;">
+            Học viên không thực hiện bài viết này (Does not attempt the task in any way).
+          </p>
+        </div>
+      `;
+      return;
     }
 
     aiCard.innerHTML = `
@@ -454,7 +524,7 @@ XUẤT BÁO CÁO THEO ĐÚNG CẤU TRÚC MARKDOWN:
   }
 
   // --- RENDER AI CHẤM TRỰC TIẾP DƯỚI BÀI NÓI (TAB SPEAKING) ---
-  async renderInlineSpeakingAICard(s1, s2) {
+  async renderInlineSpeakingAICard(s1, s2, totalWords = 0) {
     const secSpeaking = document.getElementById('section_speaking');
     if (!secSpeaking) return;
 
@@ -463,6 +533,20 @@ XUẤT BÁO CÁO THEO ĐÚNG CẤU TRÚC MARKDOWN:
       aiCard = document.createElement('div');
       aiCard.id = 'inlineSpeakingAiReport';
       secSpeaking.appendChild(aiCard);
+    }
+
+    if (totalWords === 0) {
+      aiCard.innerHTML = `
+        <div style="background:#FEF2F2; border:2.5px solid #EF4444; border-radius:18px; padding:18px; margin-top:20px;">
+          <h4 style="color:#991B1B; margin:0 0 6px 0; font-size:16px; font-weight:900;">
+            🎤 PHẦN THI SPEAKING: BAND 0.0
+          </h4>
+          <p style="margin:0; font-size:13.5px; color:#7F1D1D; font-weight:700;">
+            Thí sinh không tham gia trả lời bài thi nói (Does not attend / Does not complete the test).
+          </p>
+        </div>
+      `;
+      return;
     }
 
     aiCard.innerHTML = `
@@ -562,17 +646,17 @@ XUẤT BÁO CÁO (DƯỚI 200 TỪ):
         gScore: d.gScore || 'N/A',
         lScore: d.lScore || 'N/A',
         rScore: d.rScore || 'N/A',
-        wBand: `Band ${d.wBand || '5.5'}`,
-        sBand: `Band ${d.sBand || '5.5'}`,
+        wBand: `Band ${d.wBand || '0.0'}`,
+        sBand: `Band ${d.sBand || '0.0'}`,
         bandReason: d.bandReason || 'Xem lại kết quả bài làm chi tiết bên dưới.',
         timeSpent: att.timeSpent || 'N/A'
       });
 
       if (d.wt1Text || d.wt2Text) {
-        this.renderInlineWritingAICard(d.wt1Text, d.wt2Text);
+        this.renderInlineWritingAICard(d.wt1Text, d.wt2Text, this.countWords(`${d.wt1Text} ${d.wt2Text}`));
       }
       if (d.spk1Text || d.spk2Text) {
-        this.renderInlineSpeakingAICard(d.spk1Text, d.spk2Text);
+        this.renderInlineSpeakingAICard(d.spk1Text, d.spk2Text, this.countWords(`${d.spk1Text} ${d.spk2Text}`));
       }
 
       document.getElementById('btnSubmitFullDiagnostic')?.remove();
