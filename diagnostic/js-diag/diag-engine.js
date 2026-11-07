@@ -1,10 +1,10 @@
 /**
  * diagnostic/js-diag/diag-engine.js
  * BỘ MÁY ĐIỀU PHỐI KHẢO THÍ CHẨN ĐOÁN THÍCH ỨNG MASTER (TEST 1, 2, 3 & 3 SET XOAY TUA)
- * BẢN FULL ĐẦY ĐỦ 100% - KHÔNG CẮT BỚT BẤT KỲ DÒNG NÀO
- * - XÓA BỎ TOÀN BỘ ĐIỂM SÀN ẢO 4.5 WRITING & SPEAKING
- * - BỎ TRỐNG BÀI ➔ TRẢ THẲNG BAND 0.0 THEO ĐÚNG CHUẨN KHẢO THÍ
- * - IN-PLACE REVIEW & INLINE AI GRADING TRỰC TIẾP TRÊN GIAO DIỆN
+ * BẢN FULL ĐẦY ĐỦ 100% - KHÔNG CẮT BỚT BẤT KỲ DÒNG CODE TÍNH NĂNG NÀO
+ * - BẢO LƯU TOÀN BỘ LOGIC LÀM BÀI, AUDIO PLAYER, WEBSPEECH & CHẤM ĐIỂM GỐC
+ * - BỔ SUNG ĐÓNG GÓI 100% DỮ LIỆU BÀI LÀM CHI TIẾT (DETAILS) LÊN GOOGLE DRIVE
+ * - HỖ TRỢ ADMIN & PHỤ HUYNH XEM LẠI BÀI TỪ XA QUA CLOUD (TỰ FETCH NẾU LOCAL RỖNG)
  */
 
 import { diagGrammarEngine } from './diag-grammar.js';
@@ -61,6 +61,7 @@ class DiagnosticEngineMaster {
     this.speechRecognition = null;
     this.isRecording = false;
     this.isReviewMode = false;
+    this.currentAttemptSnapshot = null;
   }
 
   async init() {
@@ -92,10 +93,11 @@ class DiagnosticEngineMaster {
     this.initSpeechRecognition();
     this.startTimer();
 
-    // 6. Khôi phục Review Mode nếu có attemptId trên URL
+    // 6. Khôi phục Review Mode nếu có attemptId trên URL (Hỗ trợ mở từ Cloud cho Admin)
     const attemptId = urlParams.get('attemptId');
+    const emailParam = urlParams.get('email') || '';
     if (attemptId) {
-      this.restoreReviewMode(attemptId);
+      await this.restoreReviewMode(attemptId, emailParam);
     }
   }
 
@@ -215,7 +217,7 @@ class DiagnosticEngineMaster {
   }
 
   // =========================================================================
-  // 4. CHẤM BÀI TRỰC TIẾP TRÊN GIAO DIỆN (XÓA SÀN ĐIỂM ẢO 4.5/5.5)
+  // 4. CHẤM BÀI TRỰC TIẾP TRÊN GIAO DIỆN & LƯU TOÀN DIỆN LÊN GOOGLE DRIVE
   // =========================================================================
   async submitFullExam() {
     if (!confirm("Em có chắc chắn muốn nộp bài thi để hệ thống phân tích câu chữ và AI chấm điểm trực tiếp trên bài làm không?")) {
@@ -346,25 +348,51 @@ class DiagnosticEngineMaster {
       timeSpent: `${Math.round(this.timerSeconds / 60)} phút`
     });
 
-    // 8. GỌI AI CHẤM TRỰC TIẾP DƯỚI BÀI VIẾT (CHỈ GỌI KHI CÓ BÀI LÀM)
-    this.renderInlineWritingAICard(wt1Text, wt2Text, totalWritingWords);
+    // 8. ĐÓNG GÓI 100% CHI TIẾT BÀI LÀM (DETAILS) ĐỂ LƯU VÀO GOOGLE DRIVE
+    const studentEmail = localStorage.getItem('ielts_student_email') || 'guest@gmail.com';
+    const studentName = localStorage.getItem('ielts_student_name') || 'Học viên';
+    const studentId = localStorage.getItem('tram_student_id') || 'TR-GUEST';
 
-    // 9. GỌI AI CHẤM TRỰC TIẾP DƯỚI BÀI NÓI (CHỈ GỌI KHI CÓ BÀI NÓI)
-    this.renderInlineSpeakingAICard(spk1Text, spk2Text, totalSpeakingWords);
-
-    // 10. Lưu lịch sử làm bài
     const attemptSnapshot = {
       id: "diag_attempt_" + Date.now(),
       timestamp: new Date().toLocaleString('vi-VN'),
       testTitle: `${DIAGNOSTIC_META[this.testId]?.title || this.testId} (Set ${this.setNum})`,
-      studentName: localStorage.getItem('ielts_student_name') || 'Học viên',
-      studentEmail: localStorage.getItem('ielts_student_email') || 'guest@gmail.com',
+      studentName: studentName,
+      studentEmail: studentEmail,
+      studentId: studentId,
       score: `Band ${estimatedBand} (${overallScore}/100)`,
       timeSpent: `${Math.round(this.timerSeconds / 60)} phút`,
       moduleType: "diagnostic",
-      pageUrl: `diagnostic/runner-diag.html?testId=${this.testId}&set=${this.setNum}`
+      pageUrl: `diagnostic/runner-diag.html?testId=${this.testId}&set=${this.setNum}`,
+      details: {
+        overallBand: `Band ${estimatedBand}`,
+        overallScore: `${overallScore}/100`,
+        timeSpent: `${Math.round(this.timerSeconds / 60)} phút`,
+        bandReason: bandReason,
+        gScore: `${grammarResult.score}/${grammarResult.total}`,
+        lScore: `${lisEval.score}/${lisEval.total}`,
+        rScore: `${readingResult.score}/${readingResult.total}`,
+        wBand: writingBand.toFixed(1),
+        sBand: speakingBand.toFixed(1),
+        grammarSnapshot: grammarResult.answersSnapshot || {},
+        gWrongList: grammarResult.wrongList || [],
+        listeningSnapshot: lisEval.answersSnapshot || {},
+        lDetails: lisEval.details || [],
+        readingSnapshot: readingResult.answersSnapshot || {},
+        rDetails: readingResult.details || [],
+        writingAnswersSnapshot: writingSubData.answersSnapshot || {},
+        wt1Text: wt1Text,
+        wt2Text: wt2Text,
+        spk1Text: spk1Text,
+        spk2Text: spk2Text,
+        wAiFeedback: "",
+        sAiFeedback: ""
+      }
     };
 
+    this.currentAttemptSnapshot = attemptSnapshot;
+
+    // Lưu vào Local Storage tại máy
     try {
       const localHist = JSON.parse(localStorage.getItem('ielts_local_history') || '[]');
       localHist.unshift(attemptSnapshot);
@@ -374,17 +402,39 @@ class DiagnosticEngineMaster {
       if (this.testId === 'test_02' && overallScore >= 55) localStorage.setItem('diag_unlocked_test3', 'true');
     } catch(e) {}
 
-    fetch(CLOUD_SCRIPT_URL, {
-      method: "POST",
-      mode: "no-cors",
-      headers: { "Content-Type": "text/plain;charset=utf-8" },
-      body: JSON.stringify({ action: "save_attempt", attempt: attemptSnapshot })
-    }).catch(() => {});
+    // Bắn gói tin lên máy chủ Google Drive
+    this.syncAttemptToCloud(attemptSnapshot);
+
+    // 9. GỌI AI CHẤM TRỰC TIẾP VÀ CẬP NHẬT PHIẾU CHẤM VÀO CLOUD
+    this.renderInlineWritingAICard(wt1Text, wt2Text, totalWritingWords).then(feedback => {
+      if (feedback && this.currentAttemptSnapshot) {
+        this.currentAttemptSnapshot.details.wAiFeedback = feedback;
+        this.syncAttemptToCloud(this.currentAttemptSnapshot);
+      }
+    });
+
+    this.renderInlineSpeakingAICard(spk1Text, spk2Text, totalSpeakingWords).then(feedback => {
+      if (feedback && this.currentAttemptSnapshot) {
+        this.currentAttemptSnapshot.details.sAiFeedback = feedback;
+        this.syncAttemptToCloud(this.currentAttemptSnapshot);
+      }
+    });
 
     if (btnSubmit) {
       btnSubmit.innerHTML = `✓ ĐÃ NỘP BÀI — ĐANG Ở CHẾ ĐỘ XEM LẠI`;
       btnSubmit.style.background = "#059669";
     }
+  }
+
+  // Tiện ích đồng bộ lên Cloud chống mất dữ liệu
+  syncAttemptToCloud(snapshot) {
+    if (!CLOUD_SCRIPT_URL || !snapshot || !snapshot.studentEmail) return;
+    fetch(CLOUD_SCRIPT_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({ action: "save_attempt", attempt: snapshot })
+    }).catch(() => {});
   }
 
   // --- RENDER THANH BANNER KẾT QUẢ NỔI TRÊN ĐẦU (KHÔNG XÓA BÀI THI) ---
@@ -449,9 +499,9 @@ class DiagnosticEngineMaster {
   }
 
   // --- RENDER AI CHẤM TRỰC TIẾP DƯỚI BÀI VIẾT (TAB WRITING) ---
-  async renderInlineWritingAICard(t1, t2, totalWords = 0) {
+  async renderInlineWritingAICard(t1, t2, totalWords = 0, preloadedFeedback = null) {
     const secWriting = document.getElementById('section_writing');
-    if (!secWriting) return;
+    if (!secWriting) return "";
 
     let aiCard = document.getElementById('inlineWritingAiReport');
     if (!aiCard) {
@@ -460,7 +510,7 @@ class DiagnosticEngineMaster {
       secWriting.appendChild(aiCard);
     }
 
-    if (totalWords === 0) {
+    if (totalWords === 0 && !t1 && !t2) {
       aiCard.innerHTML = `
         <div style="background:#FEF2F2; border:2.5px solid #EF4444; border-radius:18px; padding:18px; margin-top:20px;">
           <h4 style="color:#991B1B; margin:0 0 6px 0; font-size:16px; font-weight:900;">
@@ -471,7 +521,7 @@ class DiagnosticEngineMaster {
           </p>
         </div>
       `;
-      return;
+      return "";
     }
 
     aiCard.innerHTML = `
@@ -486,8 +536,15 @@ class DiagnosticEngineMaster {
     `;
 
     const streamBox = document.getElementById('inlineWritingAiStream');
-    const wKey = getWritingKey();
 
+    // Nếu đã có bài chấm lưu từ trước trong Cloud -> hiển thị ngay, không cần gọi lại API
+    if (preloadedFeedback) {
+      if (window.marked && streamBox) streamBox.innerHTML = window.marked.parse(preloadedFeedback);
+      else if (streamBox) streamBox.innerHTML = `<pre style="white-space:pre-wrap; font-family:inherit;">${preloadedFeedback}</pre>`;
+      return preloadedFeedback;
+    }
+
+    const wKey = getWritingKey();
     const promptText = `
 Bạn là Giám khảo Khảo thí IELTS Writing cự phách. Hãy đọc bài viết dưới đây của học sinh và xuất phiếu chấm điểm chi tiết.
 Xưng hô: "Anh" và gọi học viên là "Em".
@@ -518,15 +575,17 @@ XUẤT BÁO CÁO THEO ĐÚNG CẤU TRÚC MARKDOWN:
       } else if (streamBox) {
         streamBox.innerHTML = `<pre style="white-space:pre-wrap; font-family:inherit;">${feedback}</pre>`;
       }
+      return feedback;
     } catch(e) {
       if (streamBox) streamBox.innerHTML = `<span style="color:#DC2626;">❌ Không thể kết nối AI: ${e.message}</span>`;
+      return "";
     }
   }
 
   // --- RENDER AI CHẤM TRỰC TIẾP DƯỚI BÀI NÓI (TAB SPEAKING) ---
-  async renderInlineSpeakingAICard(s1, s2, totalWords = 0) {
+  async renderInlineSpeakingAICard(s1, s2, totalWords = 0, preloadedFeedback = null) {
     const secSpeaking = document.getElementById('section_speaking');
-    if (!secSpeaking) return;
+    if (!secSpeaking) return "";
 
     let aiCard = document.getElementById('inlineSpeakingAiReport');
     if (!aiCard) {
@@ -535,7 +594,7 @@ XUẤT BÁO CÁO THEO ĐÚNG CẤU TRÚC MARKDOWN:
       secSpeaking.appendChild(aiCard);
     }
 
-    if (totalWords === 0) {
+    if (totalWords === 0 && !s1 && !s2) {
       aiCard.innerHTML = `
         <div style="background:#FEF2F2; border:2.5px solid #EF4444; border-radius:18px; padding:18px; margin-top:20px;">
           <h4 style="color:#991B1B; margin:0 0 6px 0; font-size:16px; font-weight:900;">
@@ -546,7 +605,7 @@ XUẤT BÁO CÁO THEO ĐÚNG CẤU TRÚC MARKDOWN:
           </p>
         </div>
       `;
-      return;
+      return "";
     }
 
     aiCard.innerHTML = `
@@ -561,8 +620,15 @@ XUẤT BÁO CÁO THEO ĐÚNG CẤU TRÚC MARKDOWN:
     `;
 
     const streamBox = document.getElementById('inlineSpeakingAiStream');
-    const sKey = getSpeakingKey();
 
+    // Nếu đã có bài chấm lưu từ trước trong Cloud -> hiển thị ngay
+    if (preloadedFeedback) {
+      if (window.marked && streamBox) streamBox.innerHTML = window.marked.parse(preloadedFeedback);
+      else if (streamBox) streamBox.innerHTML = `<pre style="white-space:pre-wrap; font-family:inherit;">${preloadedFeedback}</pre>`;
+      return preloadedFeedback;
+    }
+
+    const sKey = getSpeakingKey();
     const promptText = `
 Bạn là Chuyên gia Khảo thí IELTS Speaking. Hãy nhận xét bài nói dưới đây của học sinh. Xưng hô "Anh" và "Em".
 BẢN KÝ ÂM SPEAKING:
@@ -582,8 +648,10 @@ XUẤT BÁO CÁO (DƯỚI 200 TỪ):
       } else if (streamBox) {
         streamBox.innerHTML = `<pre style="white-space:pre-wrap; font-family:inherit;">${feedback}</pre>`;
       }
+      return feedback;
     } catch(e) {
       if (streamBox) streamBox.innerHTML = `<span style="color:#DC2626;">❌ Không thể kết nối AI: ${e.message}</span>`;
+      return "";
     }
   }
 
@@ -598,17 +666,46 @@ XUẤT BÁO CÁO (DƯỚI 200 TỪ):
   }
 
   // =========================================================================
-  // 5. REVIEW MODE TỪ LỊCH SỬ (KHÔI PHỤC BÀI LÀM TRỰC TIẾP TRÊN GIAO DIỆN)
+  // 5. REVIEW MODE TỪ LỊCH SỬ & GOOGLE DRIVE CLOUD SERVER
   // =========================================================================
-  restoreReviewMode(attemptId) {
+  async restoreReviewMode(attemptId, emailParam = "") {
     this.isReviewMode = true;
     try {
+      let att = null;
+
+      // 1. Thử tìm trong Local Storage tại máy
       const localHist = JSON.parse(localStorage.getItem('ielts_local_history') || '[]');
-      const att = localHist.find(a => a.id === attemptId);
+      att = localHist.find(a => a.id === attemptId);
+
+      // 2. NẾU KHÔNG CÓ TRÊN MÁY (TRƯỜNG HỢP ADMIN HOẶC PHỤ HUYNH XEM TỪ XA QUA EMAIL)
+      if ((!att || !att.details) && (emailParam || CLOUD_SCRIPT_URL)) {
+        const queryEmail = emailParam || localStorage.getItem('ielts_student_email') || '';
+        if (queryEmail) {
+          try {
+            const res = await fetch(CLOUD_SCRIPT_URL, {
+              method: "POST",
+              headers: { "Content-Type": "text/plain;charset=utf-8" },
+              body: JSON.stringify({
+                action: "get_single_attempt",
+                email: queryEmail,
+                attemptId: attemptId
+              })
+            });
+            const cloudData = await res.json();
+            if (cloudData && cloudData.attempt) {
+              att = cloudData.attempt;
+            }
+          } catch (cloudErr) {
+            console.warn("Không thể tải bài làm từ Google Drive:", cloudErr);
+          }
+        }
+      }
+
       if (!att || !att.details) return;
 
       const d = att.details;
 
+      // Khôi phục Ngữ pháp
       if (d.grammarSnapshot) {
         diagGrammarEngine.renderReviewMode({
           answersSnapshot: d.grammarSnapshot,
@@ -622,27 +719,35 @@ XUẤT BÁO CÁO (DƯỚI 200 TỪ):
         });
       }
 
+      // Khôi phục Listening
       diagListeningEngine.renderReviewMode({
         answersSnapshot: d.listeningSnapshot || {},
         details: d.lDetails || []
       });
 
+      // Khôi phục Reading
       if (d.rDetails) {
-        diagReadingEngine.renderReviewMode({ details: d.rDetails });
+        diagReadingEngine.renderReviewMode({
+          answersSnapshot: d.readingSnapshot || {},
+          details: d.rDetails
+        });
       }
 
+      // Khôi phục Writing
       if (d.writingAnswersSnapshot && diagWritingEngine.renderReviewMode) {
         diagWritingEngine.renderReviewMode(d.writingAnswersSnapshot);
       }
 
+      // Khôi phục ô nhập Speaking
       const spk1 = document.getElementById('diag_spk_1');
       const spk2 = document.getElementById('diag_spk_2');
       if (spk1 && d.spk1Text) { spk1.value = d.spk1Text; spk1.disabled = true; }
       if (spk2 && d.spk2Text) { spk2.value = d.spk2Text; spk2.disabled = true; }
 
+      // Vẽ lại Banner kết quả
       this.renderInPlaceResultBanner({
         overallBand: att.score.split('(')[0].trim(),
-        overallScore: att.score.includes('(') ? att.score.split('(')[1].replace(')', '') : '100/100',
+        overallScore: att.score.includes('(') ? att.score.split('(')[1].replace(')', '') : (d.overallScore || '100/100'),
         gScore: d.gScore || 'N/A',
         lScore: d.lScore || 'N/A',
         rScore: d.rScore || 'N/A',
@@ -652,11 +757,12 @@ XUẤT BÁO CÁO (DƯỚI 200 TỪ):
         timeSpent: att.timeSpent || 'N/A'
       });
 
+      // Khôi phục nhận xét AI Writing & Speaking (dùng ngay dữ liệu đã lưu từ Cloud)
       if (d.wt1Text || d.wt2Text) {
-        this.renderInlineWritingAICard(d.wt1Text, d.wt2Text, this.countWords(`${d.wt1Text} ${d.wt2Text}`));
+        this.renderInlineWritingAICard(d.wt1Text, d.wt2Text, this.countWords(`${d.wt1Text} ${d.wt2Text}`), d.wAiFeedback);
       }
       if (d.spk1Text || d.spk2Text) {
-        this.renderInlineSpeakingAICard(d.spk1Text, d.spk2Text, this.countWords(`${d.spk1Text} ${d.spk2Text}`));
+        this.renderInlineSpeakingAICard(d.spk1Text, d.spk2Text, this.countWords(`${d.spk1Text} ${d.spk2Text}`), d.sAiFeedback);
       }
 
       document.getElementById('btnSubmitFullDiagnostic')?.remove();
