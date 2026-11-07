@@ -2,7 +2,8 @@
  * diagnostic/js-diag/diag-ai.js
  * BỘ MÁY AI KHẢO THÍ CHUẨN XÁC 100% THEO RUBRIC BAND DESCRIPTORS CHÍNH THỨC
  * BẢN FULL ĐẦY ĐỦ 100% - KHÔNG CẮT BỚT BẤT KỲ DÒNG NÀO
- * - XÓA BỎ HOÀN TOÀN SÀN ĐIỂM ẢO 4.5: BỎ TRỐNG LÀ 0.0, DỞ LÀ 1.0 - 2.0 - 3.0
+ * - XÓA BỎ HOÀN TOÀN SÀN ĐIỂM ẢO: BỎ TRỐNG LÀ 0.0, DỞ LÀ 1.0 - 2.0 - 3.0
+ * - EARLY EXIT NGAY TẬN GỐC KHI BỎ TRỐNG HOẶC CHỈ GÕ KÝ TỰ VÔ NGHĨA
  * - CHẤM ĐỦ 4 TIÊU CHÍ (WRITING: TA/TR, CC, LR, GRA | SPEAKING: FC, LR, GRA, PR)
  * - BẢO TOÀN NGUYÊN VẸN MASTER READING RUBRICS (CAM 21 TRANG 57 - 74)
  */
@@ -131,6 +132,14 @@ class DiagnosticAIService {
     ];
   }
 
+  // Tiện ích phòng ngự: Lọc sạch khoảng trắng, ký tự rác và đếm số từ thực tế
+  sanitizeAndCountWords(text) {
+    if (!text || typeof text !== 'string') return 0;
+    const cleaned = text.replace(/[\r\n\t]+/g, ' ').replace(/[^\p{L}\p{N}\s]/gu, '').trim();
+    if (!cleaned) return 0;
+    return cleaned.split(/\s+/).filter(Boolean).length;
+  }
+
   async executeGeminiCall(apiKey, promptText) {
     for (const model of this.modelsQueue) {
       try {
@@ -172,7 +181,7 @@ class DiagnosticAIService {
       };
     }
 
-    const isAnswerKeyCorrect = studentChoice.toUpperCase().trim() === rubricData.standardAnswer.toUpperCase().trim();
+    const isAnswerKeyCorrect = String(studentChoice || '').toUpperCase().trim() === rubricData.standardAnswer.toUpperCase().trim();
 
     const prompt = `
 Bạn là Giám khảo IELTS Reading khắt khe.
@@ -216,9 +225,9 @@ HÃY TRẢ VỀ DUY NHẤT 1 CHUỖI JSON (KHÔNG DÙNG MARKDOWN, KHÔNG \`\`\`j
   // =========================================================================
   async evaluateWritingDiagnostic(taskType, promptText, studentEssayText) {
     const rawText = (studentEssayText || '').trim();
-    const words = rawText.length === 0 ? 0 : rawText.split(/\s+/).filter(Boolean).length;
+    const words = this.sanitizeAndCountWords(rawText);
 
-    // LỚP BẢO VỆ 1: NẾU BỎ TRỐNG 0 TỪ ➔ TRẢ THẲNG VỀ BAND 0.0
+    // LỚP BẢO VỆ 1: NẾU BỎ TRỐNG 0 TỪ ➔ TRẢ THẲNG VỀ BAND 0.0 NGAY LẬP TỨC
     if (words === 0) {
       return {
         overallBand: "0.0",
@@ -243,6 +252,20 @@ HÃY TRẢ VỀ DUY NHẤT 1 CHUỖI JSON (KHÔNG DÙNG MARKDOWN, KHÔNG \`\`\`j
         rubricSummary: "Chỉ viết được một vài từ đơn lẻ, không tạo thành câu hoàn chỉnh (Can only use a few isolated words).",
         keyMistakes: ["Chưa viết đủ câu, chỉ có từ vụn vặt."],
         band8Upgrade: "Cần xây dựng cấu trúc Subject + Verb + Object cơ bản."
+      };
+    }
+
+    // LỚP BẢO VỆ 3: NẾU TỪ 15 ĐẾN DƯỚI 35 TỪ ➔ BAND 2.0
+    if (words < 35) {
+      return {
+        overallBand: "2.0",
+        ta_tr: "2.0",
+        cc: "2.0",
+        lr: "2.0",
+        gra: "2.0",
+        rubricSummary: "Nội dung cực kỳ sơ sài, hầu như không liên quan hoặc chỉ chép lại đề bài.",
+        keyMistakes: ["Đoạn văn quá ngắn, chưa đủ dung lượng tối thiểu để phát triển ý."],
+        band8Upgrade: "Hãy cố gắng viết tối thiểu 2-3 câu hoàn chỉnh có chủ ngữ và vị ngữ rõ ràng."
       };
     }
 
@@ -289,14 +312,15 @@ TRẢ VỀ DUY NHẤT 1 CHUỖI JSON HỢP LỆ (KHÔNG DÙNG DẤU \`\`\`json):
       const cleanJson = rawRes.replace(/^```json/, '').replace(/```$/, '').trim();
       return JSON.parse(cleanJson);
     } catch (err) {
-      const estimatedBand = words < 40 ? "2.5" : (words < 90 ? "3.5" : "4.5");
+      // Fallback an toàn có tính đến ngưỡng từ thực tế - không bao giờ tự động đội lên 4.5
+      const estimatedBand = words < 20 ? "1.0" : (words < 50 ? "2.5" : (words < 100 ? "3.5" : "4.5"));
       return {
         overallBand: estimatedBand,
         ta_tr: estimatedBand,
         cc: estimatedBand,
         lr: estimatedBand,
         gra: estimatedBand,
-        rubricSummary: "Hệ thống tự động chấm điểm dựa trên độ dài và mật độ từ vựng.",
+        rubricSummary: "Hệ thống tự động chấm điểm dự phòng dựa trên dung lượng câu từ thực tế.",
         keyMistakes: ["Cần chú ý lỗi ngữ pháp và chia động từ."],
         band8Upgrade: "Hãy luyện tập viết câu ghép và mở rộng vốn từ học thuật."
       };
@@ -304,11 +328,11 @@ TRẢ VỀ DUY NHẤT 1 CHUỖI JSON HỢP LỆ (KHÔNG DÙNG DẤU \`\`\`json):
   }
 
   // =========================================================================
-  // C. CHẤM SPEAKING CHUẨN RUBRIC BAND DESCRIPTORS (XÓA SÀN 4.5, CÓ THỂ ĐẠT 0.0)
+  // C. CHẤM SPEAKING CHUẨN RUBRIC BAND DESCRIPTORS (XÓA SÀN 3.5, CÓ THỂ ĐẠT 0.0)
   // =========================================================================
   async evaluateSpeakingDiagnostic(questionsList, transcriptsList) {
-    const combinedTranscript = transcriptsList.filter(Boolean).join(' ').trim();
-    const words = combinedTranscript.length === 0 ? 0 : combinedTranscript.split(/\s+/).filter(Boolean).length;
+    const combinedTranscript = (transcriptsList || []).filter(Boolean).join(' ').trim();
+    const words = this.sanitizeAndCountWords(combinedTranscript);
 
     // LỚP BẢO VỆ 1: NẾU KHÔNG GHI ÂM CHỮ NÀO ➔ BAND 0.0
     if (words === 0) {
@@ -324,7 +348,7 @@ TRẢ VỀ DUY NHẤT 1 CHUỖI JSON HỢP LỆ (KHÔNG DÙNG DẤU \`\`\`json):
       };
     }
 
-    // LỚP BẢO VỆ 2: NẾU DƯỚI 10 TỪ RỜI RẠC ➔ BAND 1.0 - 2.0
+    // LỚP BẢO VỆ 2: NẾU DƯỚI 10 TỪ RỜI RẠC ➔ BAND 1.0 - 1.5
     if (words < 10) {
       return {
         overallBand: "1.5",
@@ -338,10 +362,24 @@ TRẢ VỀ DUY NHẤT 1 CHUỖI JSON HỢP LỆ (KHÔNG DÙNG DẤU \`\`\`json):
       };
     }
 
+    // LỚP BẢO VỆ 3: NẾU DƯỚI 25 TỪ ➔ BAND 2.5
+    if (words < 25) {
+      return {
+        overallBand: "2.5",
+        fc: "2.5",
+        lr: "2.5",
+        gra: "2.0",
+        pr: "2.5",
+        rubricSummary: "Câu trả lời quá ngắn, dừng ngập ngừng thường xuyên và chưa diễn đạt được ý hoàn chỉnh.",
+        critique: "Cần kéo dài câu trả lời bằng cách thêm lý do (Because...) hoặc ví dụ (For instance...).",
+        improvedAnswer: "I enjoy living in my hometown because the people here are exceptionally warm and welcoming."
+      };
+    }
+
     const apiKey = getSpeakingKey();
 
-    const pairsText = questionsList.map((q, idx) => {
-      return `Câu hỏi ${idx + 1}: "${q}"\nThí sinh trả lời: "${transcriptsList[idx] || '(Không nói)'}"`;
+    const pairsText = (questionsList || []).map((q, idx) => {
+      return `Câu hỏi ${idx + 1}: "${q}"\nThí sinh trả lời: "${transcriptsList?.[idx] || '(Không nói)'}"`;
     }).join('\n\n');
 
     const systemPrompt = `
@@ -381,14 +419,15 @@ TRẢ VỀ DUY NHẤT 1 CHUỖI JSON HỢP LỆ (KHÔNG DÙNG \`\`\`json):
       const cleanJson = rawRes.replace(/^```json/, '').replace(/```$/, '').trim();
       return JSON.parse(cleanJson);
     } catch (err) {
-      const estimatedBand = words < 25 ? "2.5" : (words < 60 ? "3.5" : "4.5");
+      // Fallback an toàn bảo vệ ngưỡng điểm thực tế
+      const estimatedBand = words < 10 ? "1.0" : (words < 30 ? "2.5" : (words < 70 ? "3.5" : "4.5"));
       return {
         overallBand: estimatedBand,
         fc: estimatedBand,
         lr: estimatedBand,
         gra: estimatedBand,
         pr: estimatedBand,
-        rubricSummary: "Hệ thống ước lượng điểm dựa trên độ dài transcript và phản xạ phát âm.",
+        rubricSummary: "Hệ thống ước lượng điểm dự phòng dựa trên độ dài transcript và phản xạ phát âm.",
         critique: "Cần luyện tập kéo dài câu trả lời hơn.",
         improvedAnswer: "Luyện phản xạ nói theo phương pháp shadowing."
       };
