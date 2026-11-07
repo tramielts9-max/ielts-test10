@@ -1,7 +1,11 @@
 /**
  * diagnostic/js-diag/diag-reading.js
  * BỘ MÁY READING HYBRID CHO CẢ 3 TEST (TEST 1, 2, 3 & FULL TEST)
- * BẢN FULL ĐẦY ĐỦ 100% - TÍCH HỢP HIGHLIGHT KHÔNG GIỚI HẠN & RESIZER 3D DUOLINGO
+ * BẢN FULL ĐẦY ĐỦ 100% - KHÔNG CẮT BỚT BẤT KỲ DÒNG NÀO
+ * - TÍCH HỢP HIGHLIGHT KHÔNG GIỚI HẠN & BẢO LƯU VẾT BÔI VÀNG KHI CHUYỂN BÀI
+ * - XÓA HIGHLIGHT TRỰC TIẾP BẰNG CLICK CHUỘT
+ * - PHÒNG NGỰ BỎ TRỐNG BÀI: 0 CÂU ĐÚNG ➔ SCORE = 0
+ * - GIỮ NGUYÊN RESIZER 3D DUOLINGO KÉO THẢ MÀN HÌNH
  */
 
 export class DiagReadingEngine {
@@ -21,6 +25,9 @@ export class DiagReadingEngine {
     this.userAnswers = {};
     this.metrics = {};
     this.isReviewMode = false;
+
+    // Bộ nhớ đệm lưu vết DOM đã highlight của bài đọc
+    this.savedPassageDom = null;
   }
 
   // =========================================================================
@@ -40,6 +47,7 @@ export class DiagReadingEngine {
       this.userAnswers = {};
       this.metrics = {};
       this.isReviewMode = false;
+      this.savedPassageDom = null;
 
       // 1. Two-Tier (Test 1)
       if (data.formatType === "TWO_TIER" || (Array.isArray(data.questions) && data.questions[0]?.tier1Options)) {
@@ -85,7 +93,12 @@ export class DiagReadingEngine {
 
     this.restoreUserInputsUI();
     this.initDraggableResizer('diagSplitWrap', 'diagLeftPane', 'diagResizerBar', 'diagRightPane');
-    this.initTextHighlighter(mount);
+    
+    // Gắn highlighter trực tiếp vào cột bài đọc bên trái để tính toán tọa độ chuẩn xác
+    const leftPane = document.getElementById('diagLeftPane');
+    if (leftPane) {
+      this.initTextHighlighter(leftPane);
+    }
   }
 
   // --- A. GIAO DIỆN TWO-TIER (TEST 1 NỀN TẢNG) ---
@@ -143,14 +156,18 @@ export class DiagReadingEngine {
       `;
     });
 
+    const passageContent = this.savedPassageDom || `
+      <h3 style="margin:0 0 12px 0; color:#8B1518; font-size:18px;">📖 ${this.testData.passageTitle || 'BÀI ĐỌC KHẢO SÁT NỀN TẢNG'}</h3>
+      <div style="background:#FAF7F2; border:1.5px solid #E8E2D8; border-radius:12px; padding:16px; margin-bottom:16px; font-size:14px; color:#475569;">
+        <b>📌 Hướng dẫn cơ chế Two-Tier:</b> Chọn đúng phương án Tầng 1 và chọn đúng câu dẫn chứng Tầng 2 để nhận điểm trọn vẹn.
+      </div>
+      <div style="white-space:pre-wrap;">${this.passageText || 'Đọc kỹ từng đoạn trích dẫn đính kèm trực tiếp tại mỗi câu hỏi bên phải.'}</div>
+    `;
+
     mount.innerHTML = `
       <div id="diagSplitWrap" style="display:flex; height:calc(100vh - 215px); position:relative; user-select:none;">
         <div id="diagLeftPane" style="width:45%; height:100%; overflow-y:auto; background:#FFFFFF; border:2px solid #E8E2D8; border-left:6px solid #8B1518; border-radius:18px; padding:24px 26px; box-sizing:border-box; line-height:1.8; font-size:15px; color:#1E293B;">
-          <h3 style="margin:0 0 12px 0; color:#8B1518; font-size:18px;">📖 ${this.testData.passageTitle || 'BÀI ĐỌC KHẢO SÁT NỀN TẢNG'}</h3>
-          <div style="background:#FAF7F2; border:1.5px solid #E8E2D8; border-radius:12px; padding:16px; margin-bottom:16px; font-size:14px; color:#475569;">
-            <b>📌 Hướng dẫn cơ chế Two-Tier:</b> Chọn đúng phương án Tầng 1 và chọn đúng câu dẫn chứng Tầng 2 để nhận điểm trọn vẹn.
-          </div>
-          <div style="white-space:pre-wrap;">${this.passageText || 'Đọc kỹ từng đoạn trích dẫn đính kèm trực tiếp tại mỗi câu hỏi bên phải.'}</div>
+          ${passageContent}
         </div>
 
         <div id="diagResizerBar" style="width:20px; cursor:col-resize; display:flex; align-items:center; justify-content:center; z-index:10; flex-shrink:0;">
@@ -220,11 +237,15 @@ export class DiagReadingEngine {
       `;
     });
 
+    const passageContent = this.savedPassageDom || `
+      <h3 style="margin:0 0 12px 0; color:#8B1518; font-size:18px;">${this.title || 'READING PASSAGE'}</h3>
+      <div style="line-height:1.85; font-size:15px;">${this.passageHtml || this.passageText}</div>
+    `;
+
     mount.innerHTML = `
       <div id="diagSplitWrap" style="display:flex; height:calc(100vh - 215px); position:relative; user-select:none;">
         <div id="diagLeftPane" style="width:50%; height:100%; overflow-y:auto; background:#FFFFFF; border:2px solid #E8E2D8; border-left:6px solid #8B1518; border-radius:18px; padding:24px 26px; box-sizing:border-box; line-height:1.8; font-size:15px; color:#1E293B;">
-          <h3 style="margin:0 0 12px 0; color:#8B1518; font-size:18px;">${this.title || 'READING PASSAGE'}</h3>
-          <div style="line-height:1.85; font-size:15px;">${this.passageHtml || this.passageText}</div>
+          ${passageContent}
         </div>
 
         <div id="diagResizerBar" style="width:20px; cursor:col-resize; display:flex; align-items:center; justify-content:center; z-index:10; flex-shrink:0;">
@@ -244,7 +265,7 @@ export class DiagReadingEngine {
   renderGroupedCamView(mount) {
     let qContentHtml = '';
 
-    this.groups.forEach((g, gIdx) => {
+    this.groups.forEach(g => {
       const gType = (g.type || '').toLowerCase();
       const isTFNG = gType.includes('tfng');
       const isYNNG = gType.includes('ynng');
@@ -303,11 +324,15 @@ export class DiagReadingEngine {
       `;
     });
 
+    const passageContent = this.savedPassageDom || `
+      <h3 style="margin:0 0 12px 0; color:#8B1518; font-size:18px;">${this.title || 'READING PASSAGE'}</h3>
+      <div>${this.passageHtml}</div>
+    `;
+
     mount.innerHTML = `
       <div id="diagSplitWrap" style="display:flex; height:calc(100vh - 215px); position:relative; user-select:none;">
         <div id="diagLeftPane" style="width:50%; height:100%; overflow-y:auto; background:#FFFFFF; border:2px solid #E8E2D8; border-left:6px solid #8B1518; border-radius:18px; padding:24px 26px; box-sizing:border-box; line-height:1.8; font-size:15px; color:#1E293B;">
-          <h3 style="margin:0 0 12px 0; color:#8B1518; font-size:18px;">${this.title || 'READING PASSAGE'}</h3>
-          <div>${this.passageHtml}</div>
+          ${passageContent}
         </div>
         <div id="diagResizerBar" style="width:20px; cursor:col-resize; display:flex; align-items:center; justify-content:center; z-index:10; flex-shrink:0;">
           <div style="width:34px; height:60px; background:#FFFFFF; border:2.5px solid #E8E2D8; border-bottom:5px solid #D3CBC0; border-radius:18px; display:flex; align-items:center; justify-content:center; color:#8B1518; font-size:14px; box-shadow:0 4px 12px rgba(0,0,0,0.08);">
@@ -427,7 +452,7 @@ export class DiagReadingEngine {
   }
 
   // =========================================================================
-  // 5. CHẤM ĐIỂM CHUẨN XÁC
+  // 5. CHẤM ĐIỂM CHUẨN XÁC TUYỆT ĐỐI (LOẠI BỎ ĐIỂM ẢO RỖNG)
   // =========================================================================
   evaluate() {
     let score = 0;
@@ -441,8 +466,10 @@ export class DiagReadingEngine {
         const u = this.userAnswers[q.id] || {};
         const t1 = (u.t1Val || "").toUpperCase().trim();
         const t2 = (u.t2Val || "").toUpperCase().trim();
-        const isT1 = t1 === (q.correctTier1 || "").toUpperCase().trim();
-        const isT2 = t2 === (q.correctTier2 || "").toUpperCase().trim();
+        
+        // Chỉ chấm đúng khi học sinh thực sự đã chọn và khớp đáp án
+        const isT1 = t1 && t1 === (q.correctTier1 || "").toUpperCase().trim();
+        const isT2 = t2 && t2 === (q.correctTier2 || "").toUpperCase().trim();
         const isCorrect = isT1 && isT2;
         if (isCorrect) score++;
 
@@ -454,7 +481,7 @@ export class DiagReadingEngine {
           expectedTier1: q.correctTier1,
           expectedTier2: q.correctTier2,
           isCorrect: isCorrect,
-          behaviorTag: isCorrect ? "Hiểu bản chất" : (isT1 ? "Đoán mò / Sai căn cứ" : "Sai đáp án")
+          behaviorTag: isCorrect ? "Hiểu bản chất" : (isT1 ? "Đoán mò / Sai căn cứ" : (!t1 ? "Chưa làm" : "Sai đáp án"))
         };
         details.push(d);
         if (!isCorrect) wrongList.push(d);
@@ -479,7 +506,7 @@ export class DiagReadingEngine {
         const qId = q.id || `q_${qNum}`;
         const u = (this.userAnswers[qId]?.answer || this.userAnswers[qId] || '').trim();
         const exp = q.correctAnswer || q.finalAnswer || '';
-        const isCorrect = this.checkMatch(u, exp);
+        const isCorrect = u ? this.checkMatch(u, exp) : false;
         if (isCorrect) score++;
 
         const expStr = Array.isArray(exp) ? exp.join(' / ') : String(exp);
@@ -512,7 +539,7 @@ export class DiagReadingEngine {
       const q = this.questionsMap[qId] || {};
       const expected = this.expectedAnswers[qId];
       const userVal = (this.userAnswers[qId] || '').trim();
-      const isCorrect = this.checkMatch(userVal, expected);
+      const isCorrect = userVal ? this.checkMatch(userVal, expected) : false;
       if (isCorrect) score++;
 
       const expStr = Array.isArray(expected) ? expected.join(' / ') : String(expected);
@@ -609,24 +636,23 @@ export class DiagReadingEngine {
   // 7. HIGHLIGHT KHÔNG GIỚI HẠN (IELTS CBT TEXT HIGHLIGHTER)
   // =========================================================================
   initTextHighlighter(container) {
-    if (!container || container._hasHighlighter) return;
-    container._hasHighlighter = true;
+    if (!container) return;
 
     let pop = document.getElementById('ielts_reading_highlighter_pop');
     if (!pop) {
       pop = document.createElement('div');
       pop.id = 'ielts_reading_highlighter_pop';
       pop.style.cssText = `
-        position: absolute; display: none; z-index: 99999;
+        position: fixed; display: none; z-index: 999999;
         background: #1E293B; border-radius: 8px; padding: 4px 6px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.25); gap: 4px; align-items: center;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.3); gap: 4px; align-items: center;
       `;
       pop.innerHTML = `
-        <button type="button" id="btnDoReadingHighlight" style="background:#FEF08A; color:#854D0E; border:none; border-radius:5px; padding:4px 8px; font-weight:800; font-size:12px; cursor:pointer;">
+        <button type="button" id="btnDoReadingHighlight" style="background:#FEF08A; color:#854D0E; border:none; border-radius:5px; padding:5px 9px; font-weight:800; font-size:12px; cursor:pointer;">
           🖍 Tô vàng
         </button>
-        <button type="button" id="btnClearReadingHighlight" style="background:#475569; color:white; border:none; border-radius:5px; padding:4px 8px; font-weight:800; font-size:12px; cursor:pointer;">
-          ✕ Xóa
+        <button type="button" id="btnClearReadingHighlight" style="background:#475569; color:white; border:none; border-radius:5px; padding:5px 9px; font-weight:800; font-size:12px; cursor:pointer;">
+          ✕ Hủy
         </button>
       `;
       document.body.appendChild(pop);
@@ -635,47 +661,67 @@ export class DiagReadingEngine {
     let savedRange = null;
 
     const checkSelection = (e) => {
+      // Nếu click vào thẻ mark đã tô màu -> cho phép xóa trực tiếp
+      if (e.target && e.target.classList.contains('ielts-user-highlight')) {
+        if (confirm("Em có muốn xóa đoạn bôi vàng này không?")) {
+          const markEl = e.target;
+          const parent = markEl.parentNode;
+          while (markEl.firstChild) parent.insertBefore(markEl.firstChild, markEl);
+          parent.removeChild(markEl);
+          this.savedPassageDom = container.innerHTML;
+          if (pop) pop.style.display = 'none';
+          return;
+        }
+      }
+
       const sel = window.getSelection();
       if (!sel || sel.isCollapsed || !sel.toString().trim()) {
-        if (!pop.contains(e.target)) pop.style.display = 'none';
+        if (pop && !pop.contains(e.target)) pop.style.display = 'none';
         return;
       }
 
       savedRange = sel.getRangeAt(0).cloneRange();
       const rect = savedRange.getBoundingClientRect();
-      pop.style.top = `${window.scrollY + rect.top - 38}px`;
-      pop.style.left = `${window.scrollX + rect.left + rect.width / 2 - 40}px`;
+
+      // Đặt vị trí popup cố định ngay trên từ ngữ vừa bôi đen
+      pop.style.top = `${Math.max(10, rect.top - 42)}px`;
+      pop.style.left = `${Math.max(10, rect.left + rect.width / 2 - 50)}px`;
       pop.style.display = 'flex';
     };
 
+    container.removeEventListener('mouseup', checkSelection);
     container.addEventListener('mouseup', checkSelection);
-    container.addEventListener('touchend', checkSelection);
 
-    document.getElementById('btnDoReadingHighlight').onclick = () => {
+    document.getElementById('btnDoReadingHighlight').onclick = (e) => {
+      e.stopPropagation();
       if (!savedRange) return;
       const span = document.createElement('mark');
       span.style.cssText = 'background:#FEF08A; color:inherit; padding:1px 2px; border-radius:3px; cursor:pointer;';
       span.className = 'ielts-user-highlight';
-      span.title = 'Bấm để xóa highlight';
-      span.onclick = (e) => {
-        e.stopPropagation();
-        const p = span.parentNode;
-        while (span.firstChild) p.insertBefore(span.firstChild, span);
-        p.removeChild(span);
-      };
+      span.title = 'Bấm vào để xóa bôi vàng';
+
       try {
         savedRange.surroundContents(span);
       } catch (err) {
-        document.execCommand('hiliteColor', false, '#FEF08A');
+        try {
+          span.appendChild(savedRange.extractContents());
+          savedRange.insertNode(span);
+        } catch(e2) {}
       }
-      pop.style.display = 'none';
+
+      // Lưu lại vết HTML đã highlight
+      this.savedPassageDom = container.innerHTML;
+
+      if (pop) pop.style.display = 'none';
       window.getSelection().removeAllRanges();
+      savedRange = null;
     };
 
-    document.getElementById('btnClearReadingHighlight').onclick = () => {
-      document.execCommand('removeFormat', false, null);
-      pop.style.display = 'none';
+    document.getElementById('btnClearReadingHighlight').onclick = (e) => {
+      e.stopPropagation();
+      if (pop) pop.style.display = 'none';
       window.getSelection().removeAllRanges();
+      savedRange = null;
     };
   }
 }
