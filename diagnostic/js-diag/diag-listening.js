@@ -1,7 +1,10 @@
 /**
  * diagnostic/js-diag/diag-listening.js
  * BỘ ĐIỀU KHIỂN LISTENING KHẢO THÍ CHUYÊN BIỆT (TEST 1, 2, 3 & 3 SET)
- * BẢN FULL ĐẦY ĐỦ 100% - BẢO TOÀN TẤT CẢ TÍNH NĂNG GỐC + HIGHLIGHT KHÔNG GIỚI HẠN
+ * BẢN FULL ĐẦY ĐỦ 100% - KHÔNG CẮT BỚT BẤT KỲ TÍNH NĂNG NÀO
+ * - TÍCH HỢP HỆ THỐNG KÉO THẢ MATCHING CHUẨN XÁC (DRAG & DROP + CLICK-TO-PLACE)
+ * - TUA AUDIO THEO TỪNG CÂU HỎI VÀ ĐỒNG BỘ TRANSCRIPT
+ * - BẢO TOÀN TẤT CẢ TÍNH NĂNG GỐC + HIGHLIGHT KHÔNG GIỚI HẠN
  */
 
 export class DiagListeningEngine {
@@ -20,6 +23,10 @@ export class DiagListeningEngine {
     this.userAnswers = {};
     this.metrics = {};
     this.isReviewMode = false;
+
+    // Biến trạng thái kéo thả Matching
+    this.draggedData = null;
+    this.selectedOptionForPlacement = null;
   }
 
   // =========================================================================
@@ -35,6 +42,8 @@ export class DiagListeningEngine {
     this.userAnswers = {};
     this.metrics = {};
     this.isReviewMode = false;
+    this.draggedData = null;
+    this.selectedOptionForPlacement = null;
 
     // A. NẾU LÀ TEST 1: NẠP ĐÚNG FILE GỐC test1-listening-s1/s2/s3.json
     if (this.testId === 'test_01') {
@@ -195,12 +204,12 @@ export class DiagListeningEngine {
       labelEl.innerText = `${part.title || `Part ${part.partNum || partIndex + 1}`}${timeStr}`;
     }
 
-    // Đổi link âm thanh nếu Part đó dùng file MP3 riêng biệt (như ở Test 1)
+    // Đổi link âm thanh nếu Part đó dùng file MP3 riêng biệt
     if (audioEl && part.audioUrl && audioEl.src !== part.audioUrl) {
       audioEl.src = part.audioUrl;
     }
 
-    // Nhảy mốc giây nếu dùng chung 1 file MP3 dài (như ở Test 2, 3, 4)
+    // Nhảy mốc giây nếu dùng chung 1 file MP3 dài
     if (audioEl && shouldSeekAndPlay) {
       let seekTarget = part.startTime;
       if (seekTarget === undefined) {
@@ -229,7 +238,7 @@ export class DiagListeningEngine {
   }
 
   // =========================================================================
-  // 4. RENDER CÂU HỎI ĐẦY ĐỦ 100% CẢ 4 DẠNG (GIỮ NGUYÊN NÚT TUA CÂU & ANSWER BANK)
+  // 4. RENDER CÂU HỎI ĐẦY ĐỦ 100% CẢ 4 DẠNG (KÉO THẢ MATCHING CHUẨN XÁC)
   // =========================================================================
   buildPartQuestionsHtml(part) {
     const replaySec = part.startTime || 0;
@@ -242,7 +251,7 @@ export class DiagListeningEngine {
       </div>
     `;
 
-    // TRƯỜNG HỢP A: ĐỀ TEST 1 CỦA MÀY (CÂU HỎI NẰM DẠNG DICTIONARY part.questions)
+    // TRƯỜNG HỢP A: ĐỀ TEST 1 CỦA BẠN (CÂU HỎI NẰM DẠNG DICTIONARY part.questions)
     if (part.questions && !part.groups) {
       Object.entries(part.questions).forEach(([qId, q]) => {
         html += `
@@ -266,7 +275,7 @@ export class DiagListeningEngine {
       return html;
     }
 
-    // TRƯỜNG HỢP B: ĐỀ CAMBRIDGE 21 (CÓ GROUPS, TEMPLATES, MAP, MATCHING)
+    // TRƯỜNG HỢP B: ĐỀ CAMBRIDGE 21 (CÓ GROUPS, TEMPLATES, MAP, MATCHING KÉO THẢ)
     (part.groups || []).forEach(group => {
       html += `<div style="font-size:15px; font-weight:900; color:#1E293B; margin:16px 0 6px 0;">${group.title || ''}</div>`;
       if (group.instructions) {
@@ -342,45 +351,55 @@ export class DiagListeningEngine {
           </table>
         `;
 
-      // 3. Matching 2 Cột với Hộp Answer Bank
+      // 3. Dạng Kéo Thả Matching Chuẩn Tương Tác Kép (Drag & Drop + Click-to-Place)
       } else if (group.type === 'matching' && Array.isArray(group.options)) {
-        html += `
-          <div style="display:flex; gap:18px; margin-bottom:18px; flex-wrap:wrap; align-items:flex-start;">
-            <div style="flex:1.4; min-width:280px; display:flex; flex-direction:column; gap:8px;">
-              ${(group.questionIds || []).map(qId => {
-                const q = (part.questions || {})[qId];
-                const num = q?.num || qId.replace('q','');
-                return `
-                  <div class="q-item-box" id="box_${qId}" style="margin-bottom:0; padding:12px 14px; background:#FFFFFF;">
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                      <b style="font-size:13.5px; color:#1E293B;">Câu ${num}: ${q?.text || ''}</b>
-                      ${q?.time ? `<button type="button" class="btn-3d btn-3d-white" style="padding:2px 6px; font-size:11px;" onclick="window.diagListeningEngine.seekAudio(${q.time})">▶ ${this.formatSecondsToTime(q.time)}</button>` : ''}
-                    </div>
-                    <div style="display:flex; gap:8px; align-items:center; margin-top:8px;">
-                      <span style="font-size:12.5px; font-weight:800; color:#64748B;">Đáp án chọn:</span>
-                      <select id="sel_${qId}" class="diag-input" style="width:auto; min-width:180px; padding:6px 10px; font-size:13px; margin-top:0;" onchange="window.diagListeningEngine.recordAnswer('${qId}', this.value)">
-                        <option value="">-- Chọn đáp án A-${String.fromCharCode(64 + group.options.length)} --</option>
-                        ${group.options.map(opt => `<option value="${opt.key}">${opt.key}. ${opt.text}</option>`).join('')}
-                      </select>
-                    </div>
-                    <div id="fb_${qId}" style="display:none; font-size:12px; font-weight:800; margin-top:4px;"></div>
-                  </div>
-                `;
-              }).join('')}
-            </div>
-
-            <!-- Answer Bank -->
-            <div style="flex:1; min-width:240px; background:#FFFFFF; border:2px solid #E8E2D8; border-radius:14px; padding:14px; position:sticky; top:10px;">
-              <b style="font-size:13.5px; color:#0369A1; display:block; margin-bottom:10px;">📋 ${group.optionsTitle || 'Danh mục lựa chọn'}:</b>
-              <div style="display:flex; flex-direction:column; gap:6px;">
-                ${group.options.map(opt => `
-                  <div style="background:#FAF7F2; border:1px solid #CBD5E1; border-radius:8px; padding:6px 10px; font-size:13px; font-weight:700;">
-                    <span style="background:#0284C7; color:white; padding:1px 6px; border-radius:4px; font-weight:900;">${opt.key}</span>
-                    <span style="color:#1E293B; margin-left:4px;">${opt.text}</span>
-                  </div>
-                `).join('')}
+        let leftRows = '';
+        (group.questionIds || []).forEach(qId => {
+          const q = (part.questions || {})[qId];
+          const num = q?.num || qId.replace('q','');
+          leftRows += `
+            <div class="q-item-box" id="box_${qId}" style="margin-bottom:8px; padding:12px 14px; background:#FFFFFF; display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;">
+              <div style="flex:1; min-width:200px;">
+                <b style="font-size:13.5px; color:#1E293B;">Câu ${num}: ${q?.text || ''}</b>
+                ${q?.time ? `<button type="button" class="btn-3d btn-3d-white" style="padding:2px 6px; font-size:11px; margin-left:4px;" onclick="window.diagListeningEngine.seekAudio(${q.time})">▶ ${this.formatSecondsToTime(q.time)}</button>` : ''}
+              </div>
+              <div id="dropzone_${qId}" 
+                   class="diag-dropzone" 
+                   style="min-width:180px; min-height:40px; border:2px dashed #0284C7; border-radius:10px; background:#F0F9FF; display:flex; align-items:center; justify-content:center; padding:6px 12px; cursor:pointer; user-select:none; transition:all 0.15s ease;"
+                   onclick="window.diagListeningEngine.handleDropzoneClick('${qId}')"
+                   ondragover="window.diagListeningEngine.handleDragOver(event)"
+                   ondragleave="window.diagListeningEngine.handleDragLeave(event)"
+                   ondrop="window.diagListeningEngine.handleDrop(event, '${qId}')">
+                <span style="color:#64748B; font-size:12px; font-style:italic;">Kéo hoặc bấm chọn vào đây</span>
               </div>
             </div>
+            <div id="fb_${qId}" style="display:none; font-size:12px; font-weight:800; margin-bottom:8px; padding:4px 8px; border-radius:6px;"></div>
+          `;
+        });
+
+        const rightBank = `
+          <div style="flex:1; min-width:240px; background:#FFFFFF; border:2.5px solid #BAE6FD; border-radius:16px; padding:16px; position:sticky; top:12px;">
+            <b style="font-size:13.5px; color:#0369A1; display:block; margin-bottom:10px;">📋 ${group.optionsTitle || 'Ngân hàng đáp án (Kéo thả hoặc bấm để chọn)'}:</b>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+              ${group.options.map(opt => `
+                <div class="diag-matching-card" 
+                     id="opt_card_${opt.key}"
+                     draggable="true" 
+                     ondragstart="window.diagListeningEngine.handleDragStart(event, '${opt.key}', '${opt.text.replace(/'/g, "\\'")}')" 
+                     onclick="window.diagListeningEngine.selectOptionCard('${opt.key}', '${opt.text.replace(/'/g, "\\'")}', this)"
+                     style="background:#FAF7F2; border:2px solid #CBD5E1; border-bottom:4px solid #94A3B8; border-radius:10px; padding:8px 12px; font-size:13px; font-weight:700; cursor:grab; user-select:none; display:flex; align-items:center; gap:8px; transition:all 0.1s ease;">
+                  <span style="background:#0284C7; color:white; padding:2px 7px; border-radius:6px; font-weight:900; font-size:12px;">${opt.key}</span>
+                  <span style="color:#1E293B;">${opt.text}</span>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+
+        html += `
+          <div style="display:flex; gap:16px; margin-bottom:18px; flex-wrap:wrap; align-items:flex-start;">
+            <div style="flex:1.4; min-width:280px; display:flex; flex-direction:column;">${leftRows}</div>
+            ${rightBank}
           </div>
         `;
 
@@ -423,7 +442,105 @@ export class DiagListeningEngine {
   }
 
   // =========================================================================
-  // 5. GHI NHẬN ĐÁP ÁN & ĐỒNG BỘ GIAO DIỆN
+  // 5. CÁC HÀM XỬ LÝ KÉO THẢ MATCHING LISTENING
+  // =========================================================================
+  handleDragStart(e, key, text) {
+    this.draggedData = { key, text };
+    try {
+      e.dataTransfer.setData('text/plain', JSON.stringify({ key, text }));
+    } catch(err) {}
+  }
+
+  handleDragOver(e) {
+    e.preventDefault();
+    e.currentTarget.style.borderColor = '#059669';
+    e.currentTarget.style.background = '#ECFDF5';
+  }
+
+  handleDragLeave(e) {
+    e.currentTarget.style.borderColor = '#0284C7';
+    e.currentTarget.style.background = '#F0F9FF';
+  }
+
+  handleDrop(e, qId) {
+    e.preventDefault();
+    e.currentTarget.style.borderColor = '#0284C7';
+    e.currentTarget.style.background = '#F0F9FF';
+
+    let data = this.draggedData;
+    try {
+      const raw = e.dataTransfer.getData('text/plain');
+      if (raw) data = JSON.parse(raw);
+    } catch(err) {}
+
+    if (data && data.key) {
+      this.placeAnswerIntoDropzone(qId, data.key, data.text);
+    }
+  }
+
+  selectOptionCard(key, text, el) {
+    document.querySelectorAll('.diag-matching-card').forEach(c => {
+      c.style.borderColor = '#CBD5E1';
+      c.style.background = '#FAF7F2';
+    });
+
+    if (this.selectedOptionForPlacement && this.selectedOptionForPlacement.key === key) {
+      this.selectedOptionForPlacement = null;
+    } else {
+      this.selectedOptionForPlacement = { key, text };
+      if (el) {
+        el.style.borderColor = '#0284C7';
+        el.style.background = '#E0F2FE';
+      }
+    }
+  }
+
+  handleDropzoneClick(qId) {
+    if (this.selectedOptionForPlacement) {
+      this.placeAnswerIntoDropzone(qId, this.selectedOptionForPlacement.key, this.selectedOptionForPlacement.text);
+      document.querySelectorAll('.diag-matching-card').forEach(c => {
+        c.style.borderColor = '#CBD5E1';
+        c.style.background = '#FAF7F2';
+      });
+      this.selectedOptionForPlacement = null;
+    }
+  }
+
+  placeAnswerIntoDropzone(qId, key, text) {
+    this.recordAnswer(qId, key);
+    this.renderDropzoneContent(qId, key, text);
+  }
+
+  renderDropzoneContent(qId, key, text) {
+    const dz = document.getElementById(`dropzone_${qId}`);
+    if (dz) {
+      dz.style.background = '#FFFFFF';
+      dz.style.borderColor = '#0284C7';
+      dz.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center; width:100%; gap:8px;">
+          <div style="display:flex; align-items:center; gap:6px;">
+            <span style="font-weight:900; background:#0284C7; color:white; padding:1px 6px; border-radius:4px; font-size:12px;">${key}</span>
+            <span style="font-weight:800; color:#0369A1; font-size:12.5px;">${text}</span>
+          </div>
+          <button type="button" onclick="window.diagListeningEngine.clearDropAnswer('${qId}', event)" style="background:#FEE2E2; color:#DC2626; border:none; border-radius:50%; width:20px; height:20px; font-weight:900; cursor:pointer; font-size:11px; display:flex; align-items:center; justify-content:center;">✕</button>
+        </div>
+      `;
+    }
+  }
+
+  clearDropAnswer(qId, e) {
+    if (e) e.stopPropagation();
+    this.recordAnswer(qId, '');
+    const dz = document.getElementById(`dropzone_${qId}`);
+    if (dz) {
+      dz.style.background = '#F0F9FF';
+      dz.style.borderColor = '#0284C7';
+      dz.innerHTML = `<span style="color:#64748B; font-size:12px; font-style:italic;">Kéo hoặc bấm chọn vào đây</span>`;
+    }
+  }
+
+  // =========================================================================
+  // 6. GHI NHẬN ĐÁP ÁN & ĐỒNG BỘ GIAO DIỆN
   // =========================================================================
   recordAnswer(qId, val) {
     if (this.isReviewMode) return;
@@ -435,11 +552,21 @@ export class DiagListeningEngine {
       const inp = document.getElementById(`inp_${qId}`);
       if (inp) inp.value = val;
 
-      const sel = document.getElementById(`sel_${qId}`);
-      if (sel) sel.value = val;
-
       const radio = document.querySelector(`input[name="ans_${qId}"][value="${val}"]`);
       if (radio) radio.checked = true;
+
+      // Khôi phục ô kéo thả nếu có đáp án
+      const dz = document.getElementById(`dropzone_${qId}`);
+      if (dz && val) {
+        let optText = val;
+        (part.groups || []).forEach(g => {
+          if (Array.isArray(g.options)) {
+            const found = g.options.find(o => o.key === val);
+            if (found) optText = found.text;
+          }
+        });
+        this.renderDropzoneContent(qId, val, optText);
+      }
     });
   }
 
@@ -470,7 +597,7 @@ export class DiagListeningEngine {
   }
 
   // =========================================================================
-  // 6. CHẤM ĐIỂM CHUẨN XÁC TUYỆT ĐỐI (EVALUATE)
+  // 7. CHẤM ĐIỂM CHUẨN XÁC TUYỆT ĐỐI (EVALUATE)
   // =========================================================================
   evaluate() {
     let score = 0;
@@ -532,7 +659,7 @@ export class DiagListeningEngine {
   }
 
   // =========================================================================
-  // 7. REVIEW MODE: BẬT TRANSCRIPT & TÔ MÀU ĐÚNG SAI KÈM GIẢI THÍCH
+  // 8. REVIEW MODE: BẬT TRANSCRIPT & TÔ MÀU ĐÚNG SAI KÈM GIẢI THÍCH
   // =========================================================================
   renderReviewMode(evalResult) {
     this.isReviewMode = true;
@@ -548,16 +675,16 @@ export class DiagListeningEngine {
       const inp = document.getElementById(`inp_${item.questionId}`);
       const box = document.getElementById(`box_${item.questionId}`);
       const row = document.getElementById(`row_${item.questionId}`);
-      const sel = document.getElementById(`sel_${item.questionId}`);
+      const dz = document.getElementById(`dropzone_${item.questionId}`);
 
       if (inp) {
         inp.style.borderColor = item.isCorrect ? '#22C55E' : '#EF4444';
         inp.style.backgroundColor = item.isCorrect ? '#F0FDF4' : '#FEF2F2';
         inp.disabled = true;
       }
-      if (sel) {
-        sel.style.borderColor = item.isCorrect ? '#22C55E' : '#EF4444';
-        sel.disabled = true;
+      if (dz) {
+        dz.style.borderColor = item.isCorrect ? '#22C55E' : '#EF4444';
+        dz.style.backgroundColor = item.isCorrect ? '#F0FDF4' : '#FEF2F2';
       }
       if (box) {
         box.style.border = `2px solid ${item.isCorrect ? '#22C55E' : '#EF4444'}`;
@@ -578,13 +705,12 @@ export class DiagListeningEngine {
   }
 
   // =========================================================================
-  // 8. CÔNG CỤ HIGHLIGHT KHÔNG GIỚI HẠN (IELTS CBT TEXT HIGHLIGHTER)
+  // 9. CÔNG CỤ HIGHLIGHT KHÔNG GIỚI HẠN (IELTS CBT TEXT HIGHLIGHTER)
   // =========================================================================
   initTextHighlighter(container) {
     if (!container || container._hasHighlighter) return;
     container._hasHighlighter = true;
 
-    // Tạo popup nút highlight nổi
     let pop = document.getElementById('ielts_highlighter_pop');
     if (!pop) {
       pop = document.createElement('div');
