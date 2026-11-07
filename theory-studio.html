@@ -23,6 +23,15 @@
       --text-main: #1E1B4B;
     }
 
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      max-width: 100vw;
+      overflow-x: hidden !important;
+    }
+
     body {
       background-color: var(--bg-cream) !important;
       background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 100 100"><circle cx="50" cy="50" r="34" fill="none" stroke="%238B1518" stroke-width="8" opacity="0.045"/><rect x="15" y="44" width="70" height="12" rx="2" fill="%238B1518" opacity="0.045"/></svg>');
@@ -31,12 +40,13 @@
       color: #1E293B;
       font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
       margin: 0;
-      padding: 16px;
+      padding: 14px;
     }
 
     .studio-container {
-      max-width: 1240px;
+      max-width: 1260px;
       margin: 0 auto;
+      width: 100%;
     }
 
     /* TOPBAR */
@@ -48,15 +58,15 @@
       border: 2.5px solid var(--duo-border);
       border-bottom: 5px solid var(--duo-shadow);
       border-radius: 20px;
-      padding: 14px 22px;
-      margin-bottom: 18px;
+      padding: 12px 20px;
+      margin-bottom: 16px;
       flex-wrap: wrap;
-      gap: 12px;
+      gap: 10px;
     }
 
     .btn-3d {
-      border: none; border-radius: 14px; font-family: inherit; font-weight: 900; font-size: 13.5px;
-      text-transform: uppercase; padding: 10px 20px; display: inline-flex; align-items: center;
+      border: none; border-radius: 14px; font-family: inherit; font-weight: 900; font-size: 13px;
+      text-transform: uppercase; padding: 9px 18px; display: inline-flex; align-items: center;
       justify-content: center; gap: 8px; cursor: pointer; text-decoration: none; transition: all 0.08s ease;
       box-sizing: border-box; white-space: nowrap;
     }
@@ -64,34 +74,37 @@
     .btn-3d-white { background: #FFFFFF; color: #1E293B !important; border: 2px solid var(--duo-border); border-bottom: 4px solid var(--duo-shadow); }
     .btn-3d-red { background: var(--tram-red); color: #FFFFFF !important; border-bottom: 4px solid var(--tram-red-shadow); }
     .btn-3d-amber { background: #F59E0B; color: #1E1B4B !important; border-bottom: 4px solid #B45309; }
+    .btn-3d-blue { background: #0284C7; color: #FFFFFF !important; border-bottom: 4px solid #0369A1; }
 
-    /* LAYOUT 2 CỘT */
+    /* LAYOUT 2 CỘT CHỐNG TRÀN TUYỆT ĐỐI */
     .studio-layout {
       display: grid;
-      grid-template-columns: 1.55fr 1fr;
-      gap: 20px;
+      grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr);
+      gap: 16px;
       align-items: start;
+      width: 100%;
     }
 
     @media (max-width: 960px) {
       .studio-layout {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
       }
     }
 
-    /* KHUNG VIDEO PLAYER CHỐNG LỘ LINK & BẢO VỆ SKIP AD */
+    /* KHUNG VIDEO PLAYER */
     .video-card-box {
       background: #FFFFFF;
       border: 2.5px solid var(--duo-border);
       border-bottom: 6px solid var(--duo-shadow);
-      border-radius: 24px;
-      padding: 18px;
+      border-radius: 22px;
+      padding: 16px;
+      min-width: 0;
     }
 
     .video-viewport-wrapper {
       position: relative;
       width: 100%;
-      padding-top: 56.25%; /* Tỉ lệ 16:9 */
+      padding-top: 56.25%;
       background: #000000;
       border-radius: 16px;
       overflow: hidden;
@@ -104,21 +117,10 @@
       border: none;
     }
 
-    /* KHIÊN ĐỤC LỖ THÔNG MINH */
-    .shield-top-bar {
-      position: absolute; top: 0; left: 0; right: 0; height: 60px;
-      z-index: 4; background: transparent; pointer-events: auto;
-    }
-    .shield-bottom-left-link {
-      position: absolute; bottom: 0; left: 0; width: 120px; height: 52px;
-      z-index: 4; background: transparent; pointer-events: auto;
-    }
-    .shield-bottom-right-logo {
-      position: absolute; bottom: 0; right: 0; width: 95px; height: 42px;
-      z-index: 4; background: transparent; pointer-events: auto;
-    }
+    .shield-top-bar { position: absolute; top: 0; left: 0; right: 0; height: 60px; z-index: 4; background: transparent; }
+    .shield-bottom-left-link { position: absolute; bottom: 0; left: 0; width: 120px; height: 52px; z-index: 4; background: transparent; }
+    .shield-bottom-right-logo { position: absolute; bottom: 0; right: 0; width: 95px; height: 42px; z-index: 4; background: transparent; }
 
-    /* BỘ ĐIỀU KHIỂN TRẠM IELTS CUSTOM PLAYER BAR */
     .custom-player-bar {
       background: #0F172A;
       color: #FFFFFF;
@@ -130,241 +132,141 @@
       gap: 8px;
     }
 
-    .progress-seek-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
+    .progress-seek-row { display: flex; align-items: center; gap: 10px; }
     .video-progress-bar {
-      flex: 1;
-      height: 6px;
-      -webkit-appearance: none;
-      background: #334155;
-      border-radius: 4px;
-      outline: none;
-      cursor: pointer;
+      flex: 1; height: 6px; -webkit-appearance: none; background: #334155; border-radius: 4px; outline: none; cursor: pointer;
     }
     .video-progress-bar::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      width: 14px; height: 14px;
-      border-radius: 50%;
-      background: #F59E0B;
-      cursor: pointer;
+      -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; background: #F59E0B; cursor: pointer;
     }
 
     .controls-action-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 10px;
+      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;
     }
-
     .ctrl-btn {
-      background: transparent;
-      border: none;
-      color: #FFFFFF;
-      font-size: 15px;
-      cursor: pointer;
-      padding: 4px 8px;
-      border-radius: 6px;
-      font-weight: 800;
+      background: transparent; border: none; color: #FFFFFF; font-size: 15px; cursor: pointer;
+      padding: 4px 8px; border-radius: 6px; font-weight: 800;
     }
     .ctrl-btn:hover { background: rgba(255,255,255,0.15); }
     .speed-btn.active { background: #F59E0B; color: #0F172A; }
 
-    /* CỘT PLAYLIST */
+    /* CỘT PLAYLIST & DẠNG BÀI */
     .playlist-card-box {
       background: #FFFFFF;
       border: 2.5px solid var(--duo-border);
       border-bottom: 6px solid var(--duo-shadow);
-      border-radius: 24px;
-      padding: 18px;
+      border-radius: 22px;
+      padding: 16px;
+      min-width: 0;
     }
 
     .skill-filter-bar {
-      display: flex;
-      gap: 6px;
-      overflow-x: auto;
-      padding-bottom: 8px;
-      margin-bottom: 10px;
+      display: flex; gap: 6px; overflow-x: auto; padding-bottom: 6px; margin-bottom: 10px;
     }
-
     .skill-pill-btn {
-      padding: 6px 14px;
-      border-radius: 12px;
-      font-size: 12px;
-      font-weight: 800;
-      border: 2px solid var(--duo-border);
-      background: #FAF7F2;
-      cursor: pointer;
-      color: #64748B;
-      white-space: nowrap;
+      padding: 6px 12px; border-radius: 12px; font-size: 12px; font-weight: 800;
+      border: 2px solid var(--duo-border); background: #FAF7F2; cursor: pointer; color: #64748B; white-space: nowrap;
     }
-    .skill-pill-btn.active {
-      background: var(--tram-red);
-      color: #FFFFFF;
-      border-color: var(--tram-red);
-    }
+    .skill-pill-btn.active { background: var(--tram-red); color: #FFFFFF; border-color: var(--tram-red); }
 
-    /* THANH LỌC DẠNG BÀI CON (SUB-CATEGORY PILLS) */
+    /* HÀNG DẠNG BÀI CON (SUB-CATEGORY PILLS) */
     .sub-filter-scroll-wrapper {
       background: #F8FAFC;
       border: 1.5px solid #E2E8F0;
       border-radius: 14px;
       padding: 8px 10px;
       margin-bottom: 12px;
+      min-width: 0;
     }
     .sub-filter-title {
-      font-size: 11px;
-      font-weight: 900;
-      color: #0284C7;
-      text-transform: uppercase;
-      margin-bottom: 6px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
+      font-size: 11px; font-weight: 900; color: #0284C7; text-transform: uppercase;
+      margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center;
     }
     .sub-filter-bar {
-      display: flex;
-      gap: 6px;
-      overflow-x: auto;
-      padding-bottom: 4px;
+      display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px;
     }
     .sub-pill-btn {
-      padding: 5px 12px;
-      border-radius: 10px;
-      font-size: 11.5px;
-      font-weight: 800;
-      border: 1.5px solid #CBD5E1;
-      background: #FFFFFF;
-      cursor: pointer;
-      color: #334155;
-      white-space: nowrap;
+      padding: 5px 10px; border-radius: 10px; font-size: 11px; font-weight: 800;
+      border: 1.5px solid #CBD5E1; background: #FFFFFF; cursor: pointer; color: #334155; white-space: nowrap;
       transition: all 0.1s ease;
     }
-    .sub-pill-btn:hover {
-      border-color: #0284C7;
-      color: #0284C7;
-    }
-    .sub-pill-btn.active {
-      background: #0284C7;
-      color: #FFFFFF;
-      border-color: #0284C7;
-      box-shadow: 0 2px 6px rgba(2, 132, 199, 0.25);
+    .sub-pill-btn:hover { border-color: #0284C7; color: #0284C7; }
+    .sub-pill-btn.active { background: #0284C7; color: #FFFFFF; border-color: #0284C7; }
+
+    /* BATCH ACTION BAR (CHUYỂN DẠNG BÀI HÀNG LOẠT) */
+    .batch-bar-box {
+      background: #EFF6FF;
+      border: 1.5px solid #BFDBFE;
+      border-radius: 12px;
+      padding: 8px 10px;
+      margin-bottom: 10px;
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
     }
 
     /* PLAYLIST ITEM */
     .playlist-item {
-      padding: 10px 12px;
-      border-radius: 14px;
-      border: 2px solid var(--duo-border);
-      background: #FAF7F2;
-      cursor: pointer;
-      margin-bottom: 8px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      transition: all 0.1s ease;
-      position: relative;
+      padding: 8px 10px; border-radius: 14px; border: 2px solid var(--duo-border); background: #FAF7F2;
+      cursor: pointer; margin-bottom: 8px; display: flex; align-items: center; gap: 8px;
+      transition: all 0.1s ease; position: relative; min-width: 0;
     }
-    .playlist-item:hover {
-      background: #FFFFFF;
-      border-color: #F59E0B;
-      transform: translateX(3px);
-    }
-    .playlist-item.active {
-      background: #FFFBEB;
-      border-color: #D97706;
-      border-left: 6px solid #B45309;
-    }
-    .playlist-item.is-draft {
-      opacity: 0.7;
-      border-style: dashed;
-    }
+    .playlist-item:hover { background: #FFFFFF; border-color: #F59E0B; transform: translateX(2px); }
+    .playlist-item.active { background: #FFFBEB; border-color: #D97706; border-left: 5px solid #B45309; }
+    .playlist-item.is-draft { opacity: 0.7; border-style: dashed; }
+
+    .batch-checkbox { width: 16px; height: 16px; cursor: pointer; display: none; }
+    .is-admin-mode .batch-checkbox { display: inline-block; }
 
     .playlist-thumb {
-      width: 62px;
-      height: 38px;
-      border-radius: 6px;
-      object-fit: cover;
-      flex-shrink: 0;
-      border: 1px solid var(--duo-border);
-      background: #000;
+      width: 58px; height: 36px; border-radius: 6px; object-fit: cover; flex-shrink: 0;
+      border: 1px solid var(--duo-border); background: #000;
     }
 
     .btn-mark-done {
-      width: 22px;
-      height: 22px;
-      border-radius: 50%;
-      border: 2px solid #CBD5E1;
-      background: #FFFFFF;
-      color: transparent;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 11px;
-      font-weight: 900;
-      cursor: pointer;
-      flex-shrink: 0;
-      padding: 0;
+      width: 22px; height: 22px; border-radius: 50%; border: 2px solid #CBD5E1; background: #FFFFFF;
+      color: transparent; display: flex; align-items: center; justify-content: center; font-size: 11px;
+      font-weight: 900; cursor: pointer; flex-shrink: 0; padding: 0;
     }
-    .btn-mark-done.done {
-      background: #16A34A;
-      border-color: #16A34A;
-      color: #FFFFFF;
-    }
+    .btn-mark-done.done { background: #16A34A; border-color: #16A34A; color: #FFFFFF; }
 
     .badge-draft-tag {
-      background: #FEE2E2;
-      color: #DC2626;
-      border: 1px solid #FCA5A5;
-      font-size: 10px;
-      font-weight: 900;
-      padding: 1px 6px;
-      border-radius: 6px;
-      text-transform: uppercase;
+      background: #FEE2E2; color: #DC2626; border: 1px solid #FCA5A5; font-size: 9.5px;
+      font-weight: 900; padding: 1px 5px; border-radius: 5px; text-transform: uppercase;
     }
 
     /* NÚT THAO TÁC ADMIN */
-    .admin-item-actions {
-      display: none;
-      align-items: center;
-      gap: 4px;
-      flex-shrink: 0;
-    }
-    .is-admin-mode .admin-item-actions {
-      display: flex;
-    }
+    .admin-item-actions { display: none; align-items: center; gap: 4px; flex-shrink: 0; }
+    .is-admin-mode .admin-item-actions { display: flex; }
     .btn-item-ctrl {
-      border: none;
-      border-radius: 6px;
-      padding: 3px 6px;
-      font-size: 11.5px;
-      font-weight: 800;
-      cursor: pointer;
-      background: #E2E8F0;
-      color: #334155;
+      border: none; border-radius: 6px; padding: 3px 6px; font-size: 11px; font-weight: 800;
+      cursor: pointer; background: #E2E8F0; color: #334155;
     }
     .btn-item-ctrl:hover { background: #CBD5E1; }
     .btn-item-edit { background: #DBEAFE; color: #1D4ED8; }
     .btn-item-del { background: #FEE2E2; color: #DC2626; }
     .btn-item-pub { background: #FEF3C7; color: #B45309; }
+    .btn-item-cat { background: #E0E7FF; color: #4338CA; }
 
-    /* ADMIN DRAWER */
+    /* MODAL QUẢN LÝ DẠNG BÀI */
+    .modal-overlay {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5);
+      display: none; align-items: center; justify-content: center; z-index: 9999; padding: 16px;
+    }
+    .modal-box {
+      background: #FFFFFF; border-radius: 20px; border: 3px solid var(--duo-border);
+      width: 100%; max-width: 540px; padding: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    }
+
     .admin-drawer {
-      background: #FFFBEB;
-      border: 2px solid #F59E0B;
-      border-radius: 16px;
-      padding: 16px;
-      margin-bottom: 16px;
-      display: none;
+      background: #FFFBEB; border: 2px solid #F59E0B; border-radius: 16px;
+      padding: 16px; margin-bottom: 16px; display: none;
     }
     .duo-input {
-      width: 100%; box-sizing: border-box; padding: 10px 14px; border: 2px solid var(--duo-border);
-      border-radius: 12px; font-size: 13.5px; font-family: inherit; font-weight: 700; color: #1E293B;
-      background: #FAF7F2; outline: none; margin-bottom: 10px;
+      width: 100%; box-sizing: border-box; padding: 9px 12px; border: 2px solid var(--duo-border);
+      border-radius: 12px; font-size: 13px; font-family: inherit; font-weight: 700; color: #1E293B;
+      background: #FAF7F2; outline: none; margin-bottom: 8px;
     }
     .duo-input:focus { background: #FFFFFF; border-color: var(--tram-red); }
   </style>
@@ -377,37 +279,37 @@
 
   <!-- TOPBAR -->
   <div class="studio-topbar">
-    <div style="display: flex; align-items: center; gap: 12px;">
-      <a href="index.html" class="btn-3d btn-3d-white" style="padding: 8px 16px; font-size: 13px;">
-        <i class="fa-solid fa-arrow-left"></i> VỀ TRANG CHỦ
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <a href="index.html" class="btn-3d btn-3d-white" style="padding: 7px 14px; font-size: 12px;">
+        <i class="fa-solid fa-arrow-left"></i> TRANG CHỦ
       </a>
       <div>
-        <h3 style="margin: 0; font-size: 18px; font-weight: 900; color: #1E1B4B;">PHÒNG BÀI GIẢNG LÝ THUYẾT TRẠM IELTS</h3>
-        <span style="font-size: 12px; font-weight: 700; color: #64748B;">Học phương pháp & chiến thuật độc quyền từ Thầy Phúc</span>
+        <h3 style="margin: 0; font-size: 17px; font-weight: 900; color: #1E1B4B;">PHÒNG BÀI GIẢNG LÝ THUYẾT TRẠM IELTS</h3>
+        <span style="font-size: 11.5px; font-weight: 700; color: #64748B;">Học phương pháp & chiến thuật độc quyền từ Thầy Phúc</span>
       </div>
     </div>
 
     <div style="display: flex; align-items: center; gap: 8px;">
-      <button type="button" id="btnToggleAdminDrawer" onclick="toggleAdminDrawer()" class="btn-3d btn-3d-amber" style="display: none; padding: 8px 14px; font-size: 12px;">
-        <i class="fa-solid fa-gear"></i> QUẢN TRỊ VIDEO (ADMIN)
+      <button type="button" id="btnToggleAdminDrawer" onclick="toggleAdminDrawer()" class="btn-3d btn-3d-amber" style="display: none; padding: 7px 12px; font-size: 11.5px;">
+        <i class="fa-solid fa-gear"></i> QUẢN TRỊ BÀI HỌC (ADMIN)
       </button>
-      <span style="background: #FFF4E5; color: #D97706; border: 2px solid #FCD34D; padding: 6px 14px; border-radius: 12px; font-weight: 900; font-size: 12.5px;">
-        <i class="fa-solid fa-shield-halved"></i> BẢN QUYỀN TRẠM IELTS
+      <span style="background: #FFF4E5; color: #D97706; border: 1.5px solid #FCD34D; padding: 5px 12px; border-radius: 10px; font-weight: 900; font-size: 11.5px;">
+        <i class="fa-solid fa-shield-halved"></i> TRẠM IELTS
       </span>
     </div>
   </div>
 
   <!-- ADMIN DRAWER (THÊM & SỬA BÀI HỌC) -->
   <div id="adminVideoDrawer" class="admin-drawer">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
-      <b style="color: #92400E; font-size: 14.5px;" id="adminDrawerHeaderTitle">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 8px;">
+      <b style="color: #92400E; font-size: 14px;" id="adminDrawerHeaderTitle">
         <i class="fa-solid fa-plus-circle"></i> THÊM BÀI GIẢNG MỚI (TỰ ĐỘNG LỌC ID YOUTUBE)
       </b>
-      <div style="display: flex; gap: 8px;">
-        <button type="button" class="btn-3d btn-3d-white" id="btnCancelEdit" onclick="cancelAdminEdit()" style="display: none; padding: 6px 12px; font-size: 12px;">
+      <div style="display: flex; gap: 6px;">
+        <button type="button" class="btn-3d btn-3d-white" id="btnCancelEdit" onclick="cancelAdminEdit()" style="display: none; padding: 5px 10px; font-size: 11.5px;">
           ✕ Hủy Chỉnh Sửa
         </button>
-        <button type="button" class="btn-3d btn-3d-white" onclick="exportVideosJSON()" style="padding: 6px 12px; font-size: 12px;">
+        <button type="button" class="btn-3d btn-3d-white" onclick="exportVideosJSON()" style="padding: 5px 10px; font-size: 11.5px;">
           📥 Xuất File JSON Vĩnh Viễn
         </button>
       </div>
@@ -415,10 +317,10 @@
 
     <input type="hidden" id="adminInputEditId" value="">
 
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 8px;">
       <div>
-        <label style="font-size: 12px; font-weight: 800; color: #475569;">Phân hệ kỹ năng:</label>
-        <select id="adminInputSkill" class="duo-input">
+        <label style="font-size: 11.5px; font-weight: 800; color: #475569;">Phân hệ kỹ năng:</label>
+        <select id="adminInputSkill" class="duo-input" onchange="populateCategoryDropdown()">
           <option value="reading">6. IELTS Reading</option>
           <option value="listening">4. IELTS Listening</option>
           <option value="writing_t1">8A. IELTS Writing Task 1</option>
@@ -434,74 +336,77 @@
         </select>
       </div>
       <div>
-        <label style="font-size: 12px; font-weight: 800; color: #475569;">Dạng bài con (Sub-Category):</label>
-        <input type="text" id="adminInputCategory" class="duo-input" placeholder="Ví dụ: TRUE/FALSE/NOT GIVEN, GAP FILL...">
+        <label style="font-size: 11.5px; font-weight: 800; color: #475569;">Chọn Dạng bài con có sẵn:</label>
+        <select id="adminSelectCategory" class="duo-input" onchange="onSelectExistingCategory(this.value)">
+          <option value="">-- Chọn hoặc gõ mới bên dưới --</option>
+        </select>
       </div>
       <div>
-        <label style="font-size: 12px; font-weight: 800; color: #475569;">Thứ tự bài học (#):</label>
+        <label style="font-size: 11.5px; font-weight: 800; color: #475569;">Tên Dạng bài (Tự do gõ):</label>
+        <input type="text" id="adminInputCategory" class="duo-input" placeholder="Ví dụ: TRUE/FALSE/NOT GIVEN...">
+      </div>
+      <div>
+        <label style="font-size: 11.5px; font-weight: 800; color: #475569;">Thứ tự bài học (#):</label>
         <input type="number" id="adminInputOrder" class="duo-input" value="1">
       </div>
       <div>
-        <label style="font-size: 12px; font-weight: 800; color: #475569;">Thời lượng (phút:giây):</label>
+        <label style="font-size: 11.5px; font-weight: 800; color: #475569;">Thời lượng (phút:giây):</label>
         <input type="text" id="adminInputDuration" class="duo-input" placeholder="Ví dụ: 15:30">
       </div>
     </div>
 
     <div>
-      <label style="font-size: 12px; font-weight: 800; color: #475569;">Tiêu đề bài học:</label>
+      <label style="font-size: 11.5px; font-weight: 800; color: #475569;">Tiêu đề bài học:</label>
       <input type="text" id="adminInputTitle" class="duo-input" placeholder="Ví dụ: GIẢI QUYẾT DẠNG TRUE/FALSE/NOT GIVEN...">
     </div>
 
     <div>
-      <label style="font-size: 12px; font-weight: 800; color: var(--tram-red);">🔗 Dán Link YouTube bất kỳ (Tự bóc tách ID):</label>
+      <label style="font-size: 11.5px; font-weight: 800; color: var(--tram-red);">🔗 Dán Link YouTube bất kỳ (Tự bóc tách ID):</label>
       <input type="text" id="adminInputUrl" class="duo-input" placeholder="https://youtu.be/... hoặc https://www.youtube.com/watch?v=...">
     </div>
 
     <div>
-      <label style="font-size: 12px; font-weight: 800; color: #475569;">Ghi chú tóm tắt bài học:</label>
+      <label style="font-size: 11.5px; font-weight: 800; color: #475569;">Ghi chú tóm tắt bài học:</label>
       <input type="text" id="adminInputDesc" class="duo-input" placeholder="Những lưu ý quan trọng cần ghi nhớ...">
     </div>
 
-    <!-- NÚT GẠT BẢN NHÁP / CÔNG KHAI -->
-    <div style="margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
-      <input type="checkbox" id="adminInputIsPublished" checked style="width: 18px; height: 18px; cursor: pointer;">
-      <label for="adminInputIsPublished" style="font-size: 13px; font-weight: 800; color: #166534; cursor: pointer;">
+    <div style="margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+      <input type="checkbox" id="adminInputIsPublished" checked style="width: 16px; height: 16px; cursor: pointer;">
+      <label for="adminInputIsPublished" style="font-size: 12.5px; font-weight: 800; color: #166534; cursor: pointer;">
         ✓ Công khai bài giảng cho học sinh xem ngay (Bỏ tích để lưu dạng Bản nháp)
       </label>
     </div>
 
     <div style="display: flex; gap: 8px;">
-      <button type="button" class="btn-3d btn-3d-red" id="btnAdminSubmit" onclick="saveAdminVideo()" style="padding: 9px 18px; font-size: 13px;">
+      <button type="button" class="btn-3d btn-3d-red" id="btnAdminSubmit" onclick="saveAdminVideo()" style="padding: 8px 16px; font-size: 12px;">
         💾 Lưu Bài Giảng Ngay
       </button>
-      <span id="adminSaveStatus" style="font-size: 13px; font-weight: 800; color: #16A34A; align-self: center;"></span>
+      <span id="adminSaveStatus" style="font-size: 12px; font-weight: 800; color: #16A34A; align-self: center;"></span>
     </div>
   </div>
 
   <!-- BỐ CỤC CHÍNH 2 CỘT -->
   <div class="studio-layout">
 
-    <!-- CỘT 1: KHUNG CHIẾU VIDEO BẢO MẬT & PLAYER CONTROLS -->
+    <!-- CỘT 1: KHUNG CHIẾU VIDEO -->
     <div class="video-card-box">
       <div class="video-viewport-wrapper" id="videoWrapperContainer" oncontextmenu="return false;">
         <div id="youtubePlayerPlaceholder"></div>
-
-        <!-- LÁ CHẮN ĐỤC LỖ THÔNG MINH -->
         <div class="shield-top-bar" title="Trạm IELTS Masterclass Player"></div>
         <div class="shield-bottom-left-link" title="Bản quyền Trạm IELTS"></div>
         <div class="shield-bottom-right-logo" title="Trạm IELTS"></div>
       </div>
 
-      <!-- BỘ ĐIỀU KHIỂN TRẠM IELTS CUSTOM PLAYER BAR -->
+      <!-- CUSTOM PLAYER BAR -->
       <div class="custom-player-bar">
         <div class="progress-seek-row">
-          <span id="playerCurrentTime" style="font-size: 12px; font-weight: 800; min-width: 40px;">00:00</span>
+          <span id="playerCurrentTime" style="font-size: 11.5px; font-weight: 800; min-width: 38px;">00:00</span>
           <input type="range" id="playerProgressBar" class="video-progress-bar" value="0" min="0" max="100" step="0.1" oninput="onSeekbarInput(this.value)">
-          <span id="playerTotalDuration" style="font-size: 12px; font-weight: 800; min-width: 40px; color: #94A3B8;">00:00</span>
+          <span id="playerTotalDuration" style="font-size: 11.5px; font-weight: 800; min-width: 38px; color: #94A3B8;">00:00</span>
         </div>
 
         <div class="controls-action-row">
-          <div style="display: flex; align-items: center; gap: 8px;">
+          <div style="display: flex; align-items: center; gap: 6px;">
             <button type="button" class="ctrl-btn" id="btnPlayPause" onclick="togglePlayPause()" title="Phát/Tạm dừng">
               <i class="fa-solid fa-play" id="iconPlayPause"></i>
             </button>
@@ -516,8 +421,8 @@
             </button>
           </div>
 
-          <div style="display: flex; align-items: center; gap: 6px;">
-            <span style="font-size: 11px; font-weight: 800; color: #94A3B8; margin-right: 2px;">TỐC ĐỘ:</span>
+          <div style="display: flex; align-items: center; gap: 5px;">
+            <span style="font-size: 10.5px; font-weight: 800; color: #94A3B8;">TỐC ĐỘ:</span>
             <button type="button" class="ctrl-btn speed-btn" onclick="setPlaySpeed(0.75, this)">0.75x</button>
             <button type="button" class="ctrl-btn speed-btn active" onclick="setPlaySpeed(1.0, this)">1.0x</button>
             <button type="button" class="ctrl-btn speed-btn" onclick="setPlaySpeed(1.25, this)">1.25x</button>
@@ -529,42 +434,41 @@
         </div>
       </div>
 
-      <!-- THÔNG TIN BÀI HỌC ĐANG PHÁT -->
-      <div style="margin-top: 14px;">
-        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; flex-wrap: wrap;">
-          <div>
-            <span id="currentVideoCategoryBadge" style="background: #FDF2F2; color: var(--tram-red); border: 1.5px solid #F8B4B7; font-size: 11px; font-weight: 900; padding: 2px 10px; border-radius: 8px; text-transform: uppercase;">
+      <!-- THÔNG TIN BÀI HỌC -->
+      <div style="margin-top: 12px; min-width: 0;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; flex-wrap: wrap;">
+          <div style="flex: 1; min-width: 200px;">
+            <span id="currentVideoCategoryBadge" style="background: #FDF2F2; color: var(--tram-red); border: 1.5px solid #F8B4B7; font-size: 10.5px; font-weight: 900; padding: 2px 8px; border-radius: 6px; text-transform: uppercase;">
               CHUYÊN ĐỀ
             </span>
-            <h3 id="currentVideoTitle" style="margin: 6px 0 2px 0; font-size: 19px; font-weight: 900; color: #1E1B4B;">
+            <h3 id="currentVideoTitle" style="margin: 6px 0 2px 0; font-size: 17px; font-weight: 900; color: #1E1B4B; line-height: 1.3;">
               Đang tải bài giảng...
             </h3>
-            <span id="currentVideoMeta" style="font-size: 12.5px; font-weight: 700; color: #64748B;">
+            <span id="currentVideoMeta" style="font-size: 12px; font-weight: 700; color: #64748B;">
               Thứ tự: -- • Thời lượng: --:-- • Giảng viên: Thầy Phúc
             </span>
           </div>
 
           <div style="display: flex; gap: 6px;">
-            <button type="button" class="btn-3d btn-3d-white" onclick="changeVideoOffset(-1)" style="padding: 7px 12px; font-size: 12px;">⏮️ Bài trước</button>
-            <button type="button" class="btn-3d btn-3d-red" onclick="changeVideoOffset(1)" style="padding: 7px 12px; font-size: 12px;">Bài tiếp ⏭️</button>
+            <button type="button" class="btn-3d btn-3d-white" onclick="changeVideoOffset(-1)" style="padding: 6px 10px; font-size: 11.5px;">⏮️ Bài trước</button>
+            <button type="button" class="btn-3d btn-3d-red" onclick="changeVideoOffset(1)" style="padding: 6px 10px; font-size: 11.5px;">Bài tiếp ⏭️</button>
           </div>
         </div>
 
-        <p id="currentVideoDesc" style="margin: 10px 0 0 0; font-size: 13.5px; font-weight: 600; color: #475569; background: #FAF7F2; border: 1.5px solid var(--duo-border); padding: 12px; border-radius: 12px; line-height: 1.5;"></p>
+        <p id="currentVideoDesc" style="margin: 8px 0 0 0; font-size: 13px; font-weight: 600; color: #475569; background: #FAF7F2; border: 1.5px solid var(--duo-border); padding: 10px; border-radius: 12px; line-height: 1.45;"></p>
       </div>
     </div>
 
-    <!-- CỘT 2: PLAYLIST & BỘ LỌC 2 TẦNG (KỸ NĂNG + DẠNG BÀI CON) -->
+    <!-- CỘT 2: DANH SÁCH BÀI HỌC & BỘ LỌC DẠNG BÀI 2 TẦNG -->
     <div class="playlist-card-box">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-        <h4 style="margin: 0; font-size: 15px; font-weight: 900; color: #1E1B4B;">📚 DANH SÁCH BÀI HỌC</h4>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+        <h4 style="margin: 0; font-size: 14.5px; font-weight: 900; color: #1E1B4B;">📚 DANH SÁCH BÀI HỌC</h4>
         <span id="playlistCountBadge" style="background: #E5DFD5; font-size: 11px; font-weight: 800; padding: 2px 8px; border-radius: 8px;">0 bài</span>
       </div>
 
-      <!-- Ô TÌM KIẾM -->
-      <input type="text" id="studioSearchInput" oninput="filterVideosUI()" placeholder="🔍 Tìm theo tên hoặc dạng bài..." class="duo-input" style="padding: 9px 12px; margin-bottom: 10px;">
+      <input type="text" id="studioSearchInput" oninput="filterVideosUI()" placeholder="🔍 Tìm theo tên hoặc dạng bài..." class="duo-input" style="padding: 8px 10px; margin-bottom: 8px;">
 
-      <!-- TẦNG 1: LỌC THEO KỸ NĂNG LỚN -->
+      <!-- TẦNG 1: KỸ NĂNG -->
       <div class="skill-filter-bar">
         <button type="button" class="skill-pill-btn active" onclick="setSkillFilter('all', this)">Tất Cả</button>
         <button type="button" class="skill-pill-btn" onclick="setSkillFilter('reading', this)">Reading</button>
@@ -576,20 +480,63 @@
         <button type="button" class="skill-pill-btn" onclick="setSkillFilter('vocab', this)">Từ Vựng</button>
       </div>
 
-      <!-- TẦNG 2: BỘ LỌC DẠNG BÀI CON (SUB-CATEGORY PILLS TỰ ĐỘNG) -->
+      <!-- TẦNG 2: DẠNG BÀI CON KÈM SỐ ĐẾM & NÚT QUẢN LÝ -->
       <div class="sub-filter-scroll-wrapper" id="subFilterWrapper" style="display: none;">
         <div class="sub-filter-title">
-          <i class="fa-solid fa-layer-group"></i> DẠNG BÀI TRỌNG TÂM:
+          <span><i class="fa-solid fa-layer-group"></i> DẠNG BÀI TRỌNG TÂM:</span>
+          <button type="button" id="btnManageCat" onclick="openCategoryManagerModal()" style="display:none; background: #E0F2FE; border: 1px solid #7DD3FC; color: #0284C7; font-size: 10.5px; font-weight: 800; border-radius: 6px; padding: 2px 6px; cursor: pointer;">
+            ⚙️ Quản Lý Dạng Bài
+          </button>
         </div>
         <div class="sub-filter-bar" id="subCategoryFilterBar"></div>
       </div>
 
-      <!-- DANH SÁCH PLAYLIST BÀI GIẢNG -->
-      <div id="playlistItemsContainer" style="max-height: 520px; overflow-y: auto; padding-right: 4px;"></div>
+      <!-- THANH CHUYỂN DẠNG BÀI HÀNG LOẠT CHO ADMIN -->
+      <div id="batchActionBar" class="batch-bar-box">
+        <div style="font-size: 11.5px; font-weight: 800; color: #1E40AF;">
+          Đã chọn: <span id="batchSelectedCount">0</span> bài
+        </div>
+        <div style="display: flex; gap: 6px;">
+          <button type="button" class="btn-3d btn-3d-blue" onclick="promptBatchMove()" style="padding: 4px 10px; font-size: 11px;">
+            📁 Chuyển Dạng Bài
+          </button>
+          <button type="button" class="btn-3d btn-3d-white" onclick="clearBatchSelection()" style="padding: 4px 8px; font-size: 11px;">
+            Bỏ chọn
+          </button>
+        </div>
+      </div>
+
+      <!-- PLAYLIST ITEMS -->
+      <div id="playlistItemsContainer" style="max-height: 520px; overflow-y: auto; padding-right: 2px;"></div>
     </div>
 
   </div>
 
+</div>
+
+<!-- MODAL QUẢN LÝ DẠNG BÀI CHO ADMIN -->
+<div id="categoryManagerModal" class="modal-overlay">
+  <div class="modal-box">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+      <h3 style="margin: 0; font-size: 16px; font-weight: 900; color: #1E1B4B;">
+        📂 QUẢN LÝ DẠNG BÀI CON (SUB-CATEGORIES)
+      </h3>
+      <button type="button" onclick="closeCategoryManagerModal()" style="border: none; background: transparent; font-size: 18px; cursor: pointer; font-weight: 900; color: #64748B;">✕</button>
+    </div>
+
+    <!-- THÊM DẠNG MỚI -->
+    <div style="display: flex; gap: 6px; margin-bottom: 14px;">
+      <input type="text" id="newCategoryInputName" placeholder="Nhập tên dạng bài mới..." class="duo-input" style="margin: 0;">
+      <button type="button" class="btn-3d btn-3d-red" onclick="handleCreateNewCategory()" style="padding: 8px 14px; font-size: 12px;">+ THÊM</button>
+    </div>
+
+    <!-- DANH SÁCH DẠNG BÀI HIỆN TẠI -->
+    <div style="max-height: 280px; overflow-y: auto; border: 1.5px solid var(--duo-border); border-radius: 12px; padding: 6px;" id="categoryManagerListContainer"></div>
+
+    <div style="margin-top: 14px; text-align: right;">
+      <button type="button" class="btn-3d btn-3d-white" onclick="closeCategoryManagerModal()" style="padding: 7px 16px; font-size: 12px;">Đóng</button>
+    </div>
+  </div>
 </div>
 
 <script type="module">
@@ -606,6 +553,7 @@
   let progressTimer = null;
   let isAdminUser = false;
   let draggedItemId = null;
+  let selectedBatchIds = new Set();
 
   function checkAdminPrivilege() {
     const params = new URLSearchParams(window.location.search);
@@ -618,6 +566,8 @@
       document.getElementById('studioMainWrapper')?.classList.add('is-admin-mode');
       const btn = document.getElementById('btnToggleAdminDrawer');
       if (btn) btn.style.display = 'inline-flex';
+      const btnCat = document.getElementById('btnManageCat');
+      if (btnCat) btnCat.style.display = 'inline-block';
     }
   }
 
@@ -644,15 +594,35 @@
     checkAdminPrivilege();
     renderSubCategoriesUI();
     renderPlaylist();
+    populateCategoryDropdown();
   }
 
-  // TỰ ĐỘNG TẠO HÀNG NÚT DẠNG BÀI CON (SUB-CATEGORY PILLS)
+  function populateCategoryDropdown() {
+    const select = document.getElementById('adminSelectCategory');
+    if (!select) return;
+    const skill = document.getElementById('adminInputSkill')?.value || activeSkill;
+    const cats = theoryVideoEngine.getSubCategories(skill, true);
+
+    let html = '<option value="">-- Chọn Dạng bài có sẵn --</option>';
+    cats.forEach(c => {
+      html += `<option value="${c.name}">${c.name}</option>`;
+    });
+    select.innerHTML = html;
+  }
+
+  window.onSelectExistingCategory = (val) => {
+    if (val) {
+      document.getElementById('adminInputCategory').value = val;
+    }
+  };
+
+  // HIỂN THỊ DẠNG BÀI CON KÈM SỐ ĐẾM (BADGE COUNT)
   function renderSubCategoriesUI() {
     const wrapper = document.getElementById('subFilterWrapper');
     const bar = document.getElementById('subCategoryFilterBar');
     if (!wrapper || !bar) return;
 
-    const subCats = theoryVideoEngine.getSubCategories(activeSkill);
+    const subCats = theoryVideoEngine.getSubCategories(activeSkill, isAdminUser);
 
     if (subCats.length <= 1) {
       wrapper.style.display = 'none';
@@ -661,11 +631,13 @@
     }
 
     wrapper.style.display = 'block';
-    let html = `<button type="button" class="sub-pill-btn ${activeSubCategory === 'all' ? 'active' : ''}" onclick="window.setSubCategoryFilter('all', this)">Tất Cả (${subCats.length} dạng)</button>`;
+    const totalCount = subCats.reduce((sum, c) => sum + c.count, 0);
+
+    let html = `<button type="button" class="sub-pill-btn ${activeSubCategory === 'all' ? 'active' : ''}" onclick="window.setSubCategoryFilter('all', this)">Tất Cả (${totalCount})</button>`;
     
-    subCats.forEach(cat => {
-      const isAct = activeSubCategory === cat;
-      html += `<button type="button" class="sub-pill-btn ${isAct ? 'active' : ''}" onclick="window.setSubCategoryFilter('${cat.replace(/'/g, "\\'")}', this)">${cat}</button>`;
+    subCats.forEach(c => {
+      const isAct = activeSubCategory === c.name;
+      html += `<button type="button" class="sub-pill-btn ${isAct ? 'active' : ''}" onclick="window.setSubCategoryFilter('${c.name.replace(/'/g, "\\'")}', this)">${c.name} (${c.count})</button>`;
     });
 
     bar.innerHTML = html;
@@ -676,6 +648,7 @@
     activeSubCategory = 'all';
     document.querySelectorAll('.skill-pill-btn').forEach(b => b.classList.remove('active'));
     if (btnEl) btnEl.classList.add('active');
+    populateCategoryDropdown();
     renderSubCategoriesUI();
     renderPlaylist();
   };
@@ -714,6 +687,7 @@
       const isDone = theoryVideoEngine.isCompleted(v.id);
       const isDraft = v.isPublished === false;
       const thumbUrl = theoryVideoEngine.getThumbnailUrl(v.youtubeId);
+      const isChecked = selectedBatchIds.has(v.id);
 
       html += `
         <div class="playlist-item ${isActive ? 'active' : ''} ${isDraft ? 'is-draft' : ''}" 
@@ -723,30 +697,33 @@
              ondrop="window.handleItemDrop(event, '${v.id}')"
              onclick="window.playByIndex(${idx})">
           
+          <input type="checkbox" class="batch-checkbox" ${isChecked ? 'checked' : ''} onclick="window.handleBatchCheckbox(event, '${v.id}')">
+
           <button type="button" class="btn-mark-done ${isDone ? 'done' : ''}" 
                   onclick="window.handleToggleDone(event, '${v.id}')" 
                   title="${isDone ? 'Đã hoàn thành' : 'Đánh dấu đã học'}">
             ✓
           </button>
 
-          <img src="${thumbUrl}" class="playlist-thumb" alt="thumbnail" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'62\\' height=\\'38\\' fill=\\'%23CBD5E1\\'><rect width=\\'100%\\' height=\\'100%\\'/></svg>'">
+          <img src="${thumbUrl}" class="playlist-thumb" alt="thumbnail" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'58\\' height=\\'36\\' fill=\\'%23CBD5E1\\'><rect width=\\'100%\\' height=\\'100%\\'/></svg>'">
 
           <div style="flex: 1; min-width: 0;">
-            <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 2px;">
-              <span style="font-size: 10px; font-weight: 900; background: rgba(0,0,0,0.06); padding: 1px 6px; border-radius: 6px; text-transform: uppercase;">
+            <div style="display: flex; align-items: center; gap: 5px; margin-bottom: 2px;">
+              <span style="font-size: 9.5px; font-weight: 900; background: rgba(0,0,0,0.06); padding: 1px 5px; border-radius: 5px; text-transform: uppercase;">
                 ${v.category || 'CHUNG'}
               </span>
-              <span style="font-size: 11px; font-weight: 700; color: #64748B;">⏱️ ${v.duration || 'N/A'}</span>
+              <span style="font-size: 10.5px; font-weight: 700; color: #64748B;">⏱️ ${v.duration || 'N/A'}</span>
               ${isDraft ? `<span class="badge-draft-tag">BẢN NHÁP</span>` : ''}
             </div>
-            <div style="font-size: 13px; font-weight: 800; color: #1E293B; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+            <div style="font-size: 12.5px; font-weight: 800; color: #1E293B; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${v.title}">
               #${v.order || (idx + 1)}. ${v.title}
             </div>
           </div>
 
           <div class="admin-item-actions" onclick="event.stopPropagation()">
-            <button type="button" class="btn-item-ctrl btn-item-pub" onclick="window.handleTogglePublish('${v.id}')" title="${isDraft ? 'Bấm để Công khai' : 'Bấm để Chuyển thành Bản nháp'}">
-              ${isDraft ? '🕶️ Ẩn' : '👁️ Hiện'}
+            <button type="button" class="btn-item-ctrl btn-item-cat" onclick="window.quickMoveCategoryPrompt('${v.id}')" title="Chuyển sang dạng bài khác">📁</button>
+            <button type="button" class="btn-item-ctrl btn-item-pub" onclick="window.handleTogglePublish('${v.id}')" title="${isDraft ? 'Công khai bài' : 'Chuyển về Bản nháp'}">
+              ${isDraft ? '🕶️' : '👁️'}
             </button>
             <button type="button" class="btn-item-ctrl" onclick="window.handleMoveOrder('${v.id}', 'up')" title="Đẩy lên">▲</button>
             <button type="button" class="btn-item-ctrl" onclick="window.handleMoveOrder('${v.id}', 'down')" title="Đẩy xuống">▼</button>
@@ -914,7 +891,124 @@
     renderPlaylist(document.getElementById('studioSearchInput')?.value || '');
   };
 
-  // ADMIN ACTIONS: ẨN/HIỆN, SỬA, XÓA, ĐỔI THỨ TỰ
+  // CHUYỂN DẠNG BÀI NHANH 1 VIDEO
+  window.quickMoveCategoryPrompt = async (videoId) => {
+    const cats = theoryVideoEngine.getSubCategories(activeSkill, true).map(c => c.name);
+    let promptMsg = `Thầy muốn chuyển bài này sang dạng nào?\nCác dạng hiện có:\n- ${cats.join('\n- ')}\n\n(Hoặc gõ tên dạng mới trực tiếp vào đây):`;
+    const targetCat = prompt(promptMsg);
+    if (targetCat) {
+      await theoryVideoEngine.moveVideoCategory(videoId, targetCat);
+      renderSubCategoriesUI();
+      renderPlaylist();
+    }
+  };
+
+  // CHỌN HÀNG LOẠT (BATCH MOVE)
+  window.handleBatchCheckbox = (e, videoId) => {
+    e.stopPropagation();
+    if (e.target.checked) selectedBatchIds.add(videoId);
+    else selectedBatchIds.delete(videoId);
+
+    const bar = document.getElementById('batchActionBar');
+    const cnt = document.getElementById('batchSelectedCount');
+    if (cnt) cnt.innerText = selectedBatchIds.size;
+    if (bar) bar.style.display = selectedBatchIds.size > 0 ? 'flex' : 'none';
+  };
+
+  window.clearBatchSelection = () => {
+    selectedBatchIds.clear();
+    const bar = document.getElementById('batchActionBar');
+    if (bar) bar.style.display = 'none';
+    renderPlaylist();
+  };
+
+  window.promptBatchMove = async () => {
+    if (!selectedBatchIds.size) return;
+    const cats = theoryVideoEngine.getSubCategories(activeSkill, true).map(c => c.name);
+    const targetCat = prompt(`Chuyển ${selectedBatchIds.size} bài đã chọn sang Dạng bài:\n- ${cats.join('\n- ')}`);
+    if (targetCat) {
+      await theoryVideoEngine.batchMoveCategory(Array.from(selectedBatchIds), targetCat);
+      window.clearBatchSelection();
+      renderSubCategoriesUI();
+      renderPlaylist();
+    }
+  };
+
+  // MODAL QUẢN LÝ CATEGORY
+  window.openCategoryManagerModal = () => {
+    const modal = document.getElementById('categoryManagerModal');
+    if (modal) modal.style.display = 'flex';
+    renderCategoryManagerList();
+  };
+
+  window.closeCategoryManagerModal = () => {
+    const modal = document.getElementById('categoryManagerModal');
+    if (modal) modal.style.display = 'none';
+    renderSubCategoriesUI();
+    renderPlaylist();
+    populateCategoryDropdown();
+  };
+
+  function renderCategoryManagerList() {
+    const box = document.getElementById('categoryManagerListContainer');
+    if (!box) return;
+
+    const cats = theoryVideoEngine.getSubCategories(activeSkill, true);
+    if (!cats.length) {
+      box.innerHTML = `<div style="text-align:center; padding:15px; color:#64748B;">Chưa có dạng bài nào!</div>`;
+      return;
+    }
+
+    let html = '';
+    cats.forEach((c, idx) => {
+      html += `
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:6px 10px; background:#FAF7F2; border-radius:8px; margin-bottom:5px;">
+          <div>
+            <b style="font-size:12px; color:#1E293B;">${c.name}</b>
+            <span style="font-size:11px; color:#64748B; margin-left:6px;">(${c.count} bài)</span>
+          </div>
+          <div style="display:flex; gap:4px;">
+            <button type="button" class="btn-item-ctrl" onclick="window.handleMoveCatOrder('${c.name.replace(/'/g, "\\'")}', 'up')">▲</button>
+            <button type="button" class="btn-item-ctrl" onclick="window.handleMoveCatOrder('${c.name.replace(/'/g, "\\'")}', 'down')">▼</button>
+            <button type="button" class="btn-item-ctrl btn-item-edit" onclick="window.handleRenameCat('${c.name.replace(/'/g, "\\'")}')">Sửa tên</button>
+            <button type="button" class="btn-item-ctrl btn-item-del" onclick="window.handleDeleteCat('${c.name.replace(/'/g, "\\'")}')">Xóa</button>
+          </div>
+        </div>
+      `;
+    });
+    box.innerHTML = html;
+  }
+
+  window.handleCreateNewCategory = () => {
+    const input = document.getElementById('newCategoryInputName');
+    const val = input?.value?.trim();
+    if (!val) return;
+    theoryVideoEngine.normalizeCategory(val);
+    input.value = '';
+    renderCategoryManagerList();
+  };
+
+  window.handleMoveCatOrder = async (catName, direction) => {
+    await theoryVideoEngine.moveCategoryOrder(activeSkill, catName, direction);
+    renderCategoryManagerList();
+  };
+
+  window.handleRenameCat = async (oldName) => {
+    const newName = prompt(`Đổi tên Dạng bài [${oldName}] thành:`, oldName);
+    if (newName && newName.trim() && newName.trim() !== oldName) {
+      await theoryVideoEngine.renameCategory(activeSkill, oldName, newName.trim());
+      renderCategoryManagerList();
+    }
+  };
+
+  window.handleDeleteCat = async (catName) => {
+    if (confirm(`Thầy có chắc chắn muốn xóa Dạng bài [${catName}] không?\n(Tất cả video trong dạng này sẽ được chuyển về nhóm CHUNG)`)) {
+      await theoryVideoEngine.deleteCategory(activeSkill, catName, 'CHUNG');
+      renderCategoryManagerList();
+    }
+  };
+
+  // ADMIN VIDEO ACTIONS
   window.handleTogglePublish = async (videoId) => {
     await theoryVideoEngine.togglePublishStatus(videoId);
     renderPlaylist(document.getElementById('studioSearchInput')?.value || '');
@@ -1037,6 +1131,7 @@
       window.cancelAdminEdit();
       renderSubCategoriesUI();
       renderPlaylist();
+      populateCategoryDropdown();
     } catch (e) {
       alert("❌ " + e.message);
     }
