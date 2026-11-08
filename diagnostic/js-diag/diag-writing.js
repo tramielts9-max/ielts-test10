@@ -4,7 +4,8 @@
  * BẢN FULL ĐẦY ĐỦ 100% - KHÔNG CẮT BỚT BẤT KỲ TÍNH NĂNG NÀO
  * - RENDER BIỂU ĐỒ TASK 1, BRAINSTORM TIẾNG VIỆT, TỪ KHÓA, PEEL BODY
  * - ĐẾM TỪ REALTIME CẢNH BÁO MÀU ĐẠT CHUẨN (150 TỪ TASK 1 / 250 TỪ TASK 2)
- * - PHÒNG NGỰ BỎ TRỐNG BÀI: 0 TỪ ➔ TRẢ THẲNG BAND 0.0 KHÔNG GỌI AI
+ * - TÁCH BIỆT CHẤM TASK 1 VÀ TASK 2, ÁP DỤNG TRỌNG SỐ CHUẨN (T1*1 + T2*2)/3
+ * - KHÓA ĐỐI XỨNG CẢNH BÁO ĐỎ: BỎ TASK 1 MẤT 33.3% ĐIỂM, BỎ TASK 2 MẤT 66.7% ĐIỂM
  * - LIGHTBOX PHÓNG TO ẢNH BIỂU ĐỒ & INLINE AI GRADING THEO RUBRIC
  */
 
@@ -61,7 +62,7 @@ export class DiagWritingEngine {
             <i class="fa-solid fa-pen-nib"></i> PHẦN 4: KHẢO SÁT NĂNG LỰC VIẾT (WRITING)
           </h3>
           <p style="margin: 4px 0 0 0; font-size: 13px; font-weight: 700; color: #64748B;">
-            Cấp độ: <b>${this.data.level}</b> • Thực hiện đầy đủ các chặng tư duy và viết câu tiếng Anh. AI sẽ chấm trực tiếp theo đúng 4 tiêu chí IELTS.
+            Cấp độ: <b>${this.data.level}</b> • Thực hiện đầy đủ cả Task 1 và Task 2. Điểm tính theo trọng số chuẩn IELTS: <b>(Task 1 × 1 + Task 2 × 2) / 3</b>.
           </p>
         </div>
         <span style="font-size: 12px; font-weight: 900; background: #DBEAFE; color: #1E40AF; padding: 4px 12px; border-radius: 12px; border: 1px solid #BFDBFE;">
@@ -383,24 +384,39 @@ export class DiagWritingEngine {
     let task1Text = '';
     let task2Text = '';
 
+    // Lấy bài làm Task 1
     if (document.getElementById('diag_wt1_input')) {
       task1Text = document.getElementById('diag_wt1_input').value.trim();
     } else {
       const b1 = document.getElementById('wt1_body1')?.value.trim() || '';
       const b2 = document.getElementById('wt1_body2')?.value.trim() || '';
-      task1Text = `Body 1: ${b1}\n\nBody 2: ${b2}`.trim();
+      if (b1 || b2) {
+        task1Text = `Body 1: ${b1}\n\nBody 2: ${b2}`.trim();
+      }
     }
 
+    // Lấy bài làm Task 2
     const wt2Inputs = document.querySelectorAll('textarea[id^="diag_wt2_"], textarea[id^="wt2_body"]');
     if (wt2Inputs.length > 0) {
       task2Text = Array.from(wt2Inputs).map(el => el.value.trim()).filter(Boolean).join('\n\n');
     }
 
+    const t1Words = task1Text ? task1Text.split(/\s+/).filter(Boolean).length : 0;
+    const t2Words = task2Text ? task2Text.split(/\s+/).filter(Boolean).length : 0;
+
     return {
       task1Text,
       task2Text,
-      answersSnapshot: this.userAnswers
+      task1Words: t1Words,
+      task2Words: t2Words,
+      totalWords: t1Words + t2Words,
+      answersSnapshot: { ...this.userAnswers }
     };
+  }
+
+  // Tiện ích phục vụ lưu snapshot ngầm cho Timer
+  getWritingSnapshot() {
+    return this.getWritingSubmissionData();
   }
 
   // =========================================================================
@@ -409,25 +425,23 @@ export class DiagWritingEngine {
   async evaluateAndRenderInlineAI() {
     const sub = this.getWritingSubmissionData();
     const mount = document.getElementById('inlineWritingAiMount');
-    if (!mount) return { overallBand: "0.0" };
+    if (!mount) return { overallBand: "0.0", task1Band: "0.0", task2Band: "0.0" };
 
-    const t1Words = sub.task1Text ? sub.task1Text.split(/\s+/).filter(Boolean).length : 0;
-    const t2Words = sub.task2Text ? sub.task2Text.split(/\s+/).filter(Boolean).length : 0;
-    const totalWords = t1Words + t2Words;
+    const testId = this.testMeta.testId || "test_01";
 
-    // PHÒNG NGỰ: NẾU THÍ SINH HOÀN TOÀN BỎ TRỐNG ➔ TRẢ BAND 0.0 KHÔNG GỌI AI
-    if (totalWords === 0) {
+    // 1. PHÒNG THỦ: NẾU BỎ TRỐNG CẢ 2 TASK ➔ TRẢ THẲNG VỀ BAND 0.0
+    if (sub.totalWords === 0) {
       mount.innerHTML = `
         <div style="background:#FEF2F2; border:2.5px solid #EF4444; border-radius:18px; padding:20px; margin-top:24px;">
           <h4 style="color:#991B1B; margin:0 0 6px 0; font-size:16px; font-weight:900;">
             ✍️ PHIẾU CHẤM ĐIỂM WRITING: BAND 0.0
           </h4>
           <p style="margin:0; font-size:13.5px; color:#7F1D1D; font-weight:700;">
-            Học viên không thực hiện bài viết này (Does not attempt the task in any way).
+            Học viên không thực hiện bài viết này (Does not attempt the task in any way). Cả Task 1 và Task 2 đều có 0 từ.
           </p>
         </div>
       `;
-      return { overallBand: "0.0" };
+      return { overallBand: "0.0", task1Band: "0.0", task2Band: "0.0" };
     }
 
     mount.innerHTML = `
@@ -436,7 +450,7 @@ export class DiagWritingEngine {
           🤖 PHIẾU CHẤM ĐIỂM WRITING TRỰC TIẾP TỪ AI GEMINI (CHUẨN 4 TIÊU CHÍ RUBRIC)
         </h4>
         <div id="writingAiEvaluationStream">
-          ⏳ <b>AI Gemini đang đọc toàn bộ bài viết, đối soát 4 tiêu chí Task Response, Coherence, Lexical, Grammar...</b>
+          ⏳ <b>AI Gemini đang đọc và phân tích độc lập Task 1 (${sub.task1Words} từ) và Task 2 (${sub.task2Words} từ)...</b>
         </div>
       </div>
     `;
@@ -446,33 +460,73 @@ export class DiagWritingEngine {
     try {
       const p1 = this.data?.task1?.promptEn || "Writing Task 1";
       const p2 = this.data?.task2?.promptEn || "Writing Task 2";
-      const fullText = `TASK 1:\n${sub.task1Text || '(Chưa làm)'}\n\nTASK 2:\n${sub.task2Text || '(Chưa làm)'}`;
+      const promptCtx = `Task 1: "${p1}" | Task 2: "${p2}"`;
 
-      const result = await diagAIService.evaluateWritingDiagnostic("Full Writing", `${p1} & ${p2}`, fullText);
+      // Gọi hàm AI đã nâng cấp với công thức chuẩn (T1*1 + T2*2)/3
+      const result = await diagAIService.evaluateWritingDiagnostic(testId, promptCtx, sub.task1Text, sub.task2Text);
+
+      // CẢNH BÁO ĐỎ ĐỐI XỨNG CẢ 2 ĐẦU NẾU HỌC SINH BỎ TRỐNG 1 TRONG 2 TASK
+      let taskWarningHtml = '';
+      if (sub.task1Words === 0 && sub.task2Words > 0) {
+        taskWarningHtml = `
+          <div style="background:#FEF2F2; border:2px solid #F87171; border-radius:12px; padding:12px 14px; margin-bottom:14px; font-size:13px; color:#991B1B; font-weight:800;">
+            ⚠️ <b>CẢNH BÁO KHẢO THÍ:</b> Em đã bỏ trống hoàn toàn Task 1 (0 từ). Theo quy chế IELTS, Task 1 chiếm 1/3 tổng số điểm viết. Việc bỏ trống Task 1 đã kéo tụt điểm tổng Writing xuống còn <b>Band ${result.overallBand}</b> dù Task 2 làm tốt!
+          </div>
+        `;
+      } else if (sub.task2Words === 0 && sub.task1Words > 0) {
+        taskWarningHtml = `
+          <div style="background:#FEF2F2; border:2px solid #F87171; border-radius:12px; padding:12px 14px; margin-bottom:14px; font-size:13px; color:#991B1B; font-weight:800;">
+            ⚠️ <b>CẢNH BÁO KHẢO THÍ:</b> Em đã bỏ trống hoàn toàn Task 2 (0 từ). Theo quy chế IELTS, Task 2 chiếm 2/3 tổng số điểm viết. Việc bỏ trống Task 2 đã kéo tụt điểm tổng Writing xuống còn <b>Band ${result.overallBand}</b> dù Task 1 làm tốt!
+          </div>
+        `;
+      }
 
       streamBox.innerHTML = `
-        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:10px; margin:14px 0 16px 0;">
-          <div style="background:#EFF6FF; border:1.5px solid #BFDBFE; padding:10px; border-radius:10px; text-align:center;">
-            <div style="font-size:11px; font-weight:800; color:#1E40AF;">TASK RESPONSE</div>
-            <b style="font-size:18px; color:#2563EB;">Band ${result.ta_tr || result.overallBand}</b>
+        ${taskWarningHtml}
+
+        <!-- 3 THẺ ĐIỂM CHI TIẾT THEO HỆ SỐ CHUẨN QUỐC TẾ -->
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr)); gap:12px; margin-bottom:16px;">
+          <div style="background:${sub.task1Words === 0 ? '#FEF2F2' : '#EFF6FF'}; border:2px solid ${sub.task1Words === 0 ? '#FCA5A5' : '#93C5FD'}; padding:12px; border-radius:12px; text-align:center;">
+            <div style="font-size:11.5px; font-weight:900; color:${sub.task1Words === 0 ? '#DC2626' : '#1E40AF'}; text-transform:uppercase;">TASK 1 (Hệ số 1)</div>
+            <b style="font-size:22px; color:${sub.task1Words === 0 ? '#DC2626' : '#2563EB'};">Band ${result.task1Band || result.overallBand}</b>
+            <div style="font-size:11.5px; color:#64748B; font-weight:700;">(${sub.task1Words} từ)</div>
           </div>
-          <div style="background:#EFF6FF; border:1.5px solid #BFDBFE; padding:10px; border-radius:10px; text-align:center;">
-            <div style="font-size:11px; font-weight:800; color:#1E40AF;">COHERENCE (CC)</div>
-            <b style="font-size:18px; color:#2563EB;">Band ${result.cc || result.overallBand}</b>
+
+          <div style="background:${sub.task2Words === 0 ? '#FEF2F2' : '#F5F3FF'}; border:2px solid ${sub.task2Words === 0 ? '#FCA5A5' : '#DDD6FE'}; padding:12px; border-radius:12px; text-align:center;">
+            <div style="font-size:11.5px; font-weight:900; color:${sub.task2Words === 0 ? '#DC2626' : '#6D28D9'}; text-transform:uppercase;">TASK 2 (Hệ số 2)</div>
+            <b style="font-size:22px; color:${sub.task2Words === 0 ? '#DC2626' : '#7C3AED'};">Band ${result.task2Band || '0.0'}</b>
+            <div style="font-size:11.5px; color:#64748B; font-weight:700;">(${sub.task2Words} từ)</div>
           </div>
-          <div style="background:#EFF6FF; border:1.5px solid #BFDBFE; padding:10px; border-radius:10px; text-align:center;">
-            <div style="font-size:11px; font-weight:800; color:#1E40AF;">VOCABULARY (LR)</div>
-            <b style="font-size:18px; color:#2563EB;">Band ${result.lr || result.overallBand}</b>
-          </div>
-          <div style="background:#EFF6FF; border:1.5px solid #BFDBFE; padding:10px; border-radius:10px; text-align:center;">
-            <div style="font-size:11px; font-weight:800; color:#1E40AF;">GRAMMAR (GRA)</div>
-            <b style="font-size:18px; color:#2563EB;">Band ${result.gra || result.overallBand}</b>
+
+          <div style="background:#ECFDF5; border:2.5px solid #10B981; padding:12px; border-radius:12px; text-align:center; box-shadow:0 4px 12px rgba(16, 185, 129, 0.15);">
+            <div style="font-size:11.5px; font-weight:900; color:#065F46; text-transform:uppercase;">TỔNG WRITING OVERALL</div>
+            <b style="font-size:24px; color:#059669;">Band ${result.overallBand}</b>
+            <div style="font-size:11px; color:#047857; font-weight:800;">(T1×1 + T2×2) / 3</div>
           </div>
         </div>
 
-        <div style="background:#DBEAFE; border:1.5px solid #93C5FD; border-radius:12px; padding:14px; margin-bottom:14px;">
-          <div style="font-size:13px; font-weight:900; color:#1E40AF; text-transform:uppercase;">🏆 TỔNG ĐIỂM WRITING: BAND ${result.overallBand}</div>
-          <div style="font-size:13.5px; line-height:1.6; color:#1E3A8A; margin-top:4px;">${result.rubricSummary || ''}</div>
+        <!-- 4 TIÊU CHÍ BAND DESCRIPTORS -->
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(120px, 1fr)); gap:8px; margin-bottom:14px;">
+          <div style="background:#F8FAFC; border:1px solid #CBD5E1; padding:8px; border-radius:8px; text-align:center;">
+            <div style="font-size:10.5px; font-weight:800; color:#475569;">TASK RESPONSE</div>
+            <b style="font-size:15px; color:#1E293B;">${result.ta_tr || result.overallBand}</b>
+          </div>
+          <div style="background:#F8FAFC; border:1px solid #CBD5E1; padding:8px; border-radius:8px; text-align:center;">
+            <div style="font-size:10.5px; font-weight:800; color:#475569;">COHERENCE (CC)</div>
+            <b style="font-size:15px; color:#1E293B;">${result.cc || result.overallBand}</b>
+          </div>
+          <div style="background:#F8FAFC; border:1px solid #CBD5E1; padding:8px; border-radius:8px; text-align:center;">
+            <div style="font-size:10.5px; font-weight:800; color:#475569;">VOCABULARY (LR)</div>
+            <b style="font-size:15px; color:#1E293B;">${result.lr || result.overallBand}</b>
+          </div>
+          <div style="background:#F8FAFC; border:1px solid #CBD5E1; padding:8px; border-radius:8px; text-align:center;">
+            <div style="font-size:10.5px; font-weight:800; color:#475569;">GRAMMAR (GRA)</div>
+            <b style="font-size:15px; color:#1E293B;">${result.gra || result.overallBand}</b>
+          </div>
+        </div>
+
+        <div style="background:#EFF6FF; border:1.5px solid #BFDBFE; border-radius:12px; padding:12px 14px; margin-bottom:14px;">
+          <div style="font-size:13.5px; line-height:1.6; color:#1E40AF;">${result.rubricSummary || ''}</div>
         </div>
 
         ${result.keyMistakes && result.keyMistakes.length > 0 ? `
@@ -493,7 +547,7 @@ export class DiagWritingEngine {
       return result;
     } catch (e) {
       streamBox.innerHTML = `<span style="color:#DC2626;">❌ Không thể kết nối AI: ${e.message}</span>`;
-      return { overallBand: "0.0" };
+      return { overallBand: "0.0", task1Band: "0.0", task2Band: "0.0" };
     }
   }
 
