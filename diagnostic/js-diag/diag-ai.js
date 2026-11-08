@@ -2,9 +2,10 @@
  * diagnostic/js-diag/diag-ai.js
  * BỘ MÁY AI KHẢO THÍ CHUẨN XÁC 100% THEO RUBRIC BAND DESCRIPTORS CHÍNH THỨC
  * BẢN FULL ĐẦY ĐỦ 100% - KHÔNG CẮT BỚT BẤT KỲ DÒNG NÀO
- * - XÓA BỎ HOÀN TOÀN SÀN ĐIỂM ẢO: BỎ TRỐNG LÀ 0.0, DỞ LÀ 1.0 - 2.0 - 3.0
- * - EARLY EXIT NGAY TẬN GỐC KHI BỎ TRỐNG HOẶC CHỈ GÕ KÝ TỰ VÔ NGHĨA
- * - CHẤM ĐỦ 4 TIÊU CHÍ (WRITING: TA/TR, CC, LR, GRA | SPEAKING: FC, LR, GRA, PR)
+ * - TÍCH HỢP TRẦN ĐIỂM RIÊNG THEO TỪNG BÀI TEST: TEST 1 (4.5), TEST 2 (6.0), TEST 3 (7.5), FULL TEST (9.0)
+ * - THUẬT TOÁN SMART OVER-CAP CÓ CHIẾT KHẤU KHI LÀM BÀI XUẤT THẦN
+ * - CHẤM ĐỘC LẬP TASK 1 & TASK 2 WRITING, ÁP DỤNG TRỌNG SỐ CHUẨN IELTS (T1*1 + T2*2)/3
+ * - TRIỆT TIÊU TOÀN BỘ BUG BỎ TRỐNG TASK 2: 0 TỪ = BAND 0.0
  * - BẢO TOÀN NGUYÊN VẸN MASTER READING RUBRICS (CAM 21 TRANG 57 - 74)
  */
 
@@ -38,7 +39,71 @@ function getSpeakingKey() {
 }
 
 // =========================================================================
-// 2. MASTER RUBRIC & DỮ LIỆU ĐỐI SOÁT NGUYÊN VĂN (CAM 21 TỪ TRANG 57 - 74)
+// 2. CẤU HÌNH TRẦN ĐIỂM & CHIẾT KHẤU SMART OVER-CAP
+// =========================================================================
+export const TEST_CEILINGS = {
+  test_01: {
+    cap: 4.5,
+    discountFactor: 0.4, // Vượt cap bị chiết khấu trừ bớt vì đề ngắn
+    maxAllowed: 6.0,
+    label: "Test 1: Nền Tảng (Trần chuẩn: 4.5)"
+  },
+  test_02: {
+    cap: 6.0,
+    discountFactor: 0.5,
+    maxAllowed: 7.0,
+    label: "Test 2: Chuẩn Hóa (Trần chuẩn: 6.0)"
+  },
+  test_03: {
+    cap: 7.5,
+    discountFactor: 0.8,
+    maxAllowed: 8.5,
+    label: "Test 3: Đỉnh Cao (Trần chuẩn: 7.5)"
+  },
+  fulltest: {
+    cap: 9.0,
+    discountFactor: 1.0,
+    maxAllowed: 9.0,
+    label: "Full Mock Test (Chuẩn IELTS: 9.0)"
+  }
+};
+
+/**
+ * Hàm làm tròn điểm chuẩn IELTS theo mốc 0.5 gần nhất
+ * Ví dụ: 6.25 -> 6.5 | 6.75 -> 7.0 | 6.15 -> 6.0
+ */
+export function roundIELTS(score) {
+  const num = parseFloat(score);
+  if (isNaN(num) || num <= 0) return 0.0;
+  const whole = Math.floor(num);
+  const decimal = num - whole;
+  if (decimal < 0.25) return whole;
+  if (decimal < 0.75) return whole + 0.5;
+  return whole + 1.0;
+}
+
+/**
+ * Thuật toán tính Smart Over-Cap có chiết khấu:
+ * Nếu bài làm bình thường -> giữ nguyên.
+ * Nếu vượt trần đề thi -> cho phép vượt nhưng trừ bớt hệ số do đề không kiểm tra full tiêu chí.
+ */
+export function calculateSmartOverCap(rawBand, testId = 'test_01') {
+  const raw = parseFloat(rawBand) || 0.0;
+  const cleanId = String(testId).toLowerCase();
+  const cfg = TEST_CEILINGS[cleanId] || TEST_CEILINGS.test_01;
+
+  if (raw <= cfg.cap) {
+    return roundIELTS(raw).toFixed(1);
+  }
+
+  // Công thức chiết khấu: Cap + (Raw - Cap) * alpha
+  const surplus = (raw - cfg.cap) * cfg.discountFactor;
+  const adjusted = Math.min(cfg.maxAllowed, cfg.cap + surplus);
+  return roundIELTS(adjusted).toFixed(1);
+}
+
+// =========================================================================
+// 3. MASTER RUBRIC & DỮ LIỆU ĐỐI SOÁT NGUYÊN VĂN (CAM 21 TỪ TRANG 57 - 74)
 // =========================================================================
 const MASTER_READING_RUBRICS = {
   // PASSAGE 2 (CAM 21): "How could multilingualism benefit India's poorest schoolchildren?"
@@ -121,7 +186,7 @@ const MASTER_READING_RUBRICS = {
 };
 
 // =========================================================================
-// 3. SERVICE ĐIỀU PHỐI AI GEMINI ĐA KỸ NĂNG CHUẨN RUBRIC
+// 4. SERVICE ĐIỀU PHỐI AI GEMINI ĐA KỸ NĂNG CHUẨN RUBRIC
 // =========================================================================
 class DiagnosticAIService {
   constructor() {
@@ -132,7 +197,7 @@ class DiagnosticAIService {
     ];
   }
 
-  // Tiện ích phòng ngự: Lọc sạch khoảng trắng, ký tự rác và đếm số từ thực tế
+  // Tiện ích phòng thủ: Lọc sạch khoảng trắng, ký tự rác và đếm số từ thực tế
   sanitizeAndCountWords(text) {
     if (!text || typeof text !== 'string') return 0;
     const cleaned = text.replace(/[\r\n\t]+/g, ' ').replace(/[^\p{L}\p{N}\s]/gu, '').trim();
@@ -221,184 +286,194 @@ HÃY TRẢ VỀ DUY NHẤT 1 CHUỖI JSON (KHÔNG DÙNG MARKDOWN, KHÔNG \`\`\`j
   }
 
   // =========================================================================
-  // B. CHẤM WRITING CHUẨN RUBRIC BAND DESCRIPTORS (XÓA SÀN 4.5, CÓ THỂ ĐẠT 0.0)
+  // B. CHẤM WRITING CHUẨN RUBRIC (TRỌNG SỐ [T1*1 + T2*2]/3 & SMART OVER-CAP)
   // =========================================================================
-  async evaluateWritingDiagnostic(taskType, promptText, studentEssayText) {
-    const rawText = (studentEssayText || '').trim();
-    const words = this.sanitizeAndCountWords(rawText);
+  async evaluateWritingDiagnostic(testId = 'test_01', promptContext = '', task1Text = '', task2Text = '') {
+    const t1Clean = (task1Text || '').trim();
+    const t2Clean = (task2Text || '').trim();
+    const t1Words = this.sanitizeAndCountWords(t1Clean);
+    const t2Words = this.sanitizeAndCountWords(t2Clean);
 
-    // LỚP BẢO VỆ 1: NẾU BỎ TRỐNG 0 TỪ ➔ TRẢ THẲNG VỀ BAND 0.0 NGAY LẬP TỨC
-    if (words === 0) {
+    // 1. KIỂM TRA CHẶN LỖI BỎ TRỐNG TASK 2 VÀ TASK 1 TẬN GỐC
+    let t1RawBand = 0.0;
+    let t2RawBand = 0.0;
+
+    // Đánh giá sơ bộ số từ Task 1
+    if (t1Words === 0) t1RawBand = 0.0;
+    else if (t1Words < 15) t1RawBand = 1.0;
+    else if (t1Words < 40) t1RawBand = 2.5;
+
+    // Đánh giá sơ bộ số từ Task 2 (TRỌNG SỐ HỆ SỐ 2)
+    if (t2Words === 0) {
+      t2RawBand = 0.0; // Bỏ trống hoàn toàn Task 2 = 0.0
+    } else if (t2Words < 15) {
+      t2RawBand = 1.0; // Dưới 15 từ = 1.0
+    } else if (t2Words < 40) {
+      t2RawBand = 2.0;
+    }
+
+    // NẾU CẢ 2 TASK ĐỀU BỎ TRỐNG -> TRẢ THẲNG VỀ BAND 0.0
+    if (t1Words === 0 && t2Words === 0) {
       return {
         overallBand: "0.0",
-        ta_tr: "0.0",
-        cc: "0.0",
-        lr: "0.0",
-        gra: "0.0",
-        rubricSummary: "Học sinh không làm bài (Does not attempt the task in any way).",
-        keyMistakes: ["Bỏ trống toàn bộ bài viết."],
-        band8Upgrade: "Hãy bắt đầu viết bài từ những câu đơn giản nhất."
+        task1Band: "0.0",
+        task2Band: "0.0",
+        ta_tr: "0.0", cc: "0.0", lr: "0.0", gra: "0.0",
+        rubricSummary: "Học sinh không làm bài thi Viết (Does not attempt the task in any way).",
+        keyMistakes: ["Bỏ trống cả Task 1 và Task 2."],
+        band8Upgrade: "Hãy bắt đầu tập viết từ những câu ghép đơn giản nhất."
       };
     }
 
-    // LỚP BẢO VỆ 2: NẾU DƯỚI 15 TỪ RỜI RẠC ➔ BAND 1.0 THEO RUBRIC
-    if (words < 15) {
-      return {
-        overallBand: "1.0",
-        ta_tr: "1.0",
-        cc: "1.0",
-        lr: "1.0",
-        gra: "1.0",
-        rubricSummary: "Chỉ viết được một vài từ đơn lẻ, không tạo thành câu hoàn chỉnh (Can only use a few isolated words).",
-        keyMistakes: ["Chưa viết đủ câu, chỉ có từ vụn vặt."],
-        band8Upgrade: "Cần xây dựng cấu trúc Subject + Verb + Object cơ bản."
-      };
-    }
+    // NẾU TASK 2 BỊ BỎ TRỐNG (TRƯỜNG HỢP HỌC SINH BUG LÀM MỖI TASK 1)
+    if (t2Words === 0) {
+      const estimatedT1 = t1Words < 20 ? 1.0 : (t1Words < 50 ? 3.0 : 4.0);
+      const combined = (estimatedT1 * 1 + 0.0 * 2) / 3;
+      const finalCombinedBand = roundIELTS(combined).toFixed(1);
 
-    // LỚP BẢO VỆ 3: NẾU TỪ 15 ĐẾN DƯỚI 35 TỪ ➔ BAND 2.0
-    if (words < 35) {
       return {
-        overallBand: "2.0",
-        ta_tr: "2.0",
-        cc: "2.0",
-        lr: "2.0",
-        gra: "2.0",
-        rubricSummary: "Nội dung cực kỳ sơ sài, hầu như không liên quan hoặc chỉ chép lại đề bài.",
-        keyMistakes: ["Đoạn văn quá ngắn, chưa đủ dung lượng tối thiểu để phát triển ý."],
-        band8Upgrade: "Hãy cố gắng viết tối thiểu 2-3 câu hoàn chỉnh có chủ ngữ và vị ngữ rõ ràng."
+        overallBand: finalCombinedBand,
+        task1Band: estimatedT1.toFixed(1),
+        task2Band: "0.0",
+        ta_tr: "1.0", cc: "1.0", lr: "1.0", gra: "1.0",
+        rubricSummary: `Học sinh chỉ làm Task 1 (${t1Words} từ) và bỏ trống hoàn toàn bài luận Task 2 (0 từ). Theo luật khảo thí quốc tế IELTS, Task 2 chiếm 2/3 tổng điểm nên điểm Writing tổng bị kéo xuống Band ${finalCombinedBand}.`,
+        keyMistakes: ["Bỏ trống hoàn toàn bài luận Task 2 (Mất 66.7% tổng số điểm Writing)."],
+        band8Upgrade: "Tuyệt đối không được bỏ trống Task 2 trong bất kỳ bài thi nào."
       };
     }
 
     const apiKey = getWritingKey();
+    const cfg = TEST_CEILINGS[testId] || TEST_CEILINGS.test_01;
 
     const systemPrompt = `
 Bạn là Giám khảo Khảo thí IELTS Writing chính thức của British Council & IDP.
-Hãy chấm bài viết dưới đây theo đúng nguyên văn BẢNG TIÊU CHÍ CHẤM ĐIỂM (IELTS WRITING BAND DESCRIPTORS).
-Tuyệt đối KHÔNG ĐƯỢC nương tay hay cho điểm sàn an ủi 4.0/4.5. Nếu bài làm kém, hãy cho đúng Band 2.0 hoặc 3.0.
+Hãy đọc bài viết của thí sinh và chấm ĐỘC LẬP TỪNG TASK theo đúng nguyên văn IELTS WRITING BAND DESCRIPTORS.
 
-TIÊU CHÍ KHẢO THÍ CHÍNH THỨC:
-1. Task Achievement / Task Response (TA/TR):
-   - Band 0: Không làm bài.
-   - Band 1: Hoàn toàn lạc đề, chỉ dùng vài từ đơn lẻ.
-   - Band 2: Hầu như không liên quan đến đề bài.
-   - Band 3: Hiểu sai đề hoàn toàn, ý tưởng rời rạc hoặc lặp lại.
-   - Band 4: Cố gắng trả lời nhưng sơ sài, thiếu ý chính.
-   - Band 5-9: Theo các cấp độ hoàn thành đề bài.
-2. Coherence & Cohesion (CC): Mạch lạc, chia đoạn, liên kết câu.
-3. Lexical Resource (LR): Vốn từ, chính tả, ngữ cảnh dùng từ.
-4. Grammatical Range & Accuracy (GRA): Độ đa dạng cấu trúc và độ chính xác ngữ pháp.
+ĐỀ BÀI: "${promptContext || 'IELTS Academic Writing'}"
 
-ĐỀ BÀI: "${promptText}"
-BÀI VIẾT CỦA THÍ SINH (${words} từ):
-"${rawText}"
+BÀI LÀM CỦA THÍ SINH:
+- TASK 1 (${t1Words} từ): "${t1Clean || '(Không làm bài)'}"
+- TASK 2 (${t2Words} từ): "${t2Clean || '(Không làm bài)'}"
 
-TRẢ VỀ DUY NHẤT 1 CHUỖI JSON HỢP LỆ (KHÔNG DÙNG DẤU \`\`\`json):
+QUY TẮC BẮT BUỘC VỀ ĐIỂM SỐ:
+1. Chấm điểm riêng biệt Task 1 (tối đa 9.0) và Task 2 (tối đa 9.0).
+2. Tuyệt đối KHÔNG ĐƯỢC cho điểm sàn an ủi. Nếu bài sơ sài, cho đúng Band 2.0 hoặc 3.0.
+3. Tính Overall Writing theo công thức chuẩn: (Task 1 * 1 + Task 2 * 2) / 3, làm tròn theo bước 0.5.
+4. Đề thi hiện tại: "${cfg.label}". Trần điểm khuyến nghị là ${cfg.cap}. Nếu bài làm xuất sắc như văn mẫu Band 8.0, bạn cứ cho điểm thực tế để hệ thống tự áp dụng chiết khấu.
+
+TRẢ VỀ DUY NHẤT 1 CHUỖI JSON HỢP LỆ (KHÔNG DÙNG MARKDOWN, KHÔNG \`\`\`json):
 {
+  "task1Band": "3.5",
+  "task2Band": "3.0",
   "overallBand": "3.0",
   "ta_tr": "3.0",
   "cc": "3.0",
-  "lr": "2.5",
+  "lr": "3.0",
   "gra": "3.0",
-  "rubricSummary": "Nhận xét ngắn 2 câu theo đúng định nghĩa trong bảng Band Descriptors.",
+  "rubricSummary": "Nhận xét ngắn 2 câu bám sát định nghĩa trong bảng Band Descriptors.",
   "keyMistakes": [
-    "Trích câu sai của học sinh ➔ Sửa lại cho đúng"
+    "Trích câu sai của học sinh ➔ Sửa lại cho chuẩn ngữ pháp"
   ],
-  "band8Upgrade": "Viết 1 đoạn văn mẫu ngắn nâng cấp từ ý tưởng của học sinh đạt chuẩn Band 8.0"
+  "band8Upgrade": "Viết 1 đoạn văn mẫu ngắn gọn nâng cấp từ ý tưởng của học sinh đạt chuẩn Band 8.0"
 }
 `;
 
     try {
       const rawRes = await this.executeGeminiCall(apiKey, systemPrompt);
       const cleanJson = rawRes.replace(/^```json/, '').replace(/```$/, '').trim();
-      return JSON.parse(cleanJson);
-    } catch (err) {
-      // Fallback an toàn có tính đến ngưỡng từ thực tế - không bao giờ tự động đội lên 4.5
-      const estimatedBand = words < 20 ? "1.0" : (words < 50 ? "2.5" : (words < 100 ? "3.5" : "4.5"));
+      const parsed = JSON.parse(cleanJson);
+
+      const t1Raw = parseFloat(parsed.task1Band) || (t1Words > 40 ? 3.5 : 2.0);
+      const t2Raw = parseFloat(parsed.task2Band) || (t2Words > 50 ? 3.5 : 2.0);
+
+      // Tính tổng theo trọng số chuẩn: (T1 * 1 + T2 * 2) / 3
+      const rawCombined = (t1Raw * 1 + t2Raw * 2) / 3;
+
+      // Áp dụng thuật toán Smart Over-Cap có chiết khấu theo từng bài Test
+      const finalT1 = calculateSmartOverCap(t1Raw, testId);
+      const finalT2 = calculateSmartOverCap(t2Raw, testId);
+      const finalOverall = calculateSmartOverCap(rawCombined, testId);
+
       return {
-        overallBand: estimatedBand,
-        ta_tr: estimatedBand,
-        cc: estimatedBand,
-        lr: estimatedBand,
-        gra: estimatedBand,
-        rubricSummary: "Hệ thống tự động chấm điểm dự phòng dựa trên dung lượng câu từ thực tế.",
-        keyMistakes: ["Cần chú ý lỗi ngữ pháp và chia động từ."],
-        band8Upgrade: "Hãy luyện tập viết câu ghép và mở rộng vốn từ học thuật."
+        overallBand: finalOverall,
+        task1Band: finalT1,
+        task2Band: finalT2,
+        ta_tr: calculateSmartOverCap(parsed.ta_tr || finalOverall, testId),
+        cc: calculateSmartOverCap(parsed.cc || finalOverall, testId),
+        lr: calculateSmartOverCap(parsed.lr || finalOverall, testId),
+        gra: calculateSmartOverCap(parsed.gra || finalOverall, testId),
+        rubricSummary: parsed.rubricSummary || "Đã phân tích 4 tiêu chí bài viết.",
+        keyMistakes: parsed.keyMistakes || ["Cần chú ý chia thì và phát triển câu phức."],
+        band8Upgrade: parsed.band8Upgrade || "Luyện viết câu phức có mệnh đề trạng ngữ chỉ kết quả."
+      };
+
+    } catch (err) {
+      // Fallback phòng thủ an toàn: Tự tính toán dựa trên số từ thực tế, không bao giờ đội ảo lên 4.5
+      const estT1 = t1Words === 0 ? 0.0 : (t1Words < 30 ? 2.0 : (t1Words < 70 ? 3.0 : 4.0));
+      const estT2 = t2Words === 0 ? 0.0 : (t2Words < 40 ? 1.5 : (t2Words < 100 ? 3.0 : 4.0));
+      const calcOverall = (estT1 * 1 + estT2 * 2) / 3;
+      const safeOverall = calculateSmartOverCap(calcOverall, testId);
+
+      return {
+        overallBand: safeOverall,
+        task1Band: calculateSmartOverCap(estT1, testId),
+        task2Band: calculateSmartOverCap(estT2, testId),
+        ta_tr: safeOverall,
+        cc: safeOverall,
+        lr: safeOverall,
+        gra: safeOverall,
+        rubricSummary: `Hệ thống tự động chấm điểm dự phòng dựa trên dung lượng câu từ thực tế (Task 1: ${t1Words} từ, Task 2: ${t2Words} từ).`,
+        keyMistakes: ["Cần mở rộng vốn từ vựng học thuật và tránh dịch word-by-word."],
+        band8Upgrade: "Hãy xây dựng thói quen viết dàn ý PEEL trước khi gõ bài."
       };
     }
   }
 
   // =========================================================================
-  // C. CHẤM SPEAKING CHUẨN RUBRIC BAND DESCRIPTORS (XÓA SÀN 3.5, CÓ THỂ ĐẠT 0.0)
+  // C. CHẤM SPEAKING CHUẨN RUBRIC (4 TIÊU CHÍ, SMART OVER-CAP & TEST CEILING)
   // =========================================================================
-  async evaluateSpeakingDiagnostic(questionsList, transcriptsList) {
+  async evaluateSpeakingDiagnostic(testId = 'test_01', questionsList = [], transcriptsList = []) {
     const combinedTranscript = (transcriptsList || []).filter(Boolean).join(' ').trim();
     const words = this.sanitizeAndCountWords(combinedTranscript);
 
-    // LỚP BẢO VỆ 1: NẾU KHÔNG GHI ÂM CHỮ NÀO ➔ BAND 0.0
+    // 1. KIỂM TRA PHÒNG THỦ: NẾU THÍ SINH HOÀN TOÀN BỎ TRỐNG ➔ BAND 0.0
     if (words === 0) {
       return {
         overallBand: "0.0",
-        fc: "0.0",
-        lr: "0.0",
-        gra: "0.0",
-        pr: "0.0",
+        fc: "0.0", lr: "0.0", gra: "0.0", pr: "0.0",
         rubricSummary: "Thí sinh không tham gia trả lời bài thi nói (Does not attend / Does not complete the test).",
-        critique: "Không có dữ liệu âm thanh để đánh giá.",
-        improvedAnswer: "Hãy bấm micro và tự tin nói những câu tiếng Anh đầu tiên."
+        critique: "Không có dữ liệu âm thanh nào được ghi nhận.",
+        improvedAnswer: "Hãy bấm micro và tự tin trả lời những câu tiếng Anh đầu tiên."
       };
     }
 
-    // LỚP BẢO VỆ 2: NẾU DƯỚI 10 TỪ RỜI RẠC ➔ BAND 1.0 - 1.5
-    if (words < 10) {
+    // 2. DƯỚI 12 TỪ RỜI RẠC ➔ BAND 1.0 - 1.5
+    if (words < 12) {
       return {
         overallBand: "1.5",
-        fc: "1.5",
-        lr: "1.5",
-        gra: "1.0",
-        pr: "1.5",
-        rubricSummary: "Chỉ phát âm được một vài từ đơn lẻ, ngập ngừng quá dài trước mỗi từ (Speech is of virtually no communicative significance).",
-        critique: "Chưa tạo thành câu giao tiếp có ý nghĩa.",
-        improvedAnswer: "Tập trả lời trọn vẹn câu: 'I am currently a student at...'"
-      };
-    }
-
-    // LỚP BẢO VỆ 3: NẾU DƯỚI 25 TỪ ➔ BAND 2.5
-    if (words < 25) {
-      return {
-        overallBand: "2.5",
-        fc: "2.5",
-        lr: "2.5",
-        gra: "2.0",
-        pr: "2.5",
-        rubricSummary: "Câu trả lời quá ngắn, dừng ngập ngừng thường xuyên và chưa diễn đạt được ý hoàn chỉnh.",
-        critique: "Cần kéo dài câu trả lời bằng cách thêm lý do (Because...) hoặc ví dụ (For instance...).",
-        improvedAnswer: "I enjoy living in my hometown because the people here are exceptionally warm and welcoming."
+        fc: "1.5", lr: "1.5", gra: "1.0", pr: "1.5",
+        rubricSummary: "Chỉ phát âm được một vài từ đơn lẻ, ngập ngừng quá dài (Speech is of virtually no communicative significance).",
+        critique: "Chưa cấu tạo được thành câu hoàn chỉnh có nghĩa.",
+        improvedAnswer: "Tập trả lời trọn vẹn câu: 'Currently, I am a university student in Hanoi.'"
       };
     }
 
     const apiKey = getSpeakingKey();
+    const cfg = TEST_CEILINGS[testId] || TEST_CEILINGS.test_01;
 
     const pairsText = (questionsList || []).map((q, idx) => {
-      return `Câu hỏi ${idx + 1}: "${q}"\nThí sinh trả lời: "${transcriptsList?.[idx] || '(Không nói)'}"`;
+      const qText = typeof q === 'string' ? q : (q.text || q.prompt || `Câu hỏi ${idx + 1}`);
+      return `Câu hỏi ${idx + 1}: "${qText}"\nThí sinh trả lời: "${transcriptsList?.[idx] || '(Không nói)'}"`;
     }).join('\n\n');
 
     const systemPrompt = `
 Bạn là Giám khảo Khảo thí IELTS Speaking chính thức của British Council & IDP.
-Hãy chấm phần thi nói dưới đây theo đúng nguyên văn BẢNG TIÊU CHÍ CHẤM ĐIỂM (IELTS SPEAKING BAND DESCRIPTORS).
+Hãy chấm phần thi nói dưới đây theo đúng nguyên văn IELTS SPEAKING BAND DESCRIPTORS (4 tiêu chí: Fluency, Lexical, Grammar, Pronunciation).
 Tuyệt đối KHÔNG ĐƯỢC nương tay hay tự động cho điểm sàn an ủi 4.0/4.5. Nếu thí sinh nói ngắc ngứ, sai ngữ pháp nhiều, hãy cho đúng Band 2.0 hoặc 3.0.
 
-TIÊU CHÍ KHẢO THÍ CHÍNH THỨC:
-1. Fluency & Coherence (FC):
-   - Band 0: Không nói.
-   - Band 1: Hoàn toàn rời rạc.
-   - Band 2: Ngập ngừng trước hầu như mọi từ.
-   - Band 3: Ngập ngừng thường xuyên, câu ngắn cụt.
-   - Band 4-9: Theo các mức độ trôi chảy và phát triển ý.
-2. Lexical Resource (LR): Vốn từ, sự linh hoạt.
-3. Grammatical Range & Accuracy (GRA): Độ chính xác ngữ pháp, câu đơn/câu phức.
-4. Pronunciation (PR): Nhận xét dựa trên ngữ âm và độ rõ ràng của từ ngữ sử dụng.
+ĐỀ THI: "${cfg.label}". Trần điểm khuyến nghị là ${cfg.cap}. Nếu thí sinh nói lưu loát xuất thần như mẫu Band 8.0, bạn cứ cho điểm thực tế để hệ thống tự áp dụng chiết khấu.
 
-BÀI LÀM CỦA THÍ SINH:
+BÀI LÀM CỦA THÍ SINH (${words} từ):
 ${pairsText}
 
 TRẢ VỀ DUY NHẤT 1 CHUỖI JSON HỢP LỆ (KHÔNG DÙNG \`\`\`json):
@@ -417,19 +492,36 @@ TRẢ VỀ DUY NHẤT 1 CHUỖI JSON HỢP LỆ (KHÔNG DÙNG \`\`\`json):
     try {
       const rawRes = await this.executeGeminiCall(apiKey, systemPrompt);
       const cleanJson = rawRes.replace(/^```json/, '').replace(/```$/, '').trim();
-      return JSON.parse(cleanJson);
-    } catch (err) {
-      // Fallback an toàn bảo vệ ngưỡng điểm thực tế
-      const estimatedBand = words < 10 ? "1.0" : (words < 30 ? "2.5" : (words < 70 ? "3.5" : "4.5"));
+      const parsed = JSON.parse(cleanJson);
+
+      const rawOverall = parseFloat(parsed.overallBand) || (words < 30 ? 2.5 : 3.5);
+      const finalOverall = calculateSmartOverCap(rawOverall, testId);
+
       return {
-        overallBand: estimatedBand,
-        fc: estimatedBand,
-        lr: estimatedBand,
-        gra: estimatedBand,
-        pr: estimatedBand,
-        rubricSummary: "Hệ thống ước lượng điểm dự phòng dựa trên độ dài transcript và phản xạ phát âm.",
-        critique: "Cần luyện tập kéo dài câu trả lời hơn.",
-        improvedAnswer: "Luyện phản xạ nói theo phương pháp shadowing."
+        overallBand: finalOverall,
+        fc: calculateSmartOverCap(parsed.fc || finalOverall, testId),
+        lr: calculateSmartOverCap(parsed.lr || finalOverall, testId),
+        gra: calculateSmartOverCap(parsed.gra || finalOverall, testId),
+        pr: calculateSmartOverCap(parsed.pr || finalOverall, testId),
+        rubricSummary: parsed.rubricSummary || "Đã phân tích phản xạ nói theo 4 tiêu chí.",
+        critique: parsed.critique || "Cần chú ý chia động từ quá khứ khi kể chuyện.",
+        improvedAnswer: parsed.improvedAnswer || "Luyện tập phương pháp Shadowing để tăng phản xạ."
+      };
+
+    } catch (err) {
+      // Fallback an toàn phòng thủ theo số từ thực tế
+      const estBand = words < 25 ? 2.0 : (words < 60 ? 3.0 : (words < 120 ? 4.0 : 5.0));
+      const safeBand = calculateSmartOverCap(estBand, testId);
+
+      return {
+        overallBand: safeBand,
+        fc: safeBand,
+        lr: safeBand,
+        gra: safeBand,
+        pr: safeBand,
+        rubricSummary: "Hệ thống tự động ước lượng điểm dự phòng dựa trên dung lượng bản ký âm.",
+        critique: "Cần luyện tập kéo dài câu trả lời bằng lý do và ví dụ thực tế.",
+        improvedAnswer: "Tập nói theo cấu trúc AREA (Answer - Reason - Example - Alternative)."
       };
     }
   }
