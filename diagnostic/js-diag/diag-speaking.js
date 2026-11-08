@@ -3,6 +3,7 @@
  * BỘ ĐIỀU KHIỂN SPEAKING KHẢO THÍ CHUYÊN BIỆT (MODULE TÁCH RIÊNG)
  * BẢN FULL ĐẦY ĐỦ 100% - KHÔNG CẮT BỚT BẤT KỲ DÒNG NÀO
  * - NẠP ĐỘNG 100% CÂU HỎI TỪ CÁC FILE JSON (TEST 1, 2, 3 & FULL MOCK TEST)
+ * - CƠ CHẾ PHÒNG THỦ KÉP: BẢO VỆ TUYỆT ĐỐI NÚT NỘP BÀI TỔNG THỂ, CHỐNG GHI ĐÈ DOM
  * - HỖ TRỢ ĐA DẠNG: 4-8 CÂU PART 1, CUE CARD THUYẾT TRÌNH PART 2, PHẢN BIỆN PART 3
  * - THU ÂM VÀ CHUYỂN GIỌNG NÓI THÀNH VĂN BẢN (WEB SPEECH API) CÓ ĐẾM TỪ REALTIME
  * - TÍCH HỢP ĐỒNG BỘ TRẦN ĐIỂM & CHIẾT KHẤU SMART OVER-CAP THEO TỪNG BÀI TEST
@@ -13,7 +14,7 @@ import { diagAIService } from './diag-ai.js';
 
 export class DiagSpeakingEngine {
   constructor(options = {}) {
-    this.containerId = options.containerId || 'section_speaking';
+    this.containerId = options.containerId || 'speakingQuestionsMount';
     this.testId = "test_01";
     this.isFullTest = false;
     this.speechRecognition = null;
@@ -100,7 +101,7 @@ export class DiagSpeakingEngine {
   }
 
   // =========================================================================
-  // 2. KHỞI TẠO VÀ RENDER GIAO DIỆN
+  // 2. KHỞI TẠO VÀ RENDER GIAO DIỆN (CHỐNG GHI ĐÈ NÚT NỘP BÀI)
   // =========================================================================
   init(isFullTest = false, testId = 'test_01') {
     this.isFullTest = isFullTest;
@@ -109,8 +110,21 @@ export class DiagSpeakingEngine {
   }
 
   render(containerId) {
-    if (containerId) this.containerId = containerId;
-    const mount = document.getElementById(this.containerId) || document.getElementById('section_speaking') || document.getElementById('ftSpeakingMount');
+    // 🔴 CƠ CHẾ ĐỊNH VỊ CHUYÊN BIỆT: Ưu tiên khung mount con để không ghi đè nút Nộp bài
+    let mount = null;
+    const dedicatedMount = document.getElementById('speakingQuestionsMount');
+    const ftMount = document.getElementById('ftSpeakingMount');
+
+    if (dedicatedMount) {
+      mount = dedicatedMount;
+    } else if (ftMount) {
+      mount = ftMount;
+    } else if (containerId && containerId !== 'section_speaking') {
+      mount = document.getElementById(containerId);
+    } else {
+      mount = document.getElementById('section_speaking');
+    }
+
     if (!mount) return;
 
     if (!this.data) {
@@ -212,6 +226,28 @@ export class DiagSpeakingEngine {
     html += `<div id="inlineSpeakingAiMount"></div>`;
     mount.innerHTML = html;
     this.restoreUserTranscripts();
+
+    // 🔴 CƠ CHẾ BẢO VỆ LỚP 2: NẾU THIẾU NÚT NỘP BÀI THÌ TỰ ĐỘNG CHÈN NGAY VÀO CHÂN TRANG
+    this.ensureSubmitButtonExists();
+  }
+
+  ensureSubmitButtonExists() {
+    const sec = document.getElementById('section_speaking');
+    const existingBtn = document.getElementById('btnSubmitFullDiagnostic');
+    if (!existingBtn && sec) {
+      const footer = document.createElement('div');
+      footer.id = 'speakingDynamicFooter';
+      footer.style.cssText = 'margin-top: 28px; border-top: 2px dashed #E8E2D8; padding-top: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;';
+      footer.innerHTML = `
+        <button type="button" onclick="window.switchSkillSection('writing')" class="btn-3d btn-3d-white">
+          &larr; Quay lại Writing
+        </button>
+        <button type="button" id="btnSubmitFullDiagnostic" onclick="window.submitDiagnosticExam()" class="btn-3d btn-3d-red" style="padding: 14px 28px; font-size: 15px; box-shadow: 0 4px 14px rgba(139, 21, 24, 0.35);">
+          🏁 HOÀN THÀNH & NỘP BÀI CHẨN ĐOÁN
+        </button>
+      `;
+      sec.appendChild(footer);
+    }
   }
 
   // Tiện ích đếm từ phòng thủ
@@ -283,7 +319,7 @@ export class DiagSpeakingEngine {
         this.activeRecordingTarget = null;
         if (btn) btn.innerHTML = `<i class="fa-solid fa-microphone"></i> Bấm để nói tiếp`;
         if (statusEl && area) {
-          const words = this.countWords(area.value);
+          const words = area.value.trim().length === 0 ? 0 : area.value.trim().split(/\s+/).filter(Boolean).length;
           statusEl.style.color = words > 0 ? "#059669" : "#64748B";
           statusEl.innerText = words > 0 ? `✓ Hoàn thành: ${words} từ` : "Chưa ghi âm";
         }
@@ -453,7 +489,7 @@ export class DiagSpeakingEngine {
       this.userAnswers = savedData.answersSnapshot;
       this.restoreUserTranscripts();
     }
-    document.querySelectorAll('#section_speaking textarea, #ftSpeakingMount textarea').forEach(tx => {
+    document.querySelectorAll('#section_speaking textarea, #ftSpeakingMount textarea, #speakingQuestionsMount textarea').forEach(tx => {
       tx.disabled = true;
       tx.style.backgroundColor = '#F8FAFC';
     });
