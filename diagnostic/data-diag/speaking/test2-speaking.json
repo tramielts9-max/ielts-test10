@@ -1,0 +1,60 @@
+{
+  "testId": "test_02",
+  "title": "Speaking Diagnostic Test 2 - Intermediate Standardized",
+  "ceilingBand": 6.0,
+  "parts": [
+    {
+      "partNum": 1,
+      "title": "Part 1: Giao Tiếp Xã Hội & Quê Hương (4 Câu)",
+      "instructions": "Trả lời trực tiếp và kéo dài câu trả lời bằng lý do hoặc ví dụ (30 - 45s/câu).",
+      "questions": [
+        {
+          "id": "t2_spk_q1",
+          "num": 1,
+          "text": "What is your hometown like? Is it a big city or a small place?",
+          "suggestedTimeSec": 45,
+          "topic": "Hometown"
+        },
+        {
+          "id": "t2_spk_q2",
+          "num": 2,
+          "text": "What do you like most about living in your current city or neighborhood?",
+          "suggestedTimeSec": 45,
+          "topic": "The city you live in"
+        },
+        {
+          "id": "t2_spk_q3",
+          "num": 3,
+          "text": "Do you prefer to sit by the window when travelling? Why?",
+          "suggestedTimeSec": 45,
+          "topic": "Travelling"
+        },
+        {
+          "id": "t2_spk_q4",
+          "num": 4,
+          "text": "What kinds of websites do you often visit in your daily leisure or study time?",
+          "suggestedTimeSec": 45,
+          "topic": "Websites"
+        }
+      ]
+    },
+    {
+      "partNum": 2,
+      "title": "Part 2: Thuyết Trình Cue Card Độc Lập",
+      "instructions": "Em có 1 phút chuẩn bị dàn ý và 2 phút để nói liên tục theo các gợi ý bên dưới.",
+      "cueCard": {
+        "id": "t2_spk_cue",
+        "topic": "An Important Decision",
+        "prompt": "Describe an important decision you made in your life.",
+        "subPrompts": [
+          "What the decision was",
+          "Why you made the decision",
+          "How easy or difficult it was to make it",
+          "And explain how you felt about the result of this decision"
+        ],
+        "prepTimeSec": 60,
+        "talkTimeSec": 120
+      }
+    }
+  ]
+}
