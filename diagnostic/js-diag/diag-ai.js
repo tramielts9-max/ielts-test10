@@ -4,8 +4,8 @@
  * BẢN FULL ĐẦY ĐỦ 100% - KHÔNG CẮT BỚT BẤT KỲ DÒNG NÀO
  * - TÍCH HỢP TRẦN ĐIỂM RIÊNG THEO TỪNG BÀI TEST: TEST 1 (4.5), TEST 2 (6.0), TEST 3 (7.5), FULL TEST (9.0)
  * - THUẬT TOÁN SMART OVER-CAP CÓ CHIẾT KHẤU KHI LÀM BÀI XUẤT THẦN
- * - CHẤM ĐỘC LẬP TASK 1 & TASK 2 WRITING, ÁP DỤNG TRỌNG SỐ CHUẨN IELTS (T1*1 + T2*2)/3
- * - TRIỆT TIÊU TOÀN BỘ BUG BỎ TRỐNG TASK 2: 0 TỪ = BAND 0.0
+ * - CHẤM ĐỘC LẬP TASK 1 & TASK 2 WRITING, ÁP DỤNG TRỌNG SỐ CHUẨN (T1*1 + T2*2)/3
+ * - KHÓA ĐỐI XỨNG CỨNG 100%: BỎ TRỐNG TASK 1 HOẶC TASK 2 ĐỀU BỊ GÁN 0.0 NGAY LẬP TỨC
  * - BẢO TOÀN NGUYÊN VẸN MASTER READING RUBRICS (CAM 21 TRANG 57 - 74)
  */
 
@@ -286,7 +286,7 @@ HÃY TRẢ VỀ DUY NHẤT 1 CHUỖI JSON (KHÔNG DÙNG MARKDOWN, KHÔNG \`\`\`j
   }
 
   // =========================================================================
-  // B. CHẤM WRITING CHUẨN RUBRIC (TRỌNG SỐ [T1*1 + T2*2]/3 & SMART OVER-CAP)
+  // B. CHẤM WRITING CHUẨN RUBRIC (KHÓA ĐỐI XỨNG CỨNG TASK 1 & TASK 2)
   // =========================================================================
   async evaluateWritingDiagnostic(testId = 'test_01', promptContext = '', task1Text = '', task2Text = '') {
     const t1Clean = (task1Text || '').trim();
@@ -294,54 +294,66 @@ HÃY TRẢ VỀ DUY NHẤT 1 CHUỖI JSON (KHÔNG DÙNG MARKDOWN, KHÔNG \`\`\`j
     const t1Words = this.sanitizeAndCountWords(t1Clean);
     const t2Words = this.sanitizeAndCountWords(t2Clean);
 
-    // 1. KIỂM TRA CHẶN LỖI BỎ TRỐNG TASK 2 VÀ TASK 1 TẬN GỐC
-    let t1RawBand = 0.0;
-    let t2RawBand = 0.0;
-
-    // Đánh giá sơ bộ số từ Task 1
-    if (t1Words === 0) t1RawBand = 0.0;
-    else if (t1Words < 15) t1RawBand = 1.0;
-    else if (t1Words < 40) t1RawBand = 2.5;
-
-    // Đánh giá sơ bộ số từ Task 2 (TRỌNG SỐ HỆ SỐ 2)
-    if (t2Words === 0) {
-      t2RawBand = 0.0; // Bỏ trống hoàn toàn Task 2 = 0.0
-    } else if (t2Words < 15) {
-      t2RawBand = 1.0; // Dưới 15 từ = 1.0
-    } else if (t2Words < 40) {
-      t2RawBand = 2.0;
-    }
-
-    // NẾU CẢ 2 TASK ĐỀU BỎ TRỐNG -> TRẢ THẲNG VỀ BAND 0.0
+    // =======================================================================
+    // 1. TRƯỜNG HỢP A: BỎ TRỐNG CẢ 2 TASK ➔ TRẢ THẲNG VỀ BAND 0.0 NGAY
+    // =======================================================================
     if (t1Words === 0 && t2Words === 0) {
       return {
         overallBand: "0.0",
         task1Band: "0.0",
         task2Band: "0.0",
         ta_tr: "0.0", cc: "0.0", lr: "0.0", gra: "0.0",
-        rubricSummary: "Học sinh không làm bài thi Viết (Does not attempt the task in any way).",
+        rubricSummary: "Học sinh không làm bài thi Viết (Does not attempt the task in any way). Cả Task 1 và Task 2 đều có 0 từ.",
         keyMistakes: ["Bỏ trống cả Task 1 và Task 2."],
         band8Upgrade: "Hãy bắt đầu tập viết từ những câu ghép đơn giản nhất."
       };
     }
 
-    // NẾU TASK 2 BỊ BỎ TRỐNG (TRƯỜNG HỢP HỌC SINH BUG LÀM MỖI TASK 1)
-    if (t2Words === 0) {
-      const estimatedT1 = t1Words < 20 ? 1.0 : (t1Words < 50 ? 3.0 : 4.0);
-      const combined = (estimatedT1 * 1 + 0.0 * 2) / 3;
+    // =======================================================================
+    // 2. TRƯỜNG HỢP B: CHỈ LÀM TASK 1, BỎ TRỐNG TASK 2 (KHÓA CỨNG TASK 2 = 0.0)
+    // =======================================================================
+    if (t2Words === 0 && t1Words > 0) {
+      const estimatedT1 = t1Words < 15 ? 1.0 : (t1Words < 40 ? 2.5 : (t1Words < 80 ? 3.5 : 4.5));
+      const adjustedT1 = calculateSmartOverCap(estimatedT1, testId);
+      // Công thức chuẩn: (T1 * 1 + 0.0 * 2) / 3
+      const combined = (parseFloat(adjustedT1) * 1 + 0.0 * 2) / 3;
       const finalCombinedBand = roundIELTS(combined).toFixed(1);
 
       return {
         overallBand: finalCombinedBand,
-        task1Band: estimatedT1.toFixed(1),
+        task1Band: adjustedT1,
         task2Band: "0.0",
         ta_tr: "1.0", cc: "1.0", lr: "1.0", gra: "1.0",
-        rubricSummary: `Học sinh chỉ làm Task 1 (${t1Words} từ) và bỏ trống hoàn toàn bài luận Task 2 (0 từ). Theo luật khảo thí quốc tế IELTS, Task 2 chiếm 2/3 tổng điểm nên điểm Writing tổng bị kéo xuống Band ${finalCombinedBand}.`,
+        rubricSummary: `Học sinh chỉ làm Task 1 (${t1Words} từ) và bỏ trống hoàn toàn bài luận Task 2 (0 từ). Theo quy chế IELTS, Task 2 chiếm 2/3 tổng điểm nên điểm Writing tổng bị kéo tụt xuống Band ${finalCombinedBand}.`,
         keyMistakes: ["Bỏ trống hoàn toàn bài luận Task 2 (Mất 66.7% tổng số điểm Writing)."],
         band8Upgrade: "Tuyệt đối không được bỏ trống Task 2 trong bất kỳ bài thi nào."
       };
     }
 
+    // =======================================================================
+    // 3. TRƯỜNG HỢP C: CHỈ LÀM TASK 2, BỎ TRỐNG TASK 1 (KHÓA CỨNG TASK 1 = 0.0)
+    // =======================================================================
+    if (t1Words === 0 && t2Words > 0) {
+      const estimatedT2 = t2Words < 15 ? 1.0 : (t2Words < 40 ? 2.0 : (t2Words < 100 ? 3.5 : (t2Words < 180 ? 5.0 : 6.0)));
+      const adjustedT2 = calculateSmartOverCap(estimatedT2, testId);
+      // Công thức chuẩn: (0.0 * 1 + T2 * 2) / 3
+      const combined = (0.0 * 1 + parseFloat(adjustedT2) * 2) / 3;
+      const finalCombinedBand = roundIELTS(combined).toFixed(1);
+
+      return {
+        overallBand: finalCombinedBand,
+        task1Band: "0.0",
+        task2Band: adjustedT2,
+        ta_tr: "1.5", cc: "1.5", lr: "1.5", gra: "1.5",
+        rubricSummary: `Học sinh chỉ làm Task 2 (${t2Words} từ) và bỏ trống hoàn toàn Task 1 (0 từ). Theo quy chế IELTS, Task 1 chiếm 1/3 tổng điểm nên điểm Writing tổng bị kéo tụt xuống Band ${finalCombinedBand}.`,
+        keyMistakes: ["Bỏ trống hoàn toàn bài mô tả Task 1 (Mất 33.3% tổng số điểm Writing)."],
+        band8Upgrade: "Hãy phân bổ 20 phút đầu giờ để hoàn thành trọn vẹn Task 1."
+      };
+    }
+
+    // =======================================================================
+    // 4. TRƯỜNG HỢP D: LÀM ĐẦY ĐỦ CẢ 2 TASK -> GỬI AI CHẤM VÀ ÁP DỤNG TRỌNG SỐ
+    // =======================================================================
     const apiKey = getWritingKey();
     const cfg = TEST_CEILINGS[testId] || TEST_CEILINGS.test_01;
 
@@ -352,8 +364,8 @@ Hãy đọc bài viết của thí sinh và chấm ĐỘC LẬP TỪNG TASK theo
 ĐỀ BÀI: "${promptContext || 'IELTS Academic Writing'}"
 
 BÀI LÀM CỦA THÍ SINH:
-- TASK 1 (${t1Words} từ): "${t1Clean || '(Không làm bài)'}"
-- TASK 2 (${t2Words} từ): "${t2Clean || '(Không làm bài)'}"
+- TASK 1 (${t1Words} từ): "${t1Clean}"
+- TASK 2 (${t2Words} từ): "${t2Clean}"
 
 QUY TẮC BẮT BUỘC VỀ ĐIỂM SỐ:
 1. Chấm điểm riêng biệt Task 1 (tối đa 9.0) và Task 2 (tối đa 9.0).
@@ -409,8 +421,8 @@ TRẢ VỀ DUY NHẤT 1 CHUỖI JSON HỢP LỆ (KHÔNG DÙNG MARKDOWN, KHÔNG \
 
     } catch (err) {
       // Fallback phòng thủ an toàn: Tự tính toán dựa trên số từ thực tế, không bao giờ đội ảo lên 4.5
-      const estT1 = t1Words === 0 ? 0.0 : (t1Words < 30 ? 2.0 : (t1Words < 70 ? 3.0 : 4.0));
-      const estT2 = t2Words === 0 ? 0.0 : (t2Words < 40 ? 1.5 : (t2Words < 100 ? 3.0 : 4.0));
+      const estT1 = t1Words < 30 ? 2.0 : (t1Words < 70 ? 3.0 : 4.0);
+      const estT2 = t2Words < 40 ? 1.5 : (t2Words < 100 ? 3.0 : 4.0);
       const calcOverall = (estT1 * 1 + estT2 * 2) / 3;
       const safeOverall = calculateSmartOverCap(calcOverall, testId);
 
