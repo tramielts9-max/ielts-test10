@@ -1,0 +1,60 @@
+{
+  "testId": "test_03",
+  "title": "Speaking Diagnostic Test 3 - Advanced Challenge",
+  "ceilingBand": 7.5,
+  "parts": [
+    {
+      "partNum": 2,
+      "title": "Part 2: Thuyết Trình Thử Thách Áp Lực Cao (2 Phút)",
+      "instructions": "Em có đúng 1 phút để phác thảo từ khóa và 2 phút để thuyết trình liền mạch.",
+      "cueCard": {
+        "id": "t3_spk_cue",
+        "topic": "A Challenging Tech Problem",
+        "prompt": "Describe a challenging technological or academic problem you faced and solved.",
+        "subPrompts": [
+          "What the problem was",
+          "When and where you faced it",
+          "How challenging it was to deal with",
+          "And explain how you successfully solved it"
+        ],
+        "prepTimeSec": 60,
+        "talkTimeSec": 120
+      }
+    },
+    {
+      "partNum": 3,
+      "title": "Part 3: Phản Biện Chuyên Sâu Đa Chiều (4 Câu - Chuẩn PEEL)",
+      "instructions": "Phát triển câu trả lời theo công thức PEEL (Point - Explain - Example - Link), nói 50 - 60s/câu.",
+      "questions": [
+        {
+          "id": "t3_spk_q1",
+          "num": 1,
+          "text": "How has artificial intelligence transformed the way people work and acquire knowledge today?",
+          "suggestedTimeSec": 60,
+          "topic": "AI & Future"
+        },
+        {
+          "id": "t3_spk_q2",
+          "num": 2,
+          "text": "Do you think students are becoming overly reliant on digital technology and AI tools in schools?",
+          "suggestedTimeSec": 60,
+          "topic": "Tech Reliance"
+        },
+        {
+          "id": "t3_spk_q3",
+          "num": 3,
+          "text": "In what ways can advanced technology create communication barriers between different generations?",
+          "suggestedTimeSec": 60,
+          "topic": "Generational Gap"
+        },
+        {
+          "id": "t3_spk_q4",
+          "num": 4,
+          "text": "Should sovereign governments establish strict ethical regulations on emerging technologies like autonomous AI?",
+          "suggestedTimeSec": 60,
+          "topic": "Tech Ethics"
+        }
+      ]
+    }
+  ]
+}
