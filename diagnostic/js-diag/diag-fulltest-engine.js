@@ -3,10 +3,12 @@
  * BỘ ĐIỀU PHỐI FULL MOCK TEST CAMBRIDGE 21 CHUẨN XÁC 100%
  * BẢN FULL ĐẦY ĐỦ 100% - KHÔNG CẮT BỚT BẤT KỲ TÍNH NĂNG NÀO
  * - XÓA BỎ HOÀN TOÀN ĐIỂM SÀN ẢO: BỎ TRỐNG ➔ TRẢ ĐÚNG BAND 0.0
+ * - NÂNG CẤP FULL SPEAKING CHUẨN CAMBRIDGE: 8 CÂU PART 1 + 1 CUE CARD PART 2 + 4 CÂU PART 3
+ * - CHẤM WRITING ĐỘC LẬP THEO TRỌNG SỐ QUỐC TẾ: (TASK 1 * 1 + TASK 2 * 2) / 3
  * - TÍCH HỢP HỆ THỐNG KÉO THẢ MATCHING CHUẨN LISTENING (DRAG & DROP + CLICK-TO-PLACE)
  * - TÍCH HỢP HIGHLIGHT READING KHÔNG GIỚI HẠN & BẢO LƯU KHI CHUYỂN PASSAGE
  * - CƠ CHẾ LÀM TRÒN OVERALL BAND CHUẨN QUY TẮC IDP & BRITISH COUNCIL
- * - [MỚI] ĐÓNG GÓI 100% DỮ LIỆU BÀI LÀM LÊN GOOGLE DRIVE & HỖ TRỢ ADMIN XEM LẠI TỪ XA
+ * - ĐÓNG GÓI 100% DỮ LIỆU BÀI LÀM LÊN GOOGLE DRIVE & HỖ TRỢ ADMIN XEM LẠI TỪ XA
  */
 
 const _WRITING_PREFIX = "AQ.Ab8RN6KGTRGy";
@@ -41,7 +43,7 @@ class DiagnosticFullTestEngine {
       listening: {},
       reading: {},
       writing: { task1: '', task2: '' },
-      speaking: { part1: '', part2: '', part3: '' }
+      speaking: {}
     };
 
     // Bộ nhớ đệm lưu vết Highlight theo từng Passage Reading
@@ -426,7 +428,7 @@ XUẤT BÁO CÁO (DƯỚI 200 TỪ):
           </div>
         `;
 
-      // 3. Dạng Kéo Thả Matching Chuẩn Tương Tác Kép (Drag & Drop + Click-to-Place)
+      // 3. Dạng Kéo Thả Matching Chuẩn Tương Tác Kép
       } else if (g.type === 'matching' && Array.isArray(g.options)) {
         let leftRows = '';
         (g.questionIds || []).forEach(qId => {
@@ -679,7 +681,6 @@ XUẤT BÁO CÁO (DƯỚI 200 TỪ):
   }
 
   switchReadPassage(idx) {
-    // 1. Lưu lại snapshot DOM có chứa highlight của Passage hiện tại trước khi chuyển
     const prevLeftPane = document.getElementById('ftReadLeftPane');
     if (prevLeftPane && this.activeReadPassageIdx !== null) {
       this.readingHighlightsCache[this.activeReadPassageIdx] = prevLeftPane.innerHTML;
@@ -801,7 +802,6 @@ XUẤT BÁO CÁO (DƯỚI 200 TỪ):
       `;
     });
 
-    // 2. Phục hồi lại văn bản bài đọc (nếu có lưu vết Highlight trước đó thì dùng lại vết)
     const cachedHtml = this.readingHighlightsCache[idx];
     const passageContent = cachedHtml || `
       <h3 style="margin:0 0 12px 0; color:var(--tram-red); font-size:18px;">${passage.title || `READING PASSAGE ${idx + 1}`}</h3>
@@ -824,7 +824,6 @@ XUẤT BÁO CÁO (DƯỚI 200 TỪ):
       </div>
     `;
 
-    // 3. Khôi phục các đáp án người dùng đã điền
     Object.entries(this.userAnswers.reading).forEach(([qid, val]) => {
       const inp = document.getElementById(`inp_ft_read_${qid}`);
       if (inp) inp.value = val;
@@ -832,7 +831,6 @@ XUẤT BÁO CÁO (DƯỚI 200 TỪ):
       if (rad) rad.checked = true;
     });
 
-    // 4. Kích hoạt Resizer và Text Highlighter cho cột bài đọc
     this.initDraggableResizer('ftReadSplitWrap', 'ftReadLeftPane', 'ftReadResizer', 'ftReadRightPane');
     this.initTextHighlighter(document.getElementById('ftReadLeftPane'));
   }
@@ -962,40 +960,116 @@ XUẤT BÁO CÁO (DƯỚI 200 TỪ):
   }
 
   // =========================================================================
-  // 5. SPEAKING
+  // 5. SPEAKING (CHUẨN FULL FORMAT: 8 CÂU P1, 1 CUE CARD P2, 4 CÂU P3)
   // =========================================================================
   renderFullSpeaking() {
     const mount = document.getElementById('ftSpeakingMount');
     if (!mount) return;
 
-    mount.innerHTML = `
-      <div class="q-item-box" style="margin-bottom:18px;">
-        <b style="font-size:14.5px; color:#92400E; display:block; margin-bottom:6px;">🎤 Part 1: Giao tiếp đời sống</b>
-        <p style="font-size:13px; color:#475569; margin:0 0 10px 0;">"Let's talk about your hometown. What do you like most about living there?"</p>
-        <button type="button" class="btn-3d btn-3d-red" id="btnRecFtSpk1" style="padding:8px 16px; font-size:13px;" onclick="window.ftEngine.toggleSpeech('ft_spk_part1', 'btnRecFtSpk1')">
-          <i class="fa-solid fa-microphone"></i> Bấm để trả lời Part 1
-        </button>
-        <textarea id="ft_spk_part1" class="diag-textarea" style="height:70px; margin-top:8px;" placeholder="Transcript Part 1..." oninput="window.ftEngine.userAnswers.speaking.part1 = this.value"></textarea>
+    const p1Questions = [
+      { id: "ft_spk_p1_1", text: "What city or town do you live in, and is it a big city or a small place?", topic: "Hometown" },
+      { id: "ft_spk_p1_2", text: "What do you like most about your hometown, and is there anything you dislike about it?", topic: "Hometown" },
+      { id: "ft_spk_p1_3", text: "What is your hometown famous for?", topic: "Hometown" },
+      { id: "ft_spk_p1_4", text: "Is your hometown a good place for young people to pursue their future careers? Why?", topic: "Hometown" },
+      { id: "ft_spk_p1_5", text: "Do you prefer to spend your free time with one close friend or with a large group of friends?", topic: "Friends" },
+      { id: "ft_spk_p1_6", text: "Where do you and your friends usually meet when you hang out?", topic: "Friends" },
+      { id: "ft_spk_p1_7", text: "Do you have a friend that you have known for a very long time?", topic: "Friends" },
+      { id: "ft_spk_p1_8", text: "Why are true friends so important in modern stressful life?", topic: "Friends" }
+    ];
+
+    const p3Questions = [
+      { id: "ft_spk_p3_1", text: "What factors drive people toward ambitious goals in competitive societies?" },
+      { id: "ft_spk_p3_2", text: "Do you think financial wealth alone is an accurate measure of a person's life success?" },
+      { id: "ft_spk_p3_3", text: "Is it always healthy for young people to be intensely ambitious in their early careers?" },
+      { id: "ft_spk_p3_4", text: "Should parents unconditionally support their children's unconventional career ambitions?" }
+    ];
+
+    let html = `
+      <!-- PART 1: 8 CÂU HỎI PHỎNG VẤN TRỰC TIẾP -->
+      <div style="background:#FFFFFF; border:2px solid #E8E2D8; border-radius:18px; padding:20px; margin-bottom:20px;">
+        <div style="border-bottom:1.5px dashed #E8E2D8; padding-bottom:8px; margin-bottom:14px; display:flex; justify-content:space-between; align-items:center;">
+          <b style="font-size:16px; color:#92400E;">🎤 PART 1: PHỎNG VẤN TRỰC TIẾP (8 CÂU HỎI - 2 CHỦ ĐỀ)</b>
+          <span style="font-size:12px; font-weight:800; color:#64748B;">Khuyến nghị 4-5 phút</span>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr; gap:12px;">
+          ${p1Questions.map((q, idx) => `
+            <div class="q-item-box" style="margin-bottom:0; background:#FAF7F2; padding:14px;">
+              <div style="font-size:14px; font-weight:800; color:#1E293B; margin-bottom:6px;">
+                <span style="color:#D97706;">Câu ${idx + 1} (${q.topic}):</span> "${q.text}"
+              </div>
+              <div style="display:flex; align-items:center; gap:10px; margin-bottom:6px;">
+                <button type="button" class="btn-3d btn-3d-red" id="btn_rec_${q.id}" style="padding:6px 14px; font-size:12px;" onclick="window.ftEngine.toggleSpeech('${q.id}', 'btn_rec_${q.id}', 'status_${q.id}')">
+                  <i class="fa-solid fa-microphone"></i> Bấm để trả lời
+                </button>
+                <span id="status_${q.id}" style="font-size:12px; font-weight:800; color:#64748B;">Chưa ghi âm (0 từ)</span>
+              </div>
+              <textarea id="${q.id}" class="diag-textarea" style="height:65px;" placeholder="Transcript câu trả lời sẽ xuất hiện tại đây..." oninput="window.ftEngine.recordSpeakingText('${q.id}', this.value, 'status_${q.id}')"></textarea>
+            </div>
+          `).join('')}
+        </div>
       </div>
 
-      <div class="q-item-box" style="margin-bottom:18px; border:2px solid #FCD34D;">
-        <b style="font-size:14.5px; color:#B45309; display:block; margin-bottom:6px;">🎤 Part 2: Thuyết trình Cue Card</b>
-        <p style="font-size:13px; color:#475569; margin:0 0 10px 0;">"Describe an important decision you made in your life. You should say: what it was, why you made it, and explain how it affected you."</p>
-        <button type="button" class="btn-3d btn-3d-red" id="btnRecFtSpk2" style="padding:8px 16px; font-size:13px;" onclick="window.ftEngine.toggleSpeech('ft_spk_part2', 'btnRecFtSpk2')">
-          <i class="fa-solid fa-microphone"></i> Bấm để nói Part 2 (Nói 2 phút)
-        </button>
-        <textarea id="ft_spk_part2" class="diag-textarea" style="height:90px; margin-top:8px;" placeholder="Transcript Part 2..." oninput="window.ftEngine.userAnswers.speaking.part2 = this.value"></textarea>
+      <!-- PART 2: 1 CUE CARD THUYẾT TRÌNH 2 PHÚT -->
+      <div style="background:#FFFDF7; border:2.5px solid #FCD34D; border-radius:18px; padding:20px; margin-bottom:20px;">
+        <div style="border-bottom:1.5px dashed #FCD34D; padding-bottom:8px; margin-bottom:14px;">
+          <b style="font-size:16px; color:#B45309;">🎤 PART 2: THUYẾT TRÌNH CUE CARD CHUẨN THI THẬT (2 PHÚT)</b>
+        </div>
+        <div style="background:#FEF3C7; border:1px solid #FDE68A; border-radius:12px; padding:14px; margin-bottom:14px;">
+          <b style="font-size:15px; color:#92400E; display:block; margin-bottom:6px;">
+            Chủ đề: "Describe a person who did something difficult and was successful."
+          </b>
+          <div style="font-size:13px; color:#78350F; font-weight:700;">You should say:</div>
+          <ul style="margin:4px 0 0 18px; padding:0; font-size:13px; color:#78350F; line-height:1.6;">
+            <li>Who this person is and how you know him/her</li>
+            <li>What difficult challenge this person tackled</li>
+            <li>Why and how he or she was able to succeed</li>
+            <li>And explain how you feel about this person's achievement</li>
+          </ul>
+        </div>
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:8px;">
+          <button type="button" class="btn-3d btn-3d-red" id="btn_rec_ft_spk_part2" style="padding:10px 20px; font-size:13.5px;" onclick="window.ftEngine.toggleSpeech('ft_spk_part2', 'btn_rec_ft_spk_part2', 'status_ft_spk_part2')">
+            <i class="fa-solid fa-microphone"></i> Bấm để nói Part 2 (Thuyết trình 2 phút)
+          </button>
+          <span id="status_ft_spk_part2" style="font-size:12.5px; font-weight:800; color:#64748B;">Chưa ghi âm (0 từ)</span>
+        </div>
+        <textarea id="ft_spk_part2" class="diag-textarea" style="height:110px;" placeholder="Transcript Part 2..." oninput="window.ftEngine.recordSpeakingText('ft_spk_part2', this.value, 'status_ft_spk_part2')"></textarea>
       </div>
 
-      <div class="q-item-box">
-        <b style="font-size:14.5px; color:#92400E; display:block; margin-bottom:6px;">🎤 Part 3: Phản biện chuyên sâu</b>
-        <p style="font-size:13px; color:#475569; margin:0 0 10px 0;">"Do you think artificial intelligence will reduce human decision-making capacity in the future?"</p>
-        <button type="button" class="btn-3d btn-3d-red" id="btnRecFtSpk3" style="padding:8px 16px; font-size:13px;" onclick="window.ftEngine.toggleSpeech('ft_spk_part3', 'btnRecFtSpk3')">
-          <i class="fa-solid fa-microphone"></i> Bấm để trả lời Part 3
-        </button>
-        <textarea id="ft_spk_part3" class="diag-textarea" style="height:70px; margin-top:8px;" placeholder="Transcript Part 3..." oninput="window.ftEngine.userAnswers.speaking.part3 = this.value"></textarea>
+      <!-- PART 3: 4 CÂU HỎI THẢO LUẬN XÃ HỘI CHUYÊN SÂU -->
+      <div style="background:#FFFFFF; border:2px solid #E8E2D8; border-radius:18px; padding:20px;">
+        <div style="border-bottom:1.5px dashed #E8E2D8; padding-bottom:8px; margin-bottom:14px;">
+          <b style="font-size:16px; color:#92400E;">🎤 PART 3: THẢO LUẬN & PHẢN BIỆN CHUYÊN SÂU (4 CÂU HỎI)</b>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr; gap:12px;">
+          ${p3Questions.map((q, idx) => `
+            <div class="q-item-box" style="margin-bottom:0; background:#FAF7F2; padding:14px;">
+              <div style="font-size:14px; font-weight:800; color:#1E293B; margin-bottom:6px;">
+                <span style="color:#D97706;">Câu ${idx + 1}:</span> "${q.text}"
+              </div>
+              <div style="display:flex; align-items:center; gap:10px; margin-bottom:6px;">
+                <button type="button" class="btn-3d btn-3d-red" id="btn_rec_${q.id}" style="padding:6px 14px; font-size:12px;" onclick="window.ftEngine.toggleSpeech('${q.id}', 'btn_rec_${q.id}', 'status_${q.id}')">
+                  <i class="fa-solid fa-microphone"></i> Bấm để trả lời
+                </button>
+                <span id="status_${q.id}" style="font-size:12px; font-weight:800; color:#64748B;">Chưa ghi âm (0 từ)</span>
+              </div>
+              <textarea id="${q.id}" class="diag-textarea" style="height:65px;" placeholder="Transcript câu trả lời sẽ xuất hiện tại đây..." oninput="window.ftEngine.recordSpeakingText('${q.id}', this.value, 'status_${q.id}')"></textarea>
+            </div>
+          `).join('')}
+        </div>
       </div>
     `;
+
+    mount.innerHTML = html;
+  }
+
+  recordSpeakingText(qId, val, statusId) {
+    this.userAnswers.speaking[qId] = String(val).trim();
+    const statusEl = document.getElementById(statusId);
+    if (statusEl) {
+      const words = String(val).trim().length === 0 ? 0 : String(val).trim().split(/\s+/).filter(Boolean).length;
+      statusEl.style.color = words > 0 ? "#059669" : "#64748B";
+      statusEl.innerText = words > 0 ? `✓ Đã nhập: ${words} từ` : "Chưa ghi âm (0 từ)";
+    }
   }
 
   recordAnswer(skill, qId, val) {
@@ -1038,27 +1112,36 @@ XUẤT BÁO CÁO (DƯỚI 200 TỪ):
     this.speechRecognition.lang = 'en-US';
   }
 
-  toggleSpeech(targetId, btnId) {
+  toggleSpeech(targetId, btnId, statusId) {
     if (!this.speechRecognition) {
       alert("Trình duyệt chưa hỗ trợ Web Speech! Em có thể gõ trực tiếp câu trả lời vào ô nhé.");
       return;
     }
     const btn = document.getElementById(btnId);
     const area = document.getElementById(targetId);
+    const statusEl = statusId ? document.getElementById(statusId) : null;
 
     if (!this.isRecording) {
       try {
         this.speechRecognition.start();
         this.isRecording = true;
         if (btn) btn.innerHTML = `<i class="fa-solid fa-stop"></i> Đang thu âm... Bấm dừng`;
+        if (statusEl) {
+          statusEl.style.color = "#DC2626";
+          statusEl.innerText = "● Đang thu âm giọng nói...";
+        }
         this.speechRecognition.onresult = (e) => {
           let str = '';
           for (let i = 0; i < e.results.length; ++i) str += e.results[i][0].transcript + ' ';
+          const fullText = str.trim();
           if (area) {
-            area.value = str.trim();
-            if (targetId === 'ft_spk_part1') this.userAnswers.speaking.part1 = str.trim();
-            if (targetId === 'ft_spk_part2') this.userAnswers.speaking.part2 = str.trim();
-            if (targetId === 'ft_spk_part3') this.userAnswers.speaking.part3 = str.trim();
+            area.value = fullText;
+            this.userAnswers.speaking[targetId] = fullText;
+            const words = fullText.length === 0 ? 0 : fullText.split(/\s+/).filter(Boolean).length;
+            if (statusEl) {
+              statusEl.style.color = "#059669";
+              statusEl.innerText = `✓ Đã ghi nhận: ${words} từ`;
+            }
           }
         };
       } catch(e) {}
@@ -1067,6 +1150,11 @@ XUẤT BÁO CÁO (DƯỚI 200 TỪ):
         this.speechRecognition.stop();
         this.isRecording = false;
         if (btn) btn.innerHTML = `<i class="fa-solid fa-microphone"></i> Bấm để nói tiếp`;
+        if (statusEl && area) {
+          const words = area.value.trim().length === 0 ? 0 : area.value.trim().split(/\s+/).filter(Boolean).length;
+          statusEl.style.color = words > 0 ? "#059669" : "#64748B";
+          statusEl.innerText = words > 0 ? `✓ Hoàn thành: ${words} từ` : "Chưa ghi âm";
+        }
       } catch(e) {}
     }
   }
@@ -1075,9 +1163,7 @@ XUẤT BÁO CÁO (DƯỚI 200 TỪ):
   // 6. THUẬT TOÁN TÍNH BAND & CHẤM ĐIỂM CHUẨN XÁC TUYỆT ĐỐI (KHÔNG CÓ SÀN ẢO)
   // =========================================================================
   calculateBandScore(correct, total = 40) {
-    // PHÒNG NGỪA TUYỆT ĐỐI: NẾU ĐÚNG 0 CÂU ➔ BAND 0.0
     if (!correct || correct <= 0) return "0.0";
-
     const s = Math.round((correct / (total || 40)) * 40);
     if (s >= 39) return "9.0";
     if (s >= 37) return "8.5";
@@ -1097,7 +1183,6 @@ XUẤT BÁO CÁO (DƯỚI 200 TỪ):
     return "1.0";
   }
 
-  // QUY TẮC LÀM TRÒN OVERALL BAND CHUẨN IDP & BRITISH COUNCIL
   calculateIELTSOverall(lBand, rBand, wBand, sBand) {
     const l = parseFloat(lBand) || 0;
     const r = parseFloat(rBand) || 0;
@@ -1110,13 +1195,9 @@ XUẤT BÁO CÁO (DƯỚI 200 TỪ):
     const whole = Math.floor(avg);
     const decimal = avg - whole;
 
-    if (decimal < 0.25) {
-      return whole.toFixed(1);
-    } else if (decimal < 0.75) {
-      return (whole + 0.5).toFixed(1);
-    } else {
-      return (whole + 1.0).toFixed(1);
-    }
+    if (decimal < 0.25) return whole.toFixed(1);
+    if (decimal < 0.75) return (whole + 0.5).toFixed(1);
+    return (whole + 1.0).toFixed(1);
   }
 
   // =========================================================================
@@ -1203,46 +1284,59 @@ XUẤT BÁO CÁO (DƯỚI 200 TỪ):
     });
     const readBand = this.calculateBandScore(rCorrect, 40);
 
-    // 4. Kiểm tra và định vị Writing
+    // 4. CHẤM WRITING ĐỘC LẬP THEO TRỌNG SỐ (T1*1 + T2*2)/3 & KHÓA BỎ TRỐNG
     const wt1Text = (document.getElementById('ft_writing_task1')?.value || '').trim();
     const wt2Text = (document.getElementById('ft_writing_task2')?.value || '').trim();
     const wt1Words = wt1Text.length === 0 ? 0 : wt1Text.split(/\s+/).filter(Boolean).length;
     const wt2Words = wt2Text.length === 0 ? 0 : wt2Text.split(/\s+/).filter(Boolean).length;
 
+    let t1Band = 0.0;
+    let t2Band = 0.0;
+
+    // Chấm sơ bộ Task 1
+    if (wt1Words === 0) t1Band = 0.0;
+    else if (wt1Words < 30) t1Band = 2.0;
+    else if (wt1Words < 80) t1Band = 3.5;
+    else if (wt1Words < 150) t1Band = 5.0;
+    else t1Band = 6.5;
+
+    // Chấm sơ bộ Task 2 (Trọng số x2)
+    if (wt2Words === 0) t2Band = 0.0; // Bỏ trống = Band 0.0
+    else if (wt2Words < 40) t2Band = 2.0;
+    else if (wt2Words < 120) t2Band = 3.5;
+    else if (wt2Words < 250) t2Band = 5.0;
+    else t2Band = 6.5;
+
+    // Tính Overall Writing theo công thức chuẩn: (T1 * 1 + T2 * 2) / 3
     let writeBand = "0.0";
     if (wt1Words === 0 && wt2Words === 0) {
-      writeBand = "0.0"; // Bỏ trống hoàn toàn
-    } else if (wt1Words < 15 && wt2Words < 15) {
-      writeBand = "1.0";
-    } else if (wt1Words < 50 && wt2Words < 80) {
-      writeBand = "3.0";
-    } else if (wt1Words < 100 || wt2Words < 160) {
-      writeBand = "4.5";
-    } else if (wt1Words >= 150 && wt2Words >= 250) {
-      writeBand = "6.5";
+      writeBand = "0.0";
     } else {
-      writeBand = "5.5";
+      const combined = (t1Band * 1 + t2Band * 2) / 3;
+      const whole = Math.floor(combined);
+      const dec = combined - whole;
+      if (dec < 0.25) writeBand = whole.toFixed(1);
+      else if (dec < 0.75) writeBand = (whole + 0.5).toFixed(1);
+      else writeBand = (whole + 1.0).toFixed(1);
     }
 
-    // 5. Kiểm tra và định vị Speaking
-    const spk1Text = (document.getElementById('ft_spk_part1')?.value || '').trim();
-    const spk2Text = (document.getElementById('ft_spk_part2')?.value || '').trim();
-    const spk3Text = (document.getElementById('ft_spk_part3')?.value || '').trim();
-    const spkAllWords = `${spk1Text} ${spk2Text} ${spk3Text}`.trim().split(/\s+/).filter(Boolean).length;
+    // 5. CHẤM SPEAKING ĐA DẠNG TRỌN VẸN CẢ 3 PARTS
+    const allSpkTranscripts = Object.values(this.userAnswers.speaking || {}).join(' ').trim();
+    const spkAllWords = allSpkTranscripts.length === 0 ? 0 : allSpkTranscripts.split(/\s+/).filter(Boolean).length;
 
     let spkBand = "0.0";
     if (spkAllWords === 0) {
-      spkBand = "0.0"; // Không nói câu nào
-    } else if (spkAllWords < 10) {
-      spkBand = "1.5";
+      spkBand = "0.0";
     } else if (spkAllWords < 30) {
-      spkBand = "3.0";
+      spkBand = "2.0";
     } else if (spkAllWords < 80) {
-      spkBand = "4.5";
-    } else if (spkAllWords < 160) {
-      spkBand = "5.5";
+      spkBand = "3.5";
+    } else if (spkAllWords < 180) {
+      spkBand = "5.0";
+    } else if (spkAllWords < 300) {
+      spkBand = "6.0";
     } else {
-      spkBand = "6.5";
+      spkBand = "7.0";
     }
 
     // 6. Tính Overall Band chính thức
@@ -1305,6 +1399,10 @@ XUẤT BÁO CÁO (DƯỚI 200 TỪ):
       readBand,
       rCorrect,
       writeBand,
+      t1Band: t1Band.toFixed(1),
+      t2Band: t2Band.toFixed(1),
+      wt1Words,
+      wt2Words,
       spkBand,
       gScore,
       gTotal
@@ -1326,6 +1424,7 @@ XUẤT BÁO CÁO (DƯỚI 200 TỪ):
       timeSpent: `${Math.round(this.timerSeconds / 60)} phút`,
       moduleType: "fulltest",
       pageUrl: `diagnostic/runner-fulltest.html?set=${this.setNum}`,
+      approvalStatus: "pending_admin_approval", // 🔴 CỔNG ADMIN GATE
       details: {
         overallBand,
         timeSpent: `${Math.round(this.timerSeconds / 60)} phút`,
@@ -1334,6 +1433,8 @@ XUẤT BÁO CÁO (DƯỚI 200 TỪ):
         readBand,
         rCorrect,
         writeBand,
+        t1Band: t1Band.toFixed(1),
+        t2Band: t2Band.toFixed(1),
         spkBand,
         gScore,
         gTotal,
@@ -1344,11 +1445,7 @@ XUẤT BÁO CÁO (DƯỚI 200 TỪ):
           task1: wt1Text,
           task2: wt2Text
         },
-        speakingAnswers: {
-          part1: spk1Text,
-          part2: spk2Text,
-          part3: spk3Text
-        },
+        speakingAnswers: this.userAnswers.speaking || {},
         wAiFeedback: "",
         sAiFeedback: ""
       }
@@ -1376,7 +1473,7 @@ XUẤT BÁO CÁO (DƯỚI 200 TỪ):
       });
     }
     if (spkAllWords > 0) {
-      this.renderInlineSpeakingAICard(spk1Text, spk2Text, spk3Text).then(feedback => {
+      this.renderInlineSpeakingAICard().then(feedback => {
         if (feedback && this.currentAttemptSnapshot) {
           this.currentAttemptSnapshot.details.sAiFeedback = feedback;
           this.syncAttemptToCloud(this.currentAttemptSnapshot);
@@ -1447,6 +1544,7 @@ XUẤT BÁO CÁO (DƯỚI 200 TỪ):
           <div style="background:#EFF6FF; border:1.5px solid #BFDBFE; padding:10px; border-radius:12px; text-align:center;">
             <div style="font-size:11px; font-weight:800; color:#1E40AF;">WRITING</div>
             <b style="font-size:17px; color:#2563EB;">Band ${data.writeBand}</b>
+            <div style="font-size:10.5px; color:#64748B;">T1: ${data.t1Band} | T2: ${data.t2Band}</div>
           </div>
           <div style="background:#FFFBEB; border:1.5px solid #FDE68A; padding:10px; border-radius:12px; text-align:center;">
             <div style="font-size:11px; font-weight:800; color:#92400E;">SPEAKING</div>
@@ -1505,7 +1603,7 @@ XUẤT BÁO CÁO THEO ĐÚNG CẤU TRÚC MARKDOWN:
 - Coherence & Cohesion: [Điểm]/9.0
 - Lexical Resource: [Điểm]/9.0
 - Grammatical Range & Accuracy: [Điểm]/9.0
-### 🏆 OVERALL WRITING BAND: [Band điểm]
+### 🏆 OVERALL WRITING BAND: [Band điểm] (Tính theo trọng số: (Task 1 * 1 + Task 2 * 2) / 3)
 
 # 🔍 CÁC LỖI SAI CẦN SỬA GẤP TRONG BÀI CỦA EM:
 (Chỉ ra các câu sai ngữ pháp và cách sửa).
@@ -1535,8 +1633,8 @@ XUẤT BÁO CÁO THEO ĐÚNG CẤU TRÚC MARKDOWN:
     }
   }
 
-  // --- RENDER AI CHẤM TRỰC TIẾP SPEAKING ---
-  async renderInlineSpeakingAICard(s1, s2, s3, preloadedFeedback = null) {
+  // --- RENDER AI CHẤM TRỰC TIẾP SPEAKING FULL TEST ---
+  async renderInlineSpeakingAICard(preloadedFeedback = null) {
     const secSpeaking = document.getElementById('section_ft_speaking');
     if (!secSpeaking) return "";
 
@@ -1550,10 +1648,10 @@ XUẤT BÁO CÁO THEO ĐÚNG CẤU TRÚC MARKDOWN:
     aiCard.innerHTML = `
       <div style="background:#FFFFFF; border:3px solid #D97706; border-radius:18px; padding:22px; margin-top:24px;">
         <h4 style="color:#B45309; margin:0 0 10px 0; font-size:18px; font-weight:900;">
-          🎤 NHẬN XÉT PHẢN XẠ NÓI TRỰC TIẾP TỪ AI GEMINI (PART 1, 2, 3)
+          🎤 NHẬN XÉT PHẢN XẠ NÓI TRỰC TIẾP TỪ AI GEMINI (FULL 3 PARTS CAMBRIDGE)
         </h4>
         <div id="ftInlineSpeakingAiStream" style="font-size:14px; line-height:1.75; color:#1E293B;">
-          ⏳ <b>AI Gemini đang đọc bản ký âm và đánh giá phản xạ...</b>
+          ⏳ <b>AI Gemini đang đọc toàn bộ các bản ký âm và đánh giá phản xạ...</b>
         </div>
       </div>
     `;
@@ -1567,12 +1665,14 @@ XUẤT BÁO CÁO THEO ĐÚNG CẤU TRÚC MARKDOWN:
     }
 
     const apiKey = getGeminiKey();
+    const speakingEntries = Object.entries(this.userAnswers.speaking || {}).map(([id, text]) => {
+      return `- ${id}: "${text}"`;
+    }).join('\n');
+
     const promptText = `
-Bạn là Chuyên gia Khảo thí IELTS Speaking. Hãy nhận xét bài nói dưới đây của học sinh. Xưng hô "Anh" và "Em".
+Bạn là Chuyên gia Khảo thí IELTS Speaking. Hãy nhận xét bài thi nói Full 3 Parts dưới đây của học sinh. Xưng hô "Anh" và "Em".
 BẢN KÝ ÂM SPEAKING:
-- Part 1: "${s1 || '(Chưa nói)'}"
-- Part 2: "${s2 || '(Chưa nói)'}"
-- Part 3: "${s3 || '(Chưa nói)'}"
+${speakingEntries || '(Không có câu trả lời nào)'}
 
 XUẤT BÁO CÁO:
 1. 🎯 Ước lượng Band điểm Speaking và nhận xét độ trôi chảy (Fluency).
@@ -1700,7 +1800,6 @@ XUẤT BÁO CÁO:
       const localHist = JSON.parse(localStorage.getItem('ielts_local_history') || '[]');
       att = localHist.find(a => a.id === attemptId);
 
-      // Kéo từ Google Drive nếu mở trên máy khác
       if ((!att || !att.details) && (emailParam || CLOUD_SCRIPT_URL)) {
         const queryEmail = emailParam || localStorage.getItem('ielts_student_email') || '';
         if (queryEmail) {
@@ -1764,15 +1863,12 @@ XUẤT BÁO CÁO:
 
       // 5. Phục hồi Speaking
       if (d.speakingAnswers) {
-        const s1 = document.getElementById('ft_spk_part1');
-        const s2 = document.getElementById('ft_spk_part2');
-        const s3 = document.getElementById('ft_spk_part3');
-        if (s1 && d.speakingAnswers.part1) { s1.value = d.speakingAnswers.part1; s1.disabled = true; }
-        if (s2 && d.speakingAnswers.part2) { s2.value = d.speakingAnswers.part2; s2.disabled = true; }
-        if (s3 && d.speakingAnswers.part3) { s3.value = d.speakingAnswers.part3; s3.disabled = true; }
-        if (d.speakingAnswers.part1 || d.speakingAnswers.part2 || d.speakingAnswers.part3) {
-          this.renderInlineSpeakingAICard(d.speakingAnswers.part1 || '', d.speakingAnswers.part2 || '', d.speakingAnswers.part3 || '', d.sAiFeedback);
-        }
+        this.userAnswers.speaking = d.speakingAnswers;
+        Object.entries(d.speakingAnswers).forEach(([id, val]) => {
+          const el = document.getElementById(id);
+          if (el) { el.value = val; el.disabled = true; }
+        });
+        this.renderInlineSpeakingAICard(d.sAiFeedback);
       }
 
       // Vẽ Banner kết quả
@@ -1784,6 +1880,8 @@ XUẤT BÁO CÁO:
         readBand: d.readBand || '0.0',
         rCorrect: d.rCorrect || 0,
         writeBand: d.writeBand || '0.0',
+        t1Band: d.t1Band || '0.0',
+        t2Band: d.t2Band || '0.0',
         spkBand: d.spkBand || '0.0',
         gScore: d.gScore || 0,
         gTotal: d.gTotal || 100
