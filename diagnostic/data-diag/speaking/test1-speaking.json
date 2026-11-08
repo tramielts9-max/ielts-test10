@@ -1,0 +1,42 @@
+{
+  "testId": "test_01",
+  "title": "Speaking Diagnostic Test 1 - Foundation",
+  "ceilingBand": 4.5,
+  "parts": [
+    {
+      "partNum": 1,
+      "title": "Part 1: Phản Xạ Giao Tiếp Đời Sống & Học Tập (4 Câu)",
+      "instructions": "Bấm micro và trả lời từng câu hỏi bằng tiếng Anh (mỗi câu từ 30 - 45 giây).",
+      "questions": [
+        {
+          "id": "t1_spk_q1",
+          "num": 1,
+          "text": "Do you work or are you a student? What do you like most about your studies or career?",
+          "suggestedTimeSec": 45,
+          "topic": "Work or Studies"
+        },
+        {
+          "id": "t1_spk_q2",
+          "num": 2,
+          "text": "What is your typical morning routine before you start your day?",
+          "suggestedTimeSec": 45,
+          "topic": "Morning Routines"
+        },
+        {
+          "id": "t1_spk_q3",
+          "num": 3,
+          "text": "How often do you use English in your daily life or studies?",
+          "suggestedTimeSec": 45,
+          "topic": "Language Use"
+        },
+        {
+          "id": "t1_spk_q4",
+          "num": 4,
+          "text": "Do you prefer studying or spending time alone or with a group of friends? Why?",
+          "suggestedTimeSec": 45,
+          "topic": "Friends & Lifestyle"
+        }
+      ]
+    }
+  ]
+}
