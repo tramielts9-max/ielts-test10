@@ -1,11 +1,13 @@
 /**
  * curriculum-system/ui-system.js
  * GIAO DIỆN LỘ TRÌNH, LỊCH CHUYÊN CẦN & BANNER LỊCH SỬ PASTEL ĐỔI MÀU THEO HỌC PHẦN
- * (BẢN ĐẦY ĐỦ 100% - KHÔNG CẮT BỚT BẤT KỲ TÍNH NĂNG NÀO)
- * TÍCH HỢP TOÀN DIỆN:
- *  1. TẠM KHÓA CẢNH CÁO HỌC VIÊN 1-CLICK & MỞ KHÓA VÀO LẠI TRONG 2 GIÂY
- *  2. HỆ THỐNG LỊCH HỌC TRỰC TIẾP: HIỂN THỊ CẢ LỚP 1-1 LẪN LỚP HỌC NHÓM (2+ HỌC SINH)
- *  3. THEO DÕI HỌC PHÍ & ĐẾM NGƯỢC SỐ BUỔI CÒN LẠI TRỰC TIẾP TRÊN DASHBOARD
+ * (BẢN ĐẦY ĐỦ 100% - BẢO TOÀN NGUYÊN VẸN MỌI TÍNH NĂNG - KHÔNG CẮT BỚT BẤT KỲ DÒNG CODE NÀO)
+ * 
+ * NÂNG CẤP GIAI ĐOẠN 3: CỔNG DUYỆT ADMIN GATE & LỘ TRÌNH THÍCH ỨNG DIAGNOSTIC:
+ *  1. HỌC SINH (!isAdmin): KHÓA BÀI HỌC KHI APPROVALSTATUS === "PENDING_ADMIN_APPROVAL" + BANNER CHỜ DUYỆT DUOLINGO
+ *  2. GIÁO VIÊN (isAdmin): CARD THÔNG BÁO DUYỆT BÀI 1-CLICK MỞ KHÓA ĐỒNG BỘ LOCAL & CLOUD
+ *  3. BẮC CẦU TỰ ĐỘNG: PHÁT HIỆN BÀI THI DIAGNOSTIC MỚI VÀ SINH LỘ TRÌNH CHỜ DUYỆT NGAY LẬP TỨC
+ *  4. GIỮ NGUYÊN 100%: TẠM KHÓA CẢNH CÁO, LỊCH HỌC 1-1 & NHÓM, THEO DÕI HỌC PHÍ, MODAL XIN DỜI LỊCH
  */
 
 import { curriculumEngineSystem } from './engine-system.js';
@@ -608,7 +610,9 @@ class CurriculumUISystem {
       schedule: scheduleData.dailySchedule,
       completedNodeIds: [],
       aiDiagnosticData: aiData,
-      isLockedByAdmin: isAdmin
+      isLockedByAdmin: isAdmin,
+      // Khi giáo viên tự tay tạo hoặc duyệt bằng form -> Đặt cờ approved
+      approvalStatus: isAdmin ? "approved" : "pending_admin_approval"
     };
 
     this.saveRoadmap(targetEmail, payload);
@@ -638,7 +642,189 @@ class CurriculumUISystem {
   }
 
   // =========================================================================
-  // 5. THANH ĐIỀU PHỐI ADMIN VỚI NÚT KHÓA/MỞ KHÓA HỌC VIÊN 1-CLICK
+  // 5. CỔNG DUYỆT ADMIN GATE: PHÊ DUYỆT 1-CLICK & TINH CHỈNH LỘ TRÌNH DIAGNOSTIC
+  // =========================================================================
+  /**
+   * Tìm bài thi Diagnostic gần nhất của học viên cần phê duyệt
+   */
+  findRecentDiagnosticAttempt(email) {
+    try {
+      const cleanEmail = (email || this.getActiveWorkingEmail()).toLowerCase().trim();
+      const rawHistory = localStorage.getItem(`ielts_history_${cleanEmail}`) || localStorage.getItem('ielts_local_history');
+      if (!rawHistory) return null;
+      const history = JSON.parse(rawHistory);
+      if (!Array.isArray(history)) return null;
+
+      const diagAttempts = history.filter(item => {
+        if (!item) return false;
+        const isDiagModule = item.moduleType === 'diagnostic';
+        const isDiagTitle = (item.testTitle || '').toLowerCase().includes('khảo sát') || 
+                            (item.testTitle || '').toLowerCase().includes('diagnostic') ||
+                            (item.testTitle || '').toLowerCase().includes('đầu vào');
+        return isDiagModule || isDiagTitle;
+      });
+
+      if (diagAttempts.length === 0) return null;
+      diagAttempts.sort((a, b) => stateManager.extractEpoch(b) - stateManager.extractEpoch(a));
+      return diagAttempts[0];
+    } catch (e) {
+      return null;
+    }
+  }
+
+  /**
+   * Phê duyệt lộ trình 1-click cho học sinh
+   */
+  async approveStudentRoadmap(studentEmail) {
+    const clean = (studentEmail || this.getActiveWorkingEmail()).toLowerCase().trim();
+    let data = this.getSavedRoadmap(clean);
+
+    if (!data) {
+      // Nếu chưa có lộ trình, thử sinh từ attempt gần nhất
+      const attempt = this.findRecentDiagnosticAttempt(clean);
+      if (attempt) {
+        data = curriculumEngineSystem.generateRoadmapFromDiagnostic(attempt);
+      }
+    }
+
+    if (!data) {
+      alert(`⚠️ Không tìm thấy dữ liệu lộ trình của học viên [${clean}] để phê duyệt!`);
+      return;
+    }
+
+    data.approvalStatus = "approved";
+    data.isLockedByAdmin = true;
+    data.approvedAt = new Date().toISOString();
+    data.approvedBy = this.getOriginalAdminEmail();
+
+    this.saveRoadmap(clean, data);
+    alert(`🎉 ĐÃ PHÊ DUYỆT & MỞ KHÓA THÀNH CÔNG!\nLộ trình của học viên [${clean}] đã sẵn sàng. Học sinh vào lại trang chủ sẽ thấy ngay nhiệm vụ 5 chặng.`);
+    this.render();
+  }
+
+  /**
+   * Hiển thị Card thông báo cần phê duyệt cho Giáo viên / Admin
+   */
+  renderAdminPendingApprovalCard(data, studentEmail) {
+    const cleanEmail = studentEmail.toLowerCase().trim();
+    const diagSource = data?.diagnosticSource || {};
+    const officialB = diagSource.officialBand || data.startBand || '4.0';
+    const potentialB = diagSource.potentialBand || data.startBand || '4.5';
+    const totalSessions = data.totals?.totalLiveSessions || 36;
+    const estMonths = data.totals?.estimatedMonths || 3;
+    const attemptId = diagSource.attemptId;
+    const reviewUrl = this.resolveReviewPageUrl(null, attemptId, cleanEmail);
+
+    return `
+      <div style="background:#FFFBEB; border:2.5px solid #FCD34D; border-bottom:6px solid #F59E0B; border-radius:20px; padding:20px 24px; margin-bottom:22px; box-shadow:0 8px 20px rgba(245,158,11,0.15);">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; border-bottom:2px dashed #FDE68A; padding-bottom:12px; margin-bottom:14px;">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <span style="font-size:26px;">📬</span>
+            <div>
+              <b style="font-size:17px; color:#92400E;">CÓ BÀI THI DIAGNOSTIC MỚI CẦN THẨM ĐỊNH & PHÊ DUYỆT LỘ TRÌNH</b>
+              <div style="font-size:12.5px; color:#B45309; font-weight:700;">Học sinh vừa hoàn thành bài test và đang chờ Thầy mở khóa lộ trình học tập</div>
+            </div>
+          </div>
+          <span style="background:#FEF3C7; color:#92400E; border:1.5px solid #FCD34D; font-size:12px; font-weight:900; padding:4px 12px; border-radius:12px;">
+            ⏳ TRẠNG THÁI: CHỜ DUYỆT (PENDING)
+          </span>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px; font-size:13.5px; color:#1E293B; font-weight:700; margin-bottom:16px;">
+          <div>
+            Học viên: <b style="color:#8B1518; font-size:15px;">${cleanEmail}</b><br>
+            Bài test: <span style="color:#475569;">${diagSource.testTitle || 'Bài Khảo Sát Nền Tảng Đầu Vào'}</span>
+          </div>
+          <div style="display:flex; gap:12px; flex-wrap:wrap;">
+            <span style="background:#EFF6FF; color:#1D4ED8; padding:6px 12px; border-radius:10px; border:1px solid #BFDBFE;">
+              ⏱️ Điểm chuẩn giờ: <b>Band ${officialB}</b>
+            </span>
+            <span style="background:#F0FDF4; color:#15803D; padding:6px 12px; border-radius:10px; border:1px solid #BBF7D0;">
+              🚀 Tiềm năng làm hết: <b>Band ${potentialB}</b>
+            </span>
+            <span style="background:#FAF5FF; color:#7E22CE; padding:6px 12px; border-radius:10px; border:1px solid #E9D5FF;">
+              🏫 Đề xuất: <b>${totalSessions} buổi</b> (${estMonths} tháng)
+            </span>
+          </div>
+        </div>
+
+        <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+          <a href="${reviewUrl}" target="_blank" style="background:#FFFFFF; color:#92400E; border:2px solid #FCD34D; border-bottom:4px solid #F59E0B; text-decoration:none; padding:9px 18px; border-radius:12px; font-weight:900; font-size:13px; display:inline-flex; align-items:center; gap:6px;">
+            👁️ Xem Chi Tiết Bài Làm
+          </a>
+
+          <button type="button" onclick="window.curriculumUI.triggerEditRoadmap()" style="background:#FFFFFF; color:#0284C7; border:2px solid #BAE6FD; border-bottom:4px solid #0284C7; padding:9px 18px; border-radius:12px; font-weight:900; font-size:13px; cursor:pointer; display:inline-flex; align-items:center; gap:6px;">
+            ✏️ Tinh Chỉnh Số Buổi / Mục Tiêu
+          </button>
+
+          <button type="button" onclick="window.curriculumUI.approveStudentRoadmap('${cleanEmail}')" style="background:#16A34A; color:#FFFFFF; border:none; border-bottom:4px solid #15803D; padding:10px 22px; border-radius:12px; font-weight:900; font-size:13.5px; cursor:pointer; display:inline-flex; align-items:center; gap:8px; box-shadow:0 4px 12px rgba(22,163,74,0.3);">
+            ✅ PHÊ DUYỆT & MỞ KHÓA LỘ TRÌNH CHO HỌC SINH
+          </button>
+        </div>
+      </div>
+    `;
+  }
+
+  /**
+   * Hiển thị Banner Chờ Duyệt Duolingo cho Học Sinh (!isAdmin)
+   */
+  renderStudentPendingGate(data, studentEmail) {
+    const diagSource = data?.diagnosticSource || {};
+    const officialB = diagSource.officialBand || data.startBand || '4.0';
+    const potentialB = diagSource.potentialBand || data.startBand || '4.5';
+    const attemptId = diagSource.attemptId;
+    const reviewUrl = this.resolveReviewPageUrl(null, attemptId, studentEmail);
+
+    return `
+      <div class="cs-container">
+        <div style="background:#FFFFFF; border:3px solid #E8E2D8; border-bottom:7px solid #D3CBC0; border-radius:26px; padding:38px 26px; text-align:center; max-width:680px; margin:20px auto 40px auto; box-shadow:0 12px 30px rgba(0,0,0,0.06);">
+          <div style="width:76px; height:76px; border-radius:50%; background:#FEF3C7; border:3.5px solid #FCD34D; display:flex; align-items:center; justify-content:center; margin:0 auto 16px auto; font-size:36px;">
+            🎉
+          </div>
+
+          <h3 style="color:#8B1518; font-size:23px; font-weight:900; margin:0 0 10px 0;">
+            CHÚC MỪNG EM ĐÃ HOÀN THÀNH BÀI THI CHẨN ĐOÁN!
+          </h3>
+
+          <p style="color:#475569; font-size:15px; line-height:1.6; margin:0 auto 20px auto; max-width:540px; font-weight:700;">
+            Hệ thống đã ghi nhận toàn bộ bài làm và các câu sai của em.<br>
+            <b style="color:#1E293B;">Thầy/Cô đang trực tiếp thẩm định bảng điểm và tinh chỉnh lộ trình 5 chặng cá nhân hóa.</b><br>
+            Em vui lòng đợi Thầy duyệt và mở khóa để bắt đầu lộ trình học nhé!
+          </p>
+
+          <div style="background:#FAF7F2; border:2px solid #E8E2D8; border-radius:18px; padding:14px 20px; display:inline-flex; align-items:center; justify-content:center; gap:20px; margin-bottom:24px; flex-wrap:wrap;">
+            <div style="text-align:left;">
+              <div style="font-size:11.5px; font-weight:800; color:#64748B; text-transform:uppercase;">Điểm Chuẩn Giờ</div>
+              <div style="font-size:18px; font-weight:900; color:#8B1518;">Band ${officialB}</div>
+            </div>
+            <div style="width:1.5px; height:32px; background:#E8E2D8;"></div>
+            <div style="text-align:left;">
+              <div style="font-size:11.5px; font-weight:800; color:#64748B; text-transform:uppercase;">Điểm Tiềm Năng</div>
+              <div style="font-size:18px; font-weight:900; color:#15803D;">Band ${potentialB}</div>
+            </div>
+            <div style="width:1.5px; height:32px; background:#E8E2D8;"></div>
+            <div style="text-align:left;">
+              <div style="font-size:11.5px; font-weight:800; color:#64748B; text-transform:uppercase;">Trạng Thái</div>
+              <div style="font-size:14px; font-weight:900; color:#D97706;">⏳ Đang Thẩm Định</div>
+            </div>
+          </div>
+
+          <div style="display:flex; justify-content:center; gap:12px; flex-wrap:wrap;">
+            <a href="${reviewUrl}" target="_blank" style="background:#8B1518; color:#FFFFFF; text-decoration:none; padding:12px 24px; border-radius:14px; font-weight:900; font-size:14.5px; border-bottom:4px solid #5E0C0E; display:inline-flex; align-items:center; gap:8px;">
+              👁️ Xem Lại Chi Tiết Bảng Điểm & Câu Sai &rarr;
+            </a>
+
+            <button type="button" onclick="window.location.reload()" style="background:#FAF7F2; color:#475569; border:2px solid #E8E2D8; border-bottom:4px solid #D3CBC0; padding:12px 20px; border-radius:14px; font-weight:800; font-size:14px; cursor:pointer;">
+              🔄 Làm Mới Kiểm Tra Lại
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  // =========================================================================
+  // 6. THANH ĐIỀU PHỐI ADMIN VỚI NÚT KHÓA/MỞ KHÓA HỌC VIÊN 1-CLICK
   // =========================================================================
   renderAdminControlBar() {
     if (!this.checkIsAdmin() && !this.isImpersonating()) return '';
@@ -708,7 +894,7 @@ class CurriculumUISystem {
   }
 
   // =========================================================================
-  // 6. RENDER GIAO DIỆN LỘ TRÌNH (TỰ ĐỘNG CHẶN NẾU HỌC SINH ĐANG BỊ KHÓA)
+  // 7. RENDER GIAO DIỆN LỘ TRÌNH (TÍCH HỢP ADMIN GATE & BLOCK HỌC SINH CHƯA DUYỆT)
   // =========================================================================
   async render(targetContainerId = 'roadmapSectionMount') {
     let container = document.getElementById(targetContainerId);
@@ -717,6 +903,7 @@ class CurriculumUISystem {
     const email = this.getActiveWorkingEmail();
     const isAdmin = this.checkIsAdmin();
 
+    // 1. Kiểm tra quyền truy cập chống khóa học sinh
     if (!isAdmin && !this.isImpersonating()) {
       const isUnlocked = await this.checkStudentAccess(email);
       if (!isUnlocked) {
@@ -747,6 +934,15 @@ class CurriculumUISystem {
       data = await this.fetchStudentRoadmapFromCloud(email);
     }
 
+    // Tự động bắt bài thi Diagnostic gần nhất nếu học sinh chưa có roadmap
+    if (!data && email !== 'guest') {
+      const recentDiag = this.findRecentDiagnosticAttempt(email);
+      if (recentDiag) {
+        data = curriculumEngineSystem.generateRoadmapFromDiagnostic(recentDiag);
+        this.saveRoadmap(email, data);
+      }
+    }
+
     // Tự động kéo lịch học và gói học phí của học sinh
     if (email && email !== 'guest') {
       this.fetchSchedules(email).then(() => {
@@ -759,6 +955,24 @@ class CurriculumUISystem {
     const adminBarHtml = this.renderAdminControlBar();
     const floatingBarHtml = this.renderFloatingImpersonationBar();
 
+    // 🔴 2. CỔNG KIỂM DUYỆT ADMIN GATE DÀNH CHO HỌC SINH (!isAdmin)
+    const isPendingApproval = data && data.approvalStatus === "pending_admin_approval";
+    if (isPendingApproval && !isAdmin) {
+      container.innerHTML = `
+        ${adminBarHtml}
+        ${floatingBarHtml}
+        ${this.renderStudentPendingGate(data, email)}
+      `;
+      return;
+    }
+
+    // 🔴 3. HIỂN THỊ CARD DUYỆT BÀI 1-CLICK DÀNH CHO GIÁO VIÊN / ADMIN
+    let adminPendingCardHtml = '';
+    if (isPendingApproval && isAdmin) {
+      adminPendingCardHtml = this.renderAdminPendingApprovalCard(data, email);
+    }
+
+    // 4. Nếu chưa có dữ liệu hoặc Admin chủ động bấm "Soạn Lại"
     if (!data || this.isForceEditing) {
       container.innerHTML = `
         <div class="cs-container">
@@ -846,6 +1060,7 @@ class CurriculumUISystem {
       return;
     }
 
+    // 5. Cập nhật tiến độ hoàn thành từ lịch sử bài nộp
     data.schedule.forEach(day => {
       day.nodes.forEach(node => {
         if (!data.completedNodeIds.includes(node.id) && this.isNodeCompletedInHistory(node)) {
@@ -864,6 +1079,7 @@ class CurriculumUISystem {
       <div class="cs-container">
         ${adminBarHtml}
         ${floatingBarHtml}
+        ${adminPendingCardHtml}
 
         <!-- BANNER ĐỒNG BỘ SỐ NGÀY ĐỘNG (${totalDaysCount} NGÀY) -->
         <div style="background: linear-gradient(135deg, #8B1518 0%, #B91C1C 100%); border-radius: 18px; padding: 20px 24px; margin-bottom: 22px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; box-shadow: 0 4px 0 #5E0C0E; color: white;">
@@ -947,13 +1163,15 @@ class CurriculumUISystem {
           ${currentDayPlan.nodes.map(node => {
             const compInfo = this.getNodeCompletionInfo(node);
             const isDone = compInfo.isCompleted;
+            const isRemedial = !!node.isRemedial || (node.title || '').includes('ĐẶC TRỊ');
 
             return `
-              <div class="cs-task-card ${isDone ? 'is-done' : ''}">
+              <div class="cs-task-card ${isDone ? 'is-done' : ''}" style="${isRemedial ? 'border-left: 6px solid #EF4444 !important;' : ''}">
                 <div class="cs-task-info">
                   <div class="cs-task-meta">
                     <span class="cs-node-id">${node.id}</span>
                     <span class="cs-node-domain">${node.domain}</span>
+                    ${isRemedial ? `<span style="font-size:11px; font-weight:900; background:#FEE2E2; color:#B91C1C; padding:2px 8px; border-radius:8px;">🚨 BÀI CỨU CÂU SAI</span>` : ''}
                     <span class="cs-node-time">⏱️ Dự kiến: <b>${node.assignedDurationMinutes} phút</b></span>
                   </div>
                   <div class="cs-task-title">
@@ -1010,7 +1228,7 @@ class CurriculumUISystem {
   }
 
   // =========================================================================
-  // 7. LỊCH CHUYÊN CẦN & BANNER LỊCH SỬ (ĐỒNG BỘ LỚP 1-1, LỚP NHÓM & HỌC PHÍ)
+  // 8. LỊCH CHUYÊN CẦN & BANNER LỊCH SỬ (ĐỒNG BỘ LỚP 1-1, LỚP NHÓM & HỌC PHÍ)
   // =========================================================================
   renderTodayHistoryAndCalendar(attempts = [], email = '') {
     this.cachedAttempts = stateManager.sortAttemptsDescending(attempts);
@@ -1374,7 +1592,7 @@ class CurriculumUISystem {
   }
 
   // =========================================================================
-  // 8. MODAL HỌC SINH XIN DỜI LỊCH (STUDENT RESCHEDULE POPUP)
+  // 9. MODAL HỌC SINH XIN DỜI LỊCH (STUDENT RESCHEDULE POPUP)
   // =========================================================================
   injectRescheduleModal() {
     if (document.getElementById('studentRescheduleModal')) return;
