@@ -1,0 +1,123 @@
+{
+  "testId": "fulltest_01",
+  "title": "IELTS Speaking Intensive Full Mock Test - Cambridge 21",
+  "ceilingBand": 9.0,
+  "parts": [
+    {
+      "partNum": 1,
+      "title": "Part 1: Phỏng Vấn Trực Tiếp (8 Câu - 2 Chủ Đề Chuẩn Format)",
+      "instructions": "Trả lời lần lượt từng câu hỏi giao tiếp đời sống (30 - 45s/câu).",
+      "questions": [
+        {
+          "id": "ft_spk_p1_q1",
+          "num": 1,
+          "topicGroup": "Hometown & Residence",
+          "text": "What city or town do you live in, and is it a big city or a small place?",
+          "suggestedTimeSec": 40
+        },
+        {
+          "id": "ft_spk_p1_q2",
+          "num": 2,
+          "topicGroup": "Hometown & Residence",
+          "text": "What do you like most about your hometown, and is there anything you dislike about it?",
+          "suggestedTimeSec": 40
+        },
+        {
+          "id": "ft_spk_p1_q3",
+          "num": 3,
+          "topicGroup": "Hometown & Residence",
+          "text": "What is your hometown famous for?",
+          "suggestedTimeSec": 40
+        },
+        {
+          "id": "ft_spk_p1_q4",
+          "num": 4,
+          "topicGroup": "Hometown & Residence",
+          "text": "Is your hometown a good place for young people to pursue their future careers? Why?",
+          "suggestedTimeSec": 40
+        },
+        {
+          "id": "ft_spk_p1_q5",
+          "num": 5,
+          "topicGroup": "Friends & Socializing",
+          "text": "Do you prefer to spend your free time with one close friend or with a large group of friends?",
+          "suggestedTimeSec": 40
+        },
+        {
+          "id": "ft_spk_p1_q6",
+          "num": 6,
+          "topicGroup": "Friends & Socializing",
+          "text": "Where do you and your friends usually meet when you hang out?",
+          "suggestedTimeSec": 40
+        },
+        {
+          "id": "ft_spk_p1_q7",
+          "num": 7,
+          "topicGroup": "Friends & Socializing",
+          "text": "Do you have a friend that you have known for a very long time?",
+          "suggestedTimeSec": 40
+        },
+        {
+          "id": "ft_spk_p1_q8",
+          "num": 8,
+          "topicGroup": "Friends & Socializing",
+          "text": "Why are true friends so important in modern life?",
+          "suggestedTimeSec": 40
+        }
+      ]
+    },
+    {
+      "partNum": 2,
+      "title": "Part 2: Thuyết Trình Cue Card Chuẩn Khảo Thí (2 Phút)",
+      "instructions": "1 phút chuẩn bị dàn ý trên nháp và 2 phút nói liên tục vào micro.",
+      "cueCard": {
+        "id": "ft_spk_p2_cue",
+        "topic": "A Person Who Achieved Difficult Success",
+        "prompt": "Describe a person you know who did something difficult and was successful.",
+        "subPrompts": [
+          "Who this person is and how you know him/her",
+          "What difficult challenge this person tackled",
+          "Why and how he or she was able to succeed",
+          "And explain how you feel about this person's achievement"
+        ],
+        "prepTimeSec": 60,
+        "talkTimeSec": 120
+      }
+    },
+    {
+      "partNum": 3,
+      "title": "Part 3: Thảo Luận Xã Hội & Phản Biện Chuyên Sâu (4 Câu)",
+      "instructions": "Phân tích đa chiều, đào sâu nguyên nhân và hệ quả xã hội (50 - 60s/câu).",
+      "questions": [
+        {
+          "id": "ft_spk_p3_q1",
+          "num": 1,
+          "text": "What factors drive people toward ambitious goals in competitive societies?",
+          "suggestedTimeSec": 60,
+          "topic": "Ambition & Success"
+        },
+        {
+          "id": "ft_spk_p3_q2",
+          "num": 2,
+          "text": "Do you think financial wealth alone is an accurate measure of a person's life success?",
+          "suggestedTimeSec": 60,
+          "topic": "Defining Success"
+        },
+        {
+          "id": "ft_spk_p3_q3",
+          "num": 3,
+          "text": "Is it always healthy for young people to be intensely ambitious in their early careers?",
+          "suggestedTimeSec": 60,
+          "topic": "Mental Health & Ambition"
+        },
+        {
+          "id": "ft_spk_p3_q4",
+          "num": 4,
+          "text": "Should parents unconditionally support their children's unconventional career ambitions?",
+          "suggestedTimeSec": 60,
+          "topic": "Family Support"
+        }
+      ]
+    }
+  ]
+}
