@@ -3,6 +3,7 @@
  * BỘ MÁY AI KHẢO THÍ CHUẨN XÁC 100% THEO RUBRIC BAND DESCRIPTORS CHÍNH THỨC
  * BẢN FULL ĐẦY ĐỦ 100% - KHÔNG CẮT BỚT BẤT KỲ DÒNG NÀO
  * - TÍCH HỢP TRẦN ĐIỂM RIÊNG THEO TỪNG BÀI TEST: TEST 1 (4.5), TEST 2 (6.0), TEST 3 (7.5), FULL TEST (9.0)
+ * - BAREM ĐẾM TỪ THÔNG MINH THEO TỪNG TEST (TEST 1 CHỈ CẦN 20 TỪ OVERVIEW, KHÔNG PHẠT OAN ĐIỂM)
  * - THUẬT TOÁN SMART OVER-CAP CÓ CHIẾT KHẤU KHI LÀM BÀI XUẤT THẦN
  * - CHẤM ĐỘC LẬP TASK 1 & TASK 2 WRITING, ÁP DỤNG TRỌNG SỐ CHUẨN (T1*1 + T2*2)/3
  * - KHÓA ĐỐI XỨNG CỨNG 100%: BỎ TRỐNG TASK 1 HOẶC TASK 2 ĐỀU BỊ GÁN 0.0 NGAY LẬP TỨC
@@ -39,12 +40,12 @@ function getSpeakingKey() {
 }
 
 // =========================================================================
-// 2. CẤU HÌNH TRẦN ĐIỂM & CHIẾT KHẤU SMART OVER-CAP
+// 2. CẤU HÌNH TRẦN ĐIỂM, CHIẾT KHẤU & BAREM ĐỘ DÀI THEO TỪNG BÀI TEST
 // =========================================================================
 export const TEST_CEILINGS = {
   test_01: {
     cap: 4.5,
-    discountFactor: 0.4, // Vượt cap bị chiết khấu trừ bớt vì đề ngắn
+    discountFactor: 0.4,
     maxAllowed: 6.0,
     label: "Test 1: Nền Tảng (Trần chuẩn: 4.5)"
   },
@@ -69,8 +70,33 @@ export const TEST_CEILINGS = {
 };
 
 /**
+ * Barem độ dài tối thiểu của từng bài Test để AI không phạt oan điểm
+ */
+export const WRITING_WORD_THRESHOLDS = {
+  test_01: {
+    t1Min: 20,  // Test 1 Task 1 chỉ là câu Overview tóm tắt (20 - 35 từ)
+    t2Min: 50,  // Test 1 Task 2 chỉ là 2 đoạn ngắn (50 - 70 từ)
+    label: "Test 1 Nền tảng (Task 1: câu Overview >= 20 từ, Task 2: >= 50 từ)"
+  },
+  test_02: {
+    t1Min: 50,
+    t2Min: 120,
+    label: "Test 2 Chuẩn hóa (Task 1: >= 50 từ, Task 2: >= 120 từ)"
+  },
+  test_03: {
+    t1Min: 90,  // Viết 2 đoạn Body Task 1 (90 - 120 từ)
+    t2Min: 160, // Viết 2 đoạn Body PEEL Task 2 (160 - 200 từ)
+    label: "Test 3 Đỉnh cao (Task 1: >= 90 từ, Task 2: >= 160 từ)"
+  },
+  fulltest: {
+    t1Min: 150, // Chuẩn thi thật 150 từ
+    t2Min: 250, // Chuẩn thi thật 250 từ
+    label: "Full Mock Test (Task 1: >= 150 từ, Task 2: >= 250 từ chuẩn Cambridge)"
+  }
+};
+
+/**
  * Hàm làm tròn điểm chuẩn IELTS theo mốc 0.5 gần nhất
- * Ví dụ: 6.25 -> 6.5 | 6.75 -> 7.0 | 6.15 -> 6.0
  */
 export function roundIELTS(score) {
   const num = parseFloat(score);
@@ -85,7 +111,7 @@ export function roundIELTS(score) {
 /**
  * Thuật toán tính Smart Over-Cap có chiết khấu:
  * Nếu bài làm bình thường -> giữ nguyên.
- * Nếu vượt trần đề thi -> cho phép vượt nhưng trừ bớt hệ số do đề không kiểm tra full tiêu chí.
+ * Nếu vượt trần đề thi -> cho phép vượt nhưng trừ bớt hệ số chiết khấu.
  */
 export function calculateSmartOverCap(rawBand, testId = 'test_01') {
   const raw = parseFloat(rawBand) || 0.0;
@@ -286,13 +312,17 @@ HÃY TRẢ VỀ DUY NHẤT 1 CHUỖI JSON (KHÔNG DÙNG MARKDOWN, KHÔNG \`\`\`j
   }
 
   // =========================================================================
-  // B. CHẤM WRITING CHUẨN RUBRIC (KHÓA ĐỐI XỨNG CỨNG TASK 1 & TASK 2)
+  // B. CHẤM WRITING CHUẨN RUBRIC (BAREM ĐỘ DÀI THEO TỪNG TEST & KHÓA ĐỐI XỨNG)
   // =========================================================================
   async evaluateWritingDiagnostic(testId = 'test_01', promptContext = '', task1Text = '', task2Text = '') {
     const t1Clean = (task1Text || '').trim();
     const t2Clean = (task2Text || '').trim();
     const t1Words = this.sanitizeAndCountWords(t1Clean);
     const t2Words = this.sanitizeAndCountWords(t2Clean);
+
+    const cleanTestId = String(testId).toLowerCase();
+    const thresholds = WRITING_WORD_THRESHOLDS[cleanTestId] || WRITING_WORD_THRESHOLDS.test_01;
+    const cfg = TEST_CEILINGS[cleanTestId] || TEST_CEILINGS.test_01;
 
     // =======================================================================
     // 1. TRƯỜNG HỢP A: BỎ TRỐNG CẢ 2 TASK ➔ TRẢ THẲNG VỀ BAND 0.0 NGAY
@@ -313,7 +343,13 @@ HÃY TRẢ VỀ DUY NHẤT 1 CHUỖI JSON (KHÔNG DÙNG MARKDOWN, KHÔNG \`\`\`j
     // 2. TRƯỜNG HỢP B: CHỈ LÀM TASK 1, BỎ TRỐNG TASK 2 (KHÓA CỨNG TASK 2 = 0.0)
     // =======================================================================
     if (t2Words === 0 && t1Words > 0) {
-      const estimatedT1 = t1Words < 15 ? 1.0 : (t1Words < 40 ? 2.5 : (t1Words < 80 ? 3.5 : 4.5));
+      // Đối chiếu theo barem độ dài của chính bài test đó
+      let estimatedT1 = 2.0;
+      if (t1Words < thresholds.t1Min * 0.5) estimatedT1 = 1.5;
+      else if (t1Words < thresholds.t1Min) estimatedT1 = 2.5;
+      else if (t1Words < thresholds.t1Min * 1.5) estimatedT1 = 3.5;
+      else estimatedT1 = 4.5;
+
       const adjustedT1 = calculateSmartOverCap(estimatedT1, testId);
       // Công thức chuẩn: (T1 * 1 + 0.0 * 2) / 3
       const combined = (parseFloat(adjustedT1) * 1 + 0.0 * 2) / 3;
@@ -334,7 +370,12 @@ HÃY TRẢ VỀ DUY NHẤT 1 CHUỖI JSON (KHÔNG DÙNG MARKDOWN, KHÔNG \`\`\`j
     // 3. TRƯỜNG HỢP C: CHỈ LÀM TASK 2, BỎ TRỐNG TASK 1 (KHÓA CỨNG TASK 1 = 0.0)
     // =======================================================================
     if (t1Words === 0 && t2Words > 0) {
-      const estimatedT2 = t2Words < 15 ? 1.0 : (t2Words < 40 ? 2.0 : (t2Words < 100 ? 3.5 : (t2Words < 180 ? 5.0 : 6.0)));
+      let estimatedT2 = 2.0;
+      if (t2Words < thresholds.t2Min * 0.4) estimatedT2 = 1.5;
+      else if (t2Words < thresholds.t2Min * 0.8) estimatedT2 = 3.0;
+      else if (t2Words < thresholds.t2Min * 1.2) estimatedT2 = 4.5;
+      else estimatedT2 = 6.0;
+
       const adjustedT2 = calculateSmartOverCap(estimatedT2, testId);
       // Công thức chuẩn: (0.0 * 1 + T2 * 2) / 3
       const combined = (0.0 * 1 + parseFloat(adjustedT2) * 2) / 3;
@@ -347,7 +388,7 @@ HÃY TRẢ VỀ DUY NHẤT 1 CHUỖI JSON (KHÔNG DÙNG MARKDOWN, KHÔNG \`\`\`j
         ta_tr: "1.5", cc: "1.5", lr: "1.5", gra: "1.5",
         rubricSummary: `Học sinh chỉ làm Task 2 (${t2Words} từ) và bỏ trống hoàn toàn Task 1 (0 từ). Theo quy chế IELTS, Task 1 chiếm 1/3 tổng điểm nên điểm Writing tổng bị kéo tụt xuống Band ${finalCombinedBand}.`,
         keyMistakes: ["Bỏ trống hoàn toàn bài mô tả Task 1 (Mất 33.3% tổng số điểm Writing)."],
-        band8Upgrade: "Hãy phân bổ 20 phút đầu giờ để hoàn thành trọn vẹn Task 1."
+        band8Upgrade: "Hãy phân bổ thời gian hợp lý để hoàn thành trọn vẹn Task 1."
       };
     }
 
@@ -355,11 +396,15 @@ HÃY TRẢ VỀ DUY NHẤT 1 CHUỖI JSON (KHÔNG DÙNG MARKDOWN, KHÔNG \`\`\`j
     // 4. TRƯỜNG HỢP D: LÀM ĐẦY ĐỦ CẢ 2 TASK -> GỬI AI CHẤM VÀ ÁP DỤNG TRỌNG SỐ
     // =======================================================================
     const apiKey = getWritingKey();
-    const cfg = TEST_CEILINGS[testId] || TEST_CEILINGS.test_01;
 
     const systemPrompt = `
 Bạn là Giám khảo Khảo thí IELTS Writing chính thức của British Council & IDP.
 Hãy đọc bài viết của thí sinh và chấm ĐỘC LẬP TỪNG TASK theo đúng nguyên văn IELTS WRITING BAND DESCRIPTORS.
+
+THÔNG TIN BÀI THI & BAREM ĐỘ DÀI:
+- Loại bài thi: "${cfg.label}"
+- Tiêu chuẩn độ dài của đề này: ${thresholds.label}
+- LƯU Ý ĐẶC BIỆT: Nếu là Test 1, Task 1 chỉ yêu cầu viết 1 câu Overview tóm tắt (tối thiểu ${thresholds.t1Min} từ là đạt chuẩn độ dài), Task 2 yêu cầu viết 2 đoạn ngắn (tối thiểu ${thresholds.t2Min} từ). TUYỆT ĐỐI KHÔNG trừ điểm thí sinh với lý do bài ngắn hơn 150/250 từ của bài thi full.
 
 ĐỀ BÀI: "${promptContext || 'IELTS Academic Writing'}"
 
@@ -395,8 +440,8 @@ TRẢ VỀ DUY NHẤT 1 CHUỖI JSON HỢP LỆ (KHÔNG DÙNG MARKDOWN, KHÔNG \
       const cleanJson = rawRes.replace(/^```json/, '').replace(/```$/, '').trim();
       const parsed = JSON.parse(cleanJson);
 
-      const t1Raw = parseFloat(parsed.task1Band) || (t1Words > 40 ? 3.5 : 2.0);
-      const t2Raw = parseFloat(parsed.task2Band) || (t2Words > 50 ? 3.5 : 2.0);
+      const t1Raw = parseFloat(parsed.task1Band) || (t1Words >= thresholds.t1Min ? 3.5 : 2.0);
+      const t2Raw = parseFloat(parsed.task2Band) || (t2Words >= thresholds.t2Min ? 3.5 : 2.0);
 
       // Tính tổng theo trọng số chuẩn: (T1 * 1 + T2 * 2) / 3
       const rawCombined = (t1Raw * 1 + t2Raw * 2) / 3;
@@ -420,9 +465,15 @@ TRẢ VỀ DUY NHẤT 1 CHUỖI JSON HỢP LỆ (KHÔNG DÙNG MARKDOWN, KHÔNG \
       };
 
     } catch (err) {
-      // Fallback phòng thủ an toàn: Tự tính toán dựa trên số từ thực tế, không bao giờ đội ảo lên 4.5
-      const estT1 = t1Words < 30 ? 2.0 : (t1Words < 70 ? 3.0 : 4.0);
-      const estT2 = t2Words < 40 ? 1.5 : (t2Words < 100 ? 3.0 : 4.0);
+      // Fallback phòng thủ an toàn: Tự tính toán dựa trên barem chuẩn của bài test đó
+      let estT1 = 2.0;
+      if (t1Words >= thresholds.t1Min) estT1 = 3.5;
+      if (t1Words >= thresholds.t1Min * 1.5) estT1 = 4.5;
+
+      let estT2 = 2.0;
+      if (t2Words >= thresholds.t2Min) estT2 = 3.5;
+      if (t2Words >= thresholds.t2Min * 1.5) estT2 = 4.5;
+
       const calcOverall = (estT1 * 1 + estT2 * 2) / 3;
       const safeOverall = calculateSmartOverCap(calcOverall, testId);
 
@@ -434,7 +485,7 @@ TRẢ VỀ DUY NHẤT 1 CHUỖI JSON HỢP LỆ (KHÔNG DÙNG MARKDOWN, KHÔNG \
         cc: safeOverall,
         lr: safeOverall,
         gra: safeOverall,
-        rubricSummary: `Hệ thống tự động chấm điểm dự phòng dựa trên dung lượng câu từ thực tế (Task 1: ${t1Words} từ, Task 2: ${t2Words} từ).`,
+        rubricSummary: `Hệ thống tự động chấm điểm dự phòng dựa trên dung lượng câu từ thực tế (Task 1: ${t1Words} từ, Task 2: ${t2Words} từ) theo tiêu chuẩn ${thresholds.label}.`,
         keyMistakes: ["Cần mở rộng vốn từ vựng học thuật và tránh dịch word-by-word."],
         band8Upgrade: "Hãy xây dựng thói quen viết dàn ý PEEL trước khi gõ bài."
       };
@@ -471,7 +522,8 @@ TRẢ VỀ DUY NHẤT 1 CHUỖI JSON HỢP LỆ (KHÔNG DÙNG MARKDOWN, KHÔNG \
     }
 
     const apiKey = getSpeakingKey();
-    const cfg = TEST_CEILINGS[testId] || TEST_CEILINGS.test_01;
+    const cleanTestId = String(testId).toLowerCase();
+    const cfg = TEST_CEILINGS[cleanTestId] || TEST_CEILINGS.test_01;
 
     const pairsText = (questionsList || []).map((q, idx) => {
       const qText = typeof q === 'string' ? q : (q.text || q.prompt || `Câu hỏi ${idx + 1}`);
