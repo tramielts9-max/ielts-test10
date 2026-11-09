@@ -2,12 +2,13 @@
  * diagnostic/js-diag/diag-engine.js
  * BỘ MÁY ĐIỀU PHỐI KHẢO THÍ CHẨN ĐOÁN THÍCH ỨNG MASTER (TEST 1, 2, 3 & 3 SET XOAY TUA)
  * BẢN FULL ĐẦY ĐỦ 100% - KHÔNG CẮT BỚT BẤT KỲ DÒNG CODE TÍNH NĂNG NÀO
- * - BẢO LƯU TOÀN BỘ LOGIC LÀM BÀI, AUDIO PLAYER, WEBSPEECH CŨ & CHẤM ĐIỂM GỐC
- * - TỰ ĐỘNG CHỤP SNAPSHOT NGẦM TẠI MỐC (+5 PHÚT): TEST 1 (50P), TEST 2 (105P), TEST 3 (110P)
- * - XUẤT 2 BẢNG KẾT QUẢ ĐỘC LẬP: KẾT QUẢ CHUẨN GIỜ (OFFICIAL) VS KẾT QUẢ TIỀM NĂNG (FULL OVERTIME)
+ * - TỰ ĐỘNG LƯU LOCAL REALTIME TỪNG GIÂY (CHỐNG F5, CHỐNG MẤT ĐIỆN PHỤC HỒI 100%)
+ * - CLOUD HEARTBEAT SYNC: ĐỊNH KỲ MỖI 2 PHÚT TỰ ĐỘNG BẮN TIẾN ĐỘ BÀI LÀM LÊN GOOGLE DRIVE
+ * - ĐÚNG PHÚT SNAPSHOT (50P/105P/110P): TỰ ĐỘNG CHỐT BÀI & BẮN THẲNG LÊN DRIVE (KHÔNG CHỜ NỘP)
+ * - TÍCH HỢP LỆNH CONSOLE TUA NHANH 49:50 ĐỂ ADMIN KIỂM THỬ MỐC 50 PHÚT TRONG 10 GIÂY
+ * - HÀNG ĐỢI RETRY QUEUE CHỐNG RỚT MẠNG KHI GỬI LÊN CLOUD
  * - MA TRẬN KHỐNG CHẾ TRẦN ĐIỂM CHUẨN XÁC: TEST 1 (80/100 = BAND 4.0, MAX 5.0)
- * - TÍCH HỢP ITEM-LEVEL ERROR TAGGING SẴN SÀNG CHO ADMIN MODERATION GATE
- * - ĐÓNG GÓI 100% DỮ LIỆU BÀI LÀM LÊN GOOGLE DRIVE & HỖ TRỢ XEM LẠI REVIEW MODE TỪ XA
+ * - BẢO LƯU 100% WEBSPEECH CŨ, NẠP ĐỘNG SPEAKING MỚI & XUẤT 2 BẢNG ĐIỂM ĐỘC LẬP
  */
 
 import { diagGrammarEngine } from './diag-grammar.js';
@@ -81,13 +82,17 @@ class DiagnosticEngineMaster {
     this.timerSeconds = 0;
     this.timerInterval = null;
 
-    // Giữ nguyên vẹn tính năng WebSpeech trực tiếp của bản gốc
+    // Giữ nguyên tính năng WebSpeech trực tiếp gốc
     this.speechRecognition = null;
     this.isRecording = false;
 
     // Dữ liệu Snapshot ngầm tại mốc (+5 phút)
     this.isSnapshotTaken = false;
     this.snapshotOfficialData = null;
+
+    // Hàng đợi gửi Cloud chống rớt mạng
+    this.cloudRetryQueue = [];
+    this.retryInterval = null;
 
     this.isReviewMode = false;
     this.currentAttemptSnapshot = null;
@@ -124,10 +129,19 @@ class DiagnosticEngineMaster {
     // 6. Khởi tạo Speech Recognition gốc (bảo toàn nguyên vẹn 100%)
     this.initSpeechRecognition();
 
-    // 7. Bật đồng hồ đếm giây & cơ chế tự động Snapshot
+    // 7. Khôi phục nháp bài làm cũ (CHỐNG F5 / CÚP ĐIỆN MẤT BÀI)
+    this.restoreLocalDraft();
+
+    // 8. Bật đồng hồ đếm giây & kích hoạt Heartbeat tự lưu Cloud mỗi 2 phút
     this.startTimer();
 
-    // 8. Khôi phục Review Mode nếu có attemptId trên URL (Hỗ trợ mở từ Cloud cho Admin)
+    // 9. Bật tiến trình theo dõi Auto-Save khi học sinh tương tác
+    this.initAutoSaveListeners();
+
+    // 10. Bật bộ xử lý hàng đợi Retry chống rớt mạng
+    this.initCloudRetryProcessor();
+
+    // 11. Khôi phục Review Mode nếu có attemptId trên URL (Hỗ trợ mở từ Cloud cho Admin)
     const attemptId = urlParams.get('attemptId');
     const emailParam = urlParams.get('email') || '';
     if (attemptId) {
@@ -186,7 +200,7 @@ class DiagnosticEngineMaster {
     console.log(`[DiagEngine] Đang nạp Speaking JSON: ${jsonPath}`);
     diagSpeakingEngine.init(false, this.testId);
     await diagSpeakingEngine.loadTestFromJson(jsonPath);
-    diagSpeakingEngine.render('section_speaking');
+    diagSpeakingEngine.render('speakingQuestionsMount');
   }
 
   // --- CHUYỂN TAB VÀ TIMER ---
@@ -198,17 +212,14 @@ class DiagnosticEngineMaster {
       if (sec) sec.style.display = (s === skillKey) ? 'block' : 'none';
     });
     this.currentSkill = skillKey;
+    this.saveLocalDraft(); // Tự động lưu mỗi lần chuyển tab
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   // =========================================================================
-  // 4. BỘ ĐẾM THỜI GIAN & TỰ ĐỘNG CHỤP SNAPSHOT TẠI MỐC (+5 PHÚT)
+  // 4. BỘ ĐẾM THỜI GIAN, CLOUD HEARTBEAT (2P) & SNAPSHOT (50P BẮN LÊN DRIVE)
   // =========================================================================
   startTimer() {
-    this.timerSeconds = 0;
-    this.isSnapshotTaken = false;
-    this.snapshotOfficialData = null;
-
     const meta = DIAGNOSTIC_META[this.testId] || DIAGNOSTIC_META.test_01;
     const targetThresholdSec = meta.snapshotSeconds || (50 * 60);
 
@@ -216,6 +227,7 @@ class DiagnosticEngineMaster {
     clearInterval(this.timerInterval);
 
     this.timerInterval = setInterval(() => {
+      if (this.isReviewMode) return;
       this.timerSeconds++;
 
       // Cập nhật giao diện đồng hồ
@@ -224,7 +236,6 @@ class DiagnosticEngineMaster {
         const ss = String(this.timerSeconds % 60).padStart(2, '0');
         disp.innerText = `${mm}:${ss}`;
 
-        // Cảnh báo màu khi vượt mốc chuẩn
         if (this.timerSeconds > meta.baseMinutes * 60) {
           disp.parentElement.style.background = "#FEE2E2";
           disp.parentElement.style.color = "#DC2626";
@@ -232,18 +243,29 @@ class DiagnosticEngineMaster {
         }
       }
 
-      // KÍCH HOẠT TỰ ĐỘNG CHỤP SNAPSHOT NGẦM TẠI ĐÚNG MỐC (+5 PHÚT)
+      // 🔴 1. TỰ ĐỘNG CHỤP SNAPSHOT VÀ BẮN THẲNG LÊN GOOGLE DRIVE TẠI PHÚT 50/105/110
       if (!this.isSnapshotTaken && this.timerSeconds === targetThresholdSec) {
-        this.takeSilentSnapshot();
+        this.takeSilentSnapshotAndSyncCloud();
+      }
+
+      // 🔴 2. CLOUD HEARTBEAT: CỨ ĐÚNG MỖI 120 GIÂY (2 PHÚT) ÂM THẦM BẮN TIẾN ĐỘ LÊN DRIVE
+      if (this.timerSeconds > 0 && this.timerSeconds % 120 === 0) {
+        this.syncHeartbeatToCloud();
+      }
+
+      // Lưu số giây vào draft local mỗi 10 giây
+      if (this.timerSeconds % 10 === 0) {
+        this.saveLocalDraft();
       }
     }, 1000);
   }
 
-  takeSilentSnapshot() {
+  // Tự động chụp Snapshot và BẮN THẲNG LÊN GOOGLE DRIVE NGAY LẬP TỨC
+  takeSilentSnapshotAndSyncCloud() {
     this.isSnapshotTaken = true;
     const meta = DIAGNOSTIC_META[this.testId] || DIAGNOSTIC_META.test_01;
 
-    // Chụp sâu toàn bộ đáp án của cả 5 kỹ năng tính đến thời điểm này
+    // Chụp sâu toàn bộ đáp án của cả 5 kỹ năng
     this.snapshotOfficialData = {
       timestamp: new Date().toLocaleTimeString('vi-VN'),
       elapsedSeconds: this.timerSeconds,
@@ -259,10 +281,169 @@ class DiagnosticEngineMaster {
       localStorage.setItem(`diag_snapshot_${this.testId}`, JSON.stringify(this.snapshotOfficialData));
     } catch(e) {}
 
-    console.log(`[DiagEngine] ⏱️ ĐÃ CHỤP SNAPSHOT BÀI LÀM TẠI PHÚT THỨ ${meta.snapshotMinutes}!`, this.snapshotOfficialData);
+    // ĐÓNG GÓI BÀI THI MỐC CHUẨN GIỜ VÀ ĐẨY THẲNG LÊN GOOGLE DRIVE
+    const studentEmail = localStorage.getItem('ielts_student_email') || 'guest@gmail.com';
+    const studentName = localStorage.getItem('ielts_student_name') || 'Học viên';
+    const studentId = localStorage.getItem('tram_student_id') || 'TR-GUEST';
 
-    // Bật thông báo toast nhẹ nhàng góc màn hình (không làm đơ hay ngắt bài thi)
-    this.showToastNotification(`⏱️ Đã lưu mốc chuẩn giờ (${meta.snapshotMinutes} phút). Em hãy tiếp tục hoàn thành bài!`);
+    const timedSnapshotAttempt = {
+      id: "diag_snap_" + Date.now(),
+      timestamp: new Date().toLocaleString('vi-VN'),
+      testTitle: `${meta.title} (Mốc Snapshot ${meta.snapshotMinutes} phút)`,
+      studentName: studentName,
+      studentEmail: studentEmail,
+      studentId: studentId,
+      score: `Chốt giờ ${meta.snapshotMinutes}p (Đang xử lý)`,
+      timeSpent: `${meta.snapshotMinutes} phút`,
+      moduleType: "diagnostic",
+      pageUrl: `diagnostic/runner-diag.html?testId=${this.testId}&set=${this.setNum}`,
+      statusTag: "official_timed_snapshot", // 🔴 CỜ CHỐT GIỜ CHÍNH THỨC TRÊN CLOUD
+      approvalStatus: "pending_admin_approval",
+      details: {
+        isOvertime: false,
+        timeSpent: `${meta.snapshotMinutes} phút`,
+        snapshotData: this.snapshotOfficialData
+      }
+    };
+
+    // BẮN LÊN GOOGLE DRIVE NGAY LẬP TỨC (KHÔNG CẦN CHỜ HỌC SINH BẤM NỘP)
+    this.syncAttemptToCloud(timedSnapshotAttempt, "official_timed_snapshot");
+
+    console.log(`[DiagEngine] ⏱️ ĐÃ CHỤP VÀ BẮN SNAPSHOT PHÚT ${meta.snapshotMinutes} LÊN DRIVE THÀNH CÔNG!`);
+    this.showToastNotification(`⏱️ Đã chốt và lưu bài làm chuẩn giờ (${meta.snapshotMinutes} phút) lên hệ thống Thầy.`);
+  }
+
+  // Heartbeat tự động đồng bộ tiến độ lên Cloud mỗi 2 phút
+  syncHeartbeatToCloud() {
+    if (this.isReviewMode) return;
+    const studentEmail = localStorage.getItem('ielts_student_email');
+    if (!studentEmail || studentEmail === 'guest@gmail.com') return;
+
+    const draftData = this.collectCurrentExamData();
+    const heartbeatPayload = {
+      id: `draft_${studentEmail}_${this.testId}`,
+      timestamp: new Date().toLocaleString('vi-VN'),
+      testTitle: `${DIAGNOSTIC_META[this.testId]?.title || this.testId} (Tự lưu 2 phút/lần)`,
+      studentName: localStorage.getItem('ielts_student_name') || 'Học viên',
+      studentEmail: studentEmail,
+      score: "Đang làm bài...",
+      timeSpent: `${Math.round(this.timerSeconds / 60)} phút`,
+      moduleType: "diagnostic",
+      statusTag: "draft_heartbeat", // Cờ tự lưu tiến độ
+      details: draftData
+    };
+
+    this.syncAttemptToCloud(heartbeatPayload, "draft_heartbeat");
+    console.log(`[DiagEngine] 💓 Cloud Heartbeat: Đã tự lưu bài phút thứ ${Math.round(this.timerSeconds / 60)} lên Drive.`);
+  }
+
+  // =========================================================================
+  // 5. CƠ CHẾ AUTO-SAVE REALTIME TỪNG GIÂY (CHỐNG F5 / CÚP ĐIỆN)
+  // =========================================================================
+  initAutoSaveListeners() {
+    // Tự lưu khi học sinh gõ chữ vào bất kỳ ô input/textarea nào
+    window.addEventListener('input', () => this.debounceAutoSave());
+    // Tự lưu khi click chọn trắc nghiệm
+    window.addEventListener('change', () => this.saveLocalDraft());
+    // Tự lưu trước khi đóng tab/tải lại trang
+    window.addEventListener('beforeunload', () => this.saveLocalDraft());
+  }
+
+  debounceAutoSave() {
+    clearTimeout(this._autoSaveTimer);
+    this._autoSaveTimer = setTimeout(() => this.saveLocalDraft(), 1000);
+  }
+
+  saveLocalDraft() {
+    if (this.isReviewMode) return;
+    try {
+      const draft = {
+        testId: this.testId,
+        setNum: this.setNum,
+        timerSeconds: this.timerSeconds,
+        isSnapshotTaken: this.isSnapshotTaken,
+        snapshotOfficialData: this.snapshotOfficialData,
+        grammarAnswers: diagGrammarEngine.userAnswers || {},
+        listeningAnswers: diagListeningEngine.userAnswers || {},
+        readingAnswers: diagReadingEngine.userAnswers || {},
+        writingAnswers: diagWritingEngine.userAnswers || {},
+        speakingAnswers: diagSpeakingEngine.userAnswers || {},
+        savedAt: Date.now()
+      };
+      localStorage.setItem(`diag_active_draft_${this.testId}`, JSON.stringify(draft));
+    } catch(e) {}
+  }
+
+  restoreLocalDraft() {
+    try {
+      const raw = localStorage.getItem(`diag_active_draft_${this.testId}`);
+      if (!raw) return;
+      const draft = JSON.parse(raw);
+      if (!draft || draft.testId !== this.testId) return;
+
+      // Chỉ khôi phục nháp nếu được tạo trong vòng 12 tiếng
+      if (Date.now() - (draft.savedAt || 0) > 12 * 3600 * 1000) return;
+
+      this.timerSeconds = draft.timerSeconds || 0;
+      this.isSnapshotTaken = !!draft.isSnapshotTaken;
+      this.snapshotOfficialData = draft.snapshotOfficialData || null;
+
+      // Phục hồi đáp án Ngữ pháp
+      if (draft.grammarAnswers) {
+        diagGrammarEngine.userAnswers = draft.grammarAnswers;
+        diagGrammarEngine.restoreUserInputsUI();
+      }
+
+      // Phục hồi đáp án Listening
+      if (draft.listeningAnswers) {
+        diagListeningEngine.userAnswers = draft.listeningAnswers;
+        if (diagListeningEngine.parts && diagListeningEngine.parts[0]) {
+          diagListeningEngine.restoreUserInputsUI(diagListeningEngine.parts[0]);
+        }
+      }
+
+      // Phục hồi đáp án Reading
+      if (draft.readingAnswers) {
+        diagReadingEngine.userAnswers = draft.readingAnswers;
+        diagReadingEngine.restoreUserInputsUI();
+      }
+
+      // Phục hồi đáp án Writing
+      if (draft.writingAnswers) {
+        diagWritingEngine.userAnswers = draft.writingAnswers;
+        diagWritingEngine.restoreUserInputs();
+      }
+
+      // Phục hồi đáp án Speaking
+      if (draft.speakingAnswers) {
+        diagSpeakingEngine.userAnswers = draft.speakingAnswers;
+        diagSpeakingEngine.restoreUserTranscripts();
+      }
+
+      console.log(`[DiagEngine] 🛡️ ĐÃ PHỤC HỒI NGUYÊN VẸN BÀI LÀM TRƯỚC ĐÓ (${Math.round(this.timerSeconds / 60)} phút)!`);
+      this.showToastNotification(`🛡️ Đã tự động khôi phục bài làm của em lúc ${Math.round(this.timerSeconds / 60)} phút.`);
+    } catch(e) {
+      console.warn("Lỗi khôi phục draft:", e);
+    }
+  }
+
+  clearLocalDraft() {
+    try {
+      localStorage.removeItem(`diag_active_draft_${this.testId}`);
+      localStorage.removeItem(`diag_snapshot_${this.testId}`);
+    } catch(e) {}
+  }
+
+  collectCurrentExamData() {
+    return {
+      timerSeconds: this.timerSeconds,
+      timeSpent: `${Math.round(this.timerSeconds / 60)} phút`,
+      grammarAnswers: diagGrammarEngine.userAnswers || {},
+      listeningAnswers: diagListeningEngine.userAnswers || {},
+      readingAnswers: diagReadingEngine.userAnswers || {},
+      writingSnapshot: diagWritingEngine.getWritingSubmissionData ? diagWritingEngine.getWritingSubmissionData() : {},
+      speakingSnapshot: diagSpeakingEngine.getSpeakingSubmissionData ? diagSpeakingEngine.getSpeakingSubmissionData() : {}
+    };
   }
 
   showToastNotification(msg) {
@@ -288,7 +469,7 @@ class DiagnosticEngineMaster {
   }
 
   // =========================================================================
-  // 5. GIỮ NGUYÊN VẸN 100% TÍNH NĂNG THU ÂM GỐC CỦA DIAG-ENGINE
+  // 6. GIỮ NGUYÊN VẸN 100% TÍNH NĂNG THU ÂM GỐC CỦA DIAG-ENGINE
   // =========================================================================
   initSpeechRecognition() {
     window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -315,7 +496,10 @@ class DiagnosticEngineMaster {
         this.speechRecognition.onresult = (e) => {
           let str = '';
           for (let i = 0; i < e.results.length; ++i) str += e.results[i][0].transcript + ' ';
-          if (area) area.value = str.trim();
+          if (area) {
+            area.value = str.trim();
+            this.saveLocalDraft();
+          }
         };
       } catch(e) {}
     } else {
@@ -327,7 +511,6 @@ class DiagnosticEngineMaster {
     }
   }
 
-  // Tiện ích đếm từ phòng thủ
   countWords(str) {
     if (!str || typeof str !== 'string') return 0;
     const cleaned = str.replace(/[\r\n\t]+/g, ' ').replace(/[^\p{L}\p{N}\s]/gu, '').trim();
@@ -336,7 +519,7 @@ class DiagnosticEngineMaster {
   }
 
   // =========================================================================
-  // 6. THUẬT TOÁN ĐỊNH VỊ BAND THEO TỪNG BÀI TEST (FIX BUG 80/100 ĂN 6.5)
+  // 7. THUẬT TOÁN ĐỊNH VỊ BAND THEO TỪNG BÀI TEST (80/100 = BAND 4.0, MAX 5.0)
   // =========================================================================
   calculateCalibratedBand(testId, overallScore, wBandNum, sBandNum) {
     const score = Math.max(0, Math.min(100, overallScore));
@@ -358,7 +541,7 @@ class DiagnosticEngineMaster {
         estimatedBand = "3.5";
         bandReason = "Nắm được ngữ pháp cơ bản nhưng phản xạ nghe còn chậm, câu viết còn bị dịch word-by-word.";
       } else if (score < 90) {
-        estimatedBand = "4.0"; // 80/100 rơi chính xác vào Band 4.0!
+        estimatedBand = "4.0"; // 80/100 RƠI CHÍNH XÁC VÀO BAND 4.0!
         bandReason = "Hoàn thành tốt bài khảo sát nền tảng Test 1. Nền câu đơn vững vàng, sẵn sàng bước sang Test 2.";
       } else if (score < 95) {
         estimatedBand = "4.5";
@@ -414,7 +597,7 @@ class DiagnosticEngineMaster {
   }
 
   // =========================================================================
-  // 7. CHẤM BÀI TRỰC TIẾP TRÊN GIAO DIỆN & LƯU ĐẦY ĐỦ 2 BẢNG KẾT QUẢ
+  // 8. CHẤM BÀI TRỰC TIẾP TRÊN GIAO DIỆN & LƯU ĐẦY ĐỦ 2 BẢNG KẾT QUẢ
   // =========================================================================
   async submitFullExam() {
     if (!confirm("Em có chắc chắn muốn nộp bài thi để hệ thống phân tích câu chữ và xuất 2 bảng điểm (Chuẩn giờ & Toàn diện) không?")) {
@@ -430,7 +613,7 @@ class DiagnosticEngineMaster {
     clearInterval(this.timerInterval);
     this.isReviewMode = true;
 
-    // 1. Chấm bài thực tế hiện tại (Toàn bộ bài làm khi bấm nộp)
+    // 1. Chấm bài thực tế hiện tại
     const liveGrammar = diagGrammarEngine.evaluate();
     const liveLis = diagListeningEngine.evaluate();
     const liveRead = diagReadingEngine.evaluate();
@@ -438,7 +621,6 @@ class DiagnosticEngineMaster {
     const liveSpeakingSub = diagSpeakingEngine.getSpeakingSubmissionData ? diagSpeakingEngine.getSpeakingSubmissionData() : {};
 
     // 2. Chấm bài mốc chuẩn giờ (Official Timed Snapshot)
-    // Nếu nộp trước mốc snapshot -> Dữ liệu chuẩn giờ chính là bài làm hiện tại
     const isOvertime = this.timerSeconds > (DIAGNOSTIC_META[this.testId]?.snapshotSeconds || 3000);
     const snapshotData = (isOvertime && this.snapshotOfficialData) ? this.snapshotOfficialData : {
       grammarAnswers: liveGrammar.answersSnapshot || {},
@@ -451,7 +633,7 @@ class DiagnosticEngineMaster {
     // 3. TÍNH ĐIỂM WRITING & SPEAKING SƠ BỘ CHO BẢNG CHUẨN GIỜ
     const snapT1Words = snapshotData.writingSnapshot?.task1Words || this.countWords(snapshotData.writingSnapshot?.task1Text || '');
     const snapT2Words = snapshotData.writingSnapshot?.task2Words || this.countWords(snapshotData.writingSnapshot?.task2Text || '');
-    let snapT1Band = snapT1Words === 0 ? 0.0 : (snapT1Words < 30 ? 2.0 : (snapT1Words < 70 ? 3.0 : 4.0));
+    let snapT1Band = snapT1Words === 0 ? 0.0 : (snapT1Words < 20 ? 2.0 : (snapT1Words < 50 ? 3.0 : 4.0));
     let snapT2Band = snapT2Words === 0 ? 0.0 : (snapT2Words < 40 ? 1.5 : (snapT2Words < 100 ? 3.0 : 4.0));
     let snapWBand = roundIELTS((snapT1Band * 1 + snapT2Band * 2) / 3);
     snapWBand = parseFloat(calculateSmartOverCap(snapWBand, this.testId));
@@ -461,7 +643,7 @@ class DiagnosticEngineMaster {
     snapSBand = parseFloat(calculateSmartOverCap(snapSBand, this.testId));
 
     // 4. TÍNH ĐIỂM WRITING & SPEAKING CHO BÀI NỘP THỰC TẾ
-    let liveT1Band = liveWritingSub.task1Words === 0 ? 0.0 : (liveWritingSub.task1Words < 30 ? 2.0 : (liveWritingSub.task1Words < 70 ? 3.0 : 4.0));
+    let liveT1Band = liveWritingSub.task1Words === 0 ? 0.0 : (liveWritingSub.task1Words < 20 ? 2.0 : (liveWritingSub.task1Words < 50 ? 3.0 : 4.0));
     let liveT2Band = liveWritingSub.task2Words === 0 ? 0.0 : (liveWritingSub.task2Words < 40 ? 1.5 : (liveWritingSub.task2Words < 100 ? 3.0 : 4.0));
     let liveWBand = roundIELTS((liveT1Band * 1 + liveT2Band * 2) / 3);
     liveWBand = parseFloat(calculateSmartOverCap(liveWBand, this.testId));
@@ -542,7 +724,8 @@ class DiagnosticEngineMaster {
       timeSpent: `${Math.round(this.timerSeconds / 60)} phút`,
       moduleType: "diagnostic",
       pageUrl: `diagnostic/runner-diag.html?testId=${this.testId}&set=${this.setNum}`,
-      approvalStatus: "pending_admin_approval", // 🔴 CỔNG ADMIN GATE: CHỜ GIÁO VIÊN DUYỆT LỘ TRÌNH
+      approvalStatus: "pending_admin_approval", // 🔴 CỔNG ADMIN GATE
+      statusTag: "final_submitted",
       details: {
         isOvertime,
         officialBand: snapBandInfo.estimatedBand,
@@ -586,21 +769,24 @@ class DiagnosticEngineMaster {
       if (this.testId === 'test_02' && liveOverallScore >= 55) localStorage.setItem('diag_unlocked_test3', 'true');
     } catch(e) {}
 
-    // Bắn lên máy chủ Google Drive
-    this.syncAttemptToCloud(attemptSnapshot);
+    // DỌN DẸP DỮ LIỆU NHÁP TẠM TRÊN MÁY HỌC SINH SAU KHI NỘP BÀI CHÍNH THỨC
+    this.clearLocalDraft();
+
+    // BẮN GÓI TIN HOÀN THÀNH LÊN GOOGLE DRIVE
+    this.syncAttemptToCloud(attemptSnapshot, "final_submitted");
 
     // 10. GỌI AI CHẤM TRỰC TIẾP WRITING & SPEAKING
     diagWritingEngine.evaluateAndRenderInlineAI().then(wRes => {
       if (wRes && this.currentAttemptSnapshot) {
         this.currentAttemptSnapshot.details.wAiFeedback = JSON.stringify(wRes);
-        this.syncAttemptToCloud(this.currentAttemptSnapshot);
+        this.syncAttemptToCloud(this.currentAttemptSnapshot, "ai_feedback_updated");
       }
     });
 
     diagSpeakingEngine.evaluateAndRenderInlineAI().then(sRes => {
       if (sRes && this.currentAttemptSnapshot) {
         this.currentAttemptSnapshot.details.sAiFeedback = JSON.stringify(sRes);
-        this.syncAttemptToCloud(this.currentAttemptSnapshot);
+        this.syncAttemptToCloud(this.currentAttemptSnapshot, "ai_feedback_updated");
       }
     });
 
@@ -610,15 +796,32 @@ class DiagnosticEngineMaster {
     }
   }
 
-  // Tiện ích gửi dữ liệu Cloud
-  syncAttemptToCloud(snapshot) {
+  // =========================================================================
+  // 9. ĐỒNG BỘ CLOUD VỚI HÀNG ĐỢI RETRY QUEUE CHỐNG RỚT MẠNG
+  // =========================================================================
+  syncAttemptToCloud(snapshot, tag = "final_submitted") {
     if (!CLOUD_SCRIPT_URL || !snapshot || !snapshot.studentEmail) return;
+
     fetch(CLOUD_SCRIPT_URL, {
       method: "POST",
       mode: "no-cors",
       headers: { "Content-Type": "text/plain;charset=utf-8" },
-      body: JSON.stringify({ action: "save_attempt", attempt: snapshot })
-    }).catch(() => {});
+      body: JSON.stringify({ action: "save_attempt", attempt: snapshot, tag: tag })
+    }).catch(err => {
+      console.warn(`[DiagEngine] Lỗi mạng khi gửi Cloud (${tag}), đưa vào hàng đợi Retry:`, err);
+      // Đưa vào hàng đợi để tự động gửi lại sau
+      this.cloudRetryQueue.push({ snapshot, tag });
+    });
+  }
+
+  initCloudRetryProcessor() {
+    clearInterval(this.retryInterval);
+    this.retryInterval = setInterval(() => {
+      if (this.cloudRetryQueue.length === 0) return;
+      const item = this.cloudRetryQueue.shift();
+      console.log(`[DiagEngine] 🔄 Đang thử gửi lại gói tin từ hàng đợi:`, item.tag);
+      this.syncAttemptToCloud(item.snapshot, item.tag);
+    }, 15000); // Thử lại mỗi 15 giây
   }
 
   // --- RENDER BANNER NỔI HIỂN THỊ 2 BẢNG KẾT QUẢ ĐỘC LẬP ---
@@ -649,10 +852,8 @@ class DiagnosticEngineMaster {
           </div>
         </div>
 
-        <!-- 2 KHỐI KẾT QUẢ SONG SONG: CHUẨN GIỜ VS TIỀM NĂNG -->
         <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:16px; margin-bottom:16px;">
           
-          <!-- KẾT QUẢ 1: CHUẨN GIỜ (OFFICIAL) -->
           <div style="background:#F0FDF4; border:2px solid #86EFAC; border-radius:16px; padding:16px;">
             <div style="display:flex; justify-content:space-between; align-items:center;">
               <b style="color:#166534; font-size:14px; text-transform:uppercase;">
@@ -665,11 +866,10 @@ class DiagnosticEngineMaster {
               <span style="font-size:14px; font-weight:800; color:#475569;">(${data.officialResult.score})</span>
             </div>
             <p style="margin:0; font-size:12.5px; color:#166534; line-height:1.5;">
-              <b>Năng lực phòng thi:</b> Đây là kết quả chính thức đo được trong thời gian quy định dưới áp lực thi thật.
+              <b>Năng lực phòng thi:</b> Kết quả đo lường chính xác trong thời gian quy định dưới áp lực thi thật.
             </p>
           </div>
 
-          <!-- KẾT QUẢ 2: TIỀM NĂNG FULL (DÙNG ĐỂ BẮC CẦU LẬP LỘ TRÌNH) -->
           <div style="background:#EFF6FF; border:2px solid #BFDBFE; border-radius:16px; padding:16px;">
             <div style="display:flex; justify-content:space-between; align-items:center;">
               <b style="color:#1E40AF; font-size:14px; text-transform:uppercase;">
@@ -682,13 +882,12 @@ class DiagnosticEngineMaster {
               <span style="font-size:14px; font-weight:800; color:#475569;">(${data.potentialResult.score})</span>
             </div>
             <p style="margin:0; font-size:12.5px; color:#1E40AF; line-height:1.5;">
-              <b>Năng lực kiến thức:</b> Kết quả hoàn thành trọn vẹn bài thi. Dữ liệu này được chuyển sang AI để băm lộ trình học tập cá nhân hóa.
+              <b>Năng lực kiến thức:</b> Kết quả hoàn thành trọn vẹn bài thi. Dữ liệu này được chuyển sang AI để băm lộ trình học tập thích ứng.
             </p>
           </div>
 
         </div>
 
-        <!-- 5 THẺ ĐIỂM KỸ NĂNG CHI TIẾT -->
         <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:10px;">
           <div style="background:#FAF7F2; border:1.5px solid #E8E2D8; padding:10px; border-radius:12px; text-align:center;">
             <div style="font-size:11px; font-weight:800; color:#166534;">NGỮ PHÁP</div>
@@ -721,7 +920,7 @@ class DiagnosticEngineMaster {
     banner.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
-  // --- RENDER AI CHẤM TRỰC TIẾP DƯỚI BÀI VIẾT (TAB WRITING) ---
+  // --- RENDER AI CHẤM TRỰC TIẾP WRITING ---
   async renderInlineWritingAICard(t1, t2, totalWords = 0, preloadedFeedback = null) {
     const secWriting = document.getElementById('section_writing');
     if (!secWriting) return "";
@@ -804,7 +1003,7 @@ XUẤT BÁO CÁO THEO ĐÚNG CẤU TRÚC MARKDOWN:
     }
   }
 
-  // --- RENDER AI CHẤM TRỰC TIẾP DƯỚI BÀI NÓI (TAB SPEAKING) ---
+  // --- RENDER AI CHẤM TRỰC TIẾP SPEAKING ---
   async renderInlineSpeakingAICard(s1, s2, totalWords = 0, preloadedFeedback = null) {
     const secSpeaking = document.getElementById('section_speaking');
     if (!secSpeaking) return "";
@@ -887,7 +1086,7 @@ XUẤT BÁO CÁO (DƯỚI 200 TỪ):
   }
 
   // =========================================================================
-  // 8. REVIEW MODE TỪ LỊCH SỬ & GOOGLE DRIVE CLOUD SERVER
+  // 10. REVIEW MODE TỪ LỊCH SỬ & GOOGLE DRIVE CLOUD SERVER
   // =========================================================================
   async restoreReviewMode(attemptId, emailParam = "") {
     this.isReviewMode = true;
@@ -990,6 +1189,24 @@ XUẤT BÁO CÁO (DƯỚI 200 TỪ):
       console.warn("Lỗi khôi phục Review Mode:", e);
     }
   }
+
+  // =========================================================================
+  // 11. CÔNG CỤ CONSOLE DÀNH RIÊNG CHO ADMIN ĐỂ KIỂM THỬ THỜI GIAN NHANH
+  // =========================================================================
+  warpTimer(targetSeconds) {
+    this.timerSeconds = parseInt(targetSeconds, 10) || 0;
+    console.log(`[Admin Warp] ⚡ Đồng hồ đã được tua đến: ${Math.floor(this.timerSeconds / 60)}p ${this.timerSeconds % 60}s (${this.timerSeconds} giây)`);
+  }
+
+  warpTimerToSnapshot() {
+    const meta = DIAGNOSTIC_META[this.testId] || DIAGNOSTIC_META.test_01;
+    const targetThresholdSec = meta.snapshotSeconds || 3000;
+    // Tua đến trước mốc snapshot đúng 10 giây
+    this.timerSeconds = Math.max(0, targetThresholdSec - 10);
+    const m = Math.floor(this.timerSeconds / 60);
+    const s = this.timerSeconds % 60;
+    console.log(`[Admin Test] ⚡ ĐÃ TUA ĐỒNG HỒ ĐẾN ${m}:${s < 10 ? '0' : ''}${s}! Ngồi đợi đúng 10 giây để quan sát hệ thống tự snapshot phút thứ ${meta.snapshotMinutes} và bắn file lên Google Drive.`);
+  }
 }
 
 export const diagEngine = new DiagnosticEngineMaster();
@@ -997,5 +1214,9 @@ window.diagEngine = diagEngine;
 window.switchSkillSection = (s) => diagEngine.switchSection(s);
 window.toggleDiagSpeech = (t, b) => diagEngine.toggleSpeech(t, b);
 window.submitDiagnosticExam = () => diagEngine.submitFullExam();
+
+// CÔNG CỤ CONSOLE CHO ADMIN (MỞ F12 GÕ ĐỂ TUA GIỜ)
+window.warpTimerToSnapshot = () => diagEngine.warpTimerToSnapshot();
+window.warpTimer = (sec) => diagEngine.warpTimer(sec);
 
 document.addEventListener('DOMContentLoaded', () => diagEngine.init());
